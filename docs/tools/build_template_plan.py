@@ -49,7 +49,7 @@ body{color:var(--ink)}.cover .course{color:var(--accent);border-color:var(--acce
  .diagram{overflow-x:auto}.diagram svg{min-width:720px}.draft{font-size:13px}.indent{margin-left:0}
 }
 '''
-# v0.12: submission content; no changes to the Factory I/O or PLC prototype.
+# v0.13: submission content; no changes to the Factory I/O or PLC prototype.
 # Reference: user-supplied "디지털 트윈 2B 계획서.hwpx" (4조), 2026-11-17.
 # Its process/data/interface structure is referenced; numerical claims are not adopted.
 css+='''
@@ -64,7 +64,7 @@ css+='''
 # Title and heading styles read from the supplied 4조 HWPX charPr 13/10/15/21.
 # 휴먼명조 is unavailable locally; Batang is the HWPX-declared substitution.
 css+='''
-@font-face{font-family:PlanHeadline;src:url("assets/plan_v0.12-headline.ttf") format("truetype");font-weight:400;font-style:normal}
+@font-face{font-family:PlanHeadline;src:url("assets/plan_v0.13-headline.ttf") format("truetype");font-weight:400;font-style:normal}
 h1{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:20pt;font-weight:400;color:#000;text-align:center;line-height:1.6;letter-spacing:0}
 h2{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:15pt;font-weight:400;color:#3a3c84;text-align:left;line-height:1.6;letter-spacing:0}
 h3,h4{font-family:"휴먼명조","Batang","바탕",serif;font-size:13pt;font-weight:700;color:#000;text-align:left;line-height:1.6;letter-spacing:0}
@@ -125,9 +125,9 @@ overview+=arrow('M210 90H260',235,True,True)+arrow('M460 90H510',235,True,True)
 overview+=label(360,23,'배터리 전공정·조립 및 검사·후공정 통합 구성안')
 overview+=label(235,180,'공급 상태·ID')+label(485,180,'검사 결과·제품 ID')
 overview+=label(360,218,'점선: 조별 시스템 간 데이터·인터록 연계 계획 (실물 반송 경로와 구분)')+'</svg></div>'
-pages.append(page('''<p class="draft">v0.12 · 계획서 개정안</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
+pages.append(page('''<p class="draft">v0.13 · 계획서 개정안</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
 <h2>1. 프로젝트 개요</h2><h3>1) 추진 목적 및 적용 범위</h3>
-<p>본 프로젝트는 PLC·로봇·비전 기반 배터리 조립·검사 공정과 연계하여 셀 입고검사, 등급별 분류 및 매칭 공급을 수행하는 가상 전공정을 구축하는 것을 목적으로 한다. 셀의 합격 여부와 특성에 따른 세트 구성을 구분하여 관리하며, 가상 설비에서 분류 시퀀스와 공급 인터록을 검증한 후 실물 설비 연계 조건을 수립한다.</p><figure class="equipment-figure"><img src="assets/line-top-v0.12.svg" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><figcaption>개략 배치도</figcaption></figure><div class="scope-strip"><span><b>3조</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>4조</b> 가상 후공정</span></div>
+<p>본 프로젝트의 핵심 과제는 구간별 셀 공급이 순서별 구성 대비 세트 내 전압 편차를 줄이면서 필요한 공급량과 대기시간 조건을 충족하는지 검증하는 것이다. 이를 위해 배터리 조립·검사 공정과 연계할 가상 전공정을 설계한다. 부적합·보류 재고의 공급 차단과 셀·세트 ID 및 인계 수량의 일치를 필수 조건으로 두고 공급 방식의 채택 여부를 판단한다.</p><figure class="equipment-figure"><img src="assets/line-top-v0.13.svg" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><figcaption>개략 배치도</figcaption></figure><div class="scope-strip"><span><b>3조</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>4조</b> 가상 후공정</span></div>
 <h3>2) 주요 개발 범위 및 기능</h3>'''+cards([
 ('입고검사 및 등급 분류','셀 ID·LOT에 유효 검사값을 연결하고 합격 셀을 A·B·C 전압 구간으로 분류'),
 ('공급 조건 검증','동일 전압 구간 4셀 구성, 보류·재고·세트 편차 확인 후 공급 허가'),
@@ -151,10 +151,10 @@ pages.append(page('''<h2>2. 프로젝트 목표</h2><h3>1) 핵심 관리 지표 
 ['NG 공급 차단','NG 공급 유출 0건','부적합·보류 확정 후 신규 공급 차단 확인. 이전 인계분은 추적·통보 기록'],
 ['LOT 보류','확정 NG 누적 3건 시 보류<br>(교육용 정책값)','측정 오류는 NG 누계에서 제외. 해당 LOT의 대기 재고·미공급 세트 차단 확인'],
 ['4셀 공급·이력','동일 구간 4셀 공급<br>구성 셀 ID 연결','배출 수량·출구 감지·요청 ID별 수신 확인 대조. 이력 저장 상태는 별도 관리'],
-['공급 성과','공급률·대기시간 병행 평가','완성 세트 수, 공급 셀 수/합격 입력 셀 수, 잔여·보류 수량과 대기시간 기록']], [23,30,47],'tight')+'''
+['공급 성과','요구 공급량·공급률 및<br>대기 상한을 시험 전 확정','완성 세트 수, 공급 셀 수/합격 입력 셀 수, 잔여·보류 수량과 대기시간을 요구조건과 대조']], [23,30,47],'tight')+'''
 <h3>2) 세트 내 전압 편차 평가 방법</h3>'''+comparison+'''
 <p class="formula">세트 편차(mV) = 세트 내 최대 전압 - 최소 전압<br>감소율(%) = (순서별 평균 편차 - 등급별 평균 편차) ÷ 순서별 평균 편차 × 100</p>
-<p class="compact">두 방식에 동일한 합격 셀·입력 순서·관찰 시간·시뮬레이션 배속을 적용한다. 구간 기준은 평가 전 고정하며, 가능하면 기준 설정 데이터와 평가 데이터를 분리한다. 완성 세트 편차와 함께 공급률·잔여 재고·대기시간을 제시한다. 비교 대상 셀이 다르면 공통 셀 집합으로 두 방식을 재구성하여 편차를 별도로 비교한다. 기준 편차가 0이면 감소율 대신 편차값을 보고하며, 50%는 첫 시험 후 적정성을 검토한다.</p>
+<p class="compact">두 방식에 동일한 합격 셀·입력 순서·관찰 시간·시뮬레이션 배속을 적용한다. 구간 기준은 평가 전 고정하며, 가능하면 기준 설정 데이터와 평가 데이터를 분리한다. 완성 세트 편차와 함께 공급률·잔여 재고·대기시간을 제시한다. 비교 대상 셀이 다르면 공통 셀 집합으로 두 방식을 재구성하여 편차를 별도로 비교한다. 기준 편차가 0이면 감소율 대신 편차값을 보고하며, 50%는 첫 시험 후 적정성을 검토한다. 편차 목표와 사전 확정한 공급·대기 조건 및 공급 차단·ID 일치 조건을 모두 충족할 때 구간별 공급안을 채택한다.</p>
 <h3>3) 교육 및 수행 역량 목표</h3>'''+cards([
 ('설계·인터페이스','설비 배치, 태그 연결, PLC 순차 제어와 공급 인터록 설계'),
 ('시운전·피드백','정지·비상정지·걸림·통신 단절 시험 및 원인별 수정 기록'),
@@ -331,6 +331,6 @@ pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>추진 기간: 2026
 
 assert len(pages)==12
 assert not any(term in ''.join(pages) for term in ['C 라인','실물 C','C →','→ C','왕 성 식','A팀','B팀'])
-document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.12</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
-(BASE/'plan_v0.12.html').write_text(document,encoding='utf-8')
-print('Created',BASE/'plan_v0.12.html')
+document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.13</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
+(BASE/'plan_v0.13.html').write_text(document,encoding='utf-8')
+print('Created',BASE/'plan_v0.13.html')
