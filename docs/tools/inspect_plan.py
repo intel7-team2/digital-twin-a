@@ -5,7 +5,7 @@ import pypdfium2 as pdfium
 from pypdf import PdfReader
 
 base = Path(__file__).resolve().parents[1]
-stem=sys.argv[1] if len(sys.argv)>1 else 'plan_v0.14'
+stem=sys.argv[1] if len(sys.argv)>1 else 'plan_v0.15'
 out = base / '.qa' / stem
 out.mkdir(parents=True, exist_ok=True)
 doc = pdfium.PdfDocument(base / (stem+'.pdf'))

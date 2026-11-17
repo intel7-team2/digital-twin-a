@@ -18,9 +18,11 @@ if not (ASSETS/'institution-logo.png').exists():
         pass
     (ASSETS/'institution-logo.png').write_bytes(logo)
 
-def table(headers, rows, widths=None, cls=''):
+def table(headers, rows, widths=None, cls='', align=None):
+    # align: one letter per column, c = center, l = left. Default centers only the first column.
+    align = align or 'c'+'l'*(len(headers)-1)
     cols='<colgroup>'+''.join(f'<col style="width:{x}%">' for x in widths)+'</colgroup>' if widths else ''
-    return f'<table class="{cls}">{cols}<thead><tr>'+''.join(f'<th>{h}</th>' for h in headers)+'</tr></thead><tbody>'+''.join('<tr>'+''.join(f'<td>{c}</td>' for c in row)+'</tr>' for row in rows)+'</tbody></table>'
+    return f'<table class="{cls}">{cols}<thead><tr>'+''.join(f'<th>{h}</th>' for h in headers)+'</tr></thead><tbody>'+''.join('<tr>'+''.join(f'<td class="a-{align[i]}">{c}</td>' for i,c in enumerate(row))+'</tr>' for row in rows)+'</tbody></table>'
 
 def page(content,n,cls=''):
     return f'<section class="page {cls}">{content}<footer>- {n} -</footer></section>'
@@ -50,7 +52,8 @@ body{color:var(--ink)}.cover .course{color:var(--accent);border-color:var(--acce
 }
 '''
 # v0.14: submission content; no changes to the Factory I/O or PLC prototype.
-# Reference: user-supplied "디지털 트윈 2B 계획서.hwpx" (4조), 2026-11-17.
+# v0.15: team review (2026-11-18) - 2A/2B names, period to 12/1, 2-n) numbering, column alignment, B lane line.
+# Reference: user-supplied "디지털 트윈 2B 계획서.hwpx" (2B), 2026-11-17.
 # Its process/data/interface structure is referenced; numerical claims are not adopted.
 css+='''
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:3mm 0 4mm}
@@ -61,7 +64,7 @@ css+='''
 .compact{font-size:9pt}.legend{font-size:8.5pt;color:#444;margin:1mm 0 3mm}
 @media screen and (max-width:820px){.cards{grid-template-columns:1fr}.card,.card b,.compact,.legend{font-size:16px}}
 '''
-# Title and heading styles read from the supplied 4조 HWPX charPr 13/10/15/21.
+# Title and heading styles read from the supplied 2B HWPX charPr 13/10/15/21.
 # 휴먼명조 is unavailable locally; Batang is the HWPX-declared substitution.
 css+='''
 @font-face{font-family:PlanHeadline;src:url("assets/plan_v0.14-headline.ttf") format("truetype");font-weight:400;font-style:normal}
@@ -71,6 +74,7 @@ h3,h4{font-family:"휴먼명조","Batang","바탕",serif;font-size:13pt;font-wei
 .cover .course{font-family:"HY견고딕","HYGothic-Extra";font-size:20pt;font-weight:700;color:#0066ff;line-height:1.6;border-color:#3a3c84}
 .cover .task{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:20pt;font-weight:400;color:#000;line-height:1.6}
 '''
+css+='td.a-c{text-align:center}td.a-l{text-align:left}'
 css+='''
 .equipment-figure{margin:3mm 0 2mm}.equipment-figure img{width:100%;height:56mm;object-fit:contain;display:block}
 .equipment-figure figcaption{font-size:8pt;color:#525252;text-align:center;margin-top:1mm}
@@ -113,21 +117,21 @@ def label(x,y,text):
 # 1. Keep the institution's cover and confirmed group/instructor information.
 pages.append(page('''<div class="course">[인텔] AI 융합 DX 마스터 클래스<br>프로젝트 실시 계획서</div>
 <div class="task">【 과제명 】<br>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈</div>
-<table class="info"><tbody><tr><th>교과목명</th><td style="color:#0b63b6;font-weight:700">[인텔] AI 융합 DX 마스터 클래스</td></tr><tr><th>지도교수</th><td>김 유 성</td></tr><tr><th>팀 구분</th><td>3조</td></tr><tr><th>팀 장</th><td>최예현</td></tr><tr><th>팀 원</th><td>이순필, 박해준, 정연우, 김동혁</td></tr></tbody></table>
+<table class="info"><tbody><tr><th>교과목명</th><td style="color:#0b63b6;font-weight:700">[인텔] AI 융합 DX 마스터 클래스</td></tr><tr><th>지도교수</th><td>김 유 성</td></tr><tr><th>팀 구분</th><td>2A</td></tr><tr><th>팀 장</th><td>최예현</td></tr><tr><th>팀 원</th><td>이순필, 박해준, 정연우, 김동혁</td></tr></tbody></table>
 <img class="logo" src="assets/institution-logo.png" alt="대한상공회의소 부산인력개발원">''',1,'cover'))
 
 # 2. Project context and boundaries, using descriptive names rather than "C".
 overview=svg_start(235,'배터리 공정의 전공정, 실물 조립·검사, 후공정과 조별 담당 경계')
-overview+=box(10,45,200,110,'3조 · 가상 전공정',['입고검사 · LOT 추적','등급 분류 · 4셀 세트'],True)
+overview+=box(10,45,200,110,'2A · 가상 전공정',['입고검사 · LOT 추적','등급 분류 · 4셀 세트'],True)
 overview+=box(260,45,200,110,'실물 조립·검사 설비',['PLC · 로봇 · 비전','기존 설비와 연계'])
-overview+=box(510,45,200,110,'4조 · 가상 후공정',['에이징 · 특성검사','포장 · 출하'])
+overview+=box(510,45,200,110,'2B · 가상 후공정',['에이징 · 특성검사','포장 · 출하'])
 overview+=arrow('M210 90H260',235,True,True)+arrow('M460 90H510',235,True,True)
 overview+=label(360,23,'배터리 전공정·조립 및 검사·후공정 통합 구성안')
 overview+=label(235,180,'공급 상태·ID')+label(485,180,'검사 결과·제품 ID')
 overview+=label(360,218,'점선: 조별 시스템 간 데이터·인터록 연계 계획 (실물 반송 경로와 구분)')+'</svg></div>'
-pages.append(page('''<p class="draft">v0.14</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
+pages.append(page('''<p class="draft">v0.15</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
 <h2>1. 프로젝트 개요</h2><h3>1) 추진 목적 및 적용 범위</h3>
-<p>본 프로젝트의 핵심 과제는 구간별 셀 공급이 순서별 구성 대비 세트 내 전압 편차를 줄이면서 필요한 공급량과 대기시간 조건을 충족하는지 검증하는 것이다. 이를 위해 배터리 조립·검사 공정과 연계할 가상 전공정을 설계한다. 부적합·보류 재고의 공급 차단과 셀·세트 ID 및 인계 수량의 일치를 필수 조건으로 두고 공급 방식의 채택 여부를 판단한다.</p><figure class="equipment-figure"><img src="assets/line-top-v0.14.svg" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><figcaption>개략 배치도</figcaption></figure><div class="scope-strip"><span><b>3조</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>4조</b> 가상 후공정</span></div>
+<p>본 프로젝트의 핵심 과제는 구간별 셀 공급이 순서별 구성 대비 세트 내 전압 편차를 줄이면서 필요한 공급량과 대기시간 조건을 충족하는지 검증하는 것이다. 이를 위해 배터리 조립·검사 공정과 연계할 가상 전공정을 설계한다. 부적합·보류 재고의 공급 차단과 셀·세트 ID 및 인계 수량의 일치를 필수 조건으로 두고 공급 방식의 채택 여부를 판단한다.</p><figure class="equipment-figure"><img src="assets/line-top-v0.14.svg" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><figcaption>개략 배치도</figcaption></figure><div class="scope-strip"><span><b>2A</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>2B</b> 가상 후공정</span></div>
 <h3>2) 주요 개발 범위 및 기능</h3>'''+cards([
 ('입고검사 및 구간 분류','셀 ID·LOT에 유효 검사값을 연결하고 합격 셀을 A·B·C 전압 구간으로 분류'),
 ('공급 조건 검증','동일 전압 구간 4셀 구성, 보류·재고·세트 편차 확인 후 공급 허가'),
@@ -151,7 +155,7 @@ pages.append(page('''<h2>2. 프로젝트 목표</h2><h3>1) 핵심 관리 지표 
 ['NG 공급 차단','NG 공급 유출 0건','부적합·보류 확정 후 신규 공급 차단 확인. 이전 인계분은 추적·통보 기록'],
 ['LOT 보류','확정 NG 누적 3건 시 보류<br>(교육용 정책값)','측정 오류는 NG 누계에서 제외. 해당 LOT의 대기 재고·미공급 세트 차단 확인'],
 ['4셀 공급·이력','동일 구간 4셀 공급<br>구성 셀 ID 연결','배출 수량·출구 감지·요청 ID별 수신 확인 대조. 이력 저장 상태는 별도 관리'],
-['공급 성과','요구 공급량·공급률 및<br>대기 상한을 시험 전 확정','완성 세트 수, 공급 셀 수/합격 입력 셀 수, 잔여·보류 수량과 대기시간을 요구조건과 대조']], [23,30,47],'tight')+'''
+['공급 성과','요구 공급량·공급률 및<br>대기 상한을 시험 전 확정','완성 세트 수, 공급 셀 수/합격 입력 셀 수, 잔여·보류 수량과 대기시간을 요구조건과 대조']], [23,30,47],'tight','ccl')+'''
 <h3>2) 세트 내 전압 편차 평가 방법</h3>'''+comparison+'''
 <p class="formula">세트 편차(mV) = 세트 내 최대 전압 - 최소 전압<br>감소율(%) = (순서별 평균 편차 - 구간별 평균 편차) ÷ 순서별 평균 편차 × 100</p>
 <p class="compact">두 방식에 동일한 합격 셀·입력 순서·관찰 시간·시뮬레이션 배속을 적용한다. 구간 기준은 평가 전 고정하며, 가능하면 기준 설정 데이터와 평가 데이터를 분리한다. 완성 세트 편차와 함께 공급률·잔여 재고·대기시간을 제시한다. 비교 대상 셀이 다르면 공통 셀 집합으로 두 방식을 재구성하여 편차를 별도로 비교한다. 기준 편차가 0이면 감소율 대신 편차값을 보고하며, 50%는 첫 시험 후 적정성을 검토한다. 편차 목표와 사전 확정한 공급·대기 조건 및 공급 차단·ID 일치 조건을 모두 충족할 때 구간별 공급안을 채택한다.</p>
@@ -164,27 +168,30 @@ pages.append(page('''<h2>2. 프로젝트 목표</h2><h3>1) 핵심 관리 지표 
 # 4. Branching process diagram replaces duplicate flow tables and long prose.
 process=svg_start(365,'입고와 검사 후 NG를 분리하고 A B C 레인에서 동일 구간 4셀을 공급하는 분기 공정')
 process+=box(10,115,115,80,'입고·LOT',['셀 ID 부여'])+box(175,115,125,80,'검사·판정',['전압 · 저항값'])
+# Main row centerline is y=155 (boxes y=115, h=80). Lanes are 80 high so B lies exactly on it.
 for y,grade in [(10,'A'),(115,'B'),(220,'C')]:
- process+=box(365,y,130,75,f'{grade}구간 버퍼',['예약 수 · 실제 재고'],True)
- process+=arrow(f'M300 150H330V{y+37}H365',365)+arrow(f'M495 {y+37}H530V150H570',365)
+ process+=box(365,y,130,80,f'{grade}구간 버퍼',['예약 수 · 실제 재고'],True)
+ c=y+40
+ process+=arrow(f'M300 155H330V{c}H365' if c!=155 else 'M300 155H365',365)
+ process+=arrow(f'M495 {c}H530V155H570' if c!=155 else 'M495 155H570',365)
 process+=box(570,115,140,80,'4셀 세트 공급',['설비 준비 확인'],True)+box(175,280,160,70,'부적합 셀 격리',['확정 NG만 누계'])
-process+=arrow('M125 150H175',365)+arrow('M235 195V280',365)
+process+=arrow('M125 155H175',365)+arrow('M235 195V280',365)
 process+=label(520,320,'동일 LOT의 NG 누계 도달')+label(520,342,'→ 해당 LOT 재고·세트 보류')+'</svg></div>'
 roles=table(['구분','성명','담당 범위'],[
 ['팀장','최예현','일정·범위 관리, 세트 구성, LOT 보류, 실물 설비 연계'],
 ['팀원','이순필','셀 추적, 검사·구간 분류, PLC 분류 로직'],
 ['팀원','박해준','Factory I/O 배치, 태그 연결, 설비 동작 검증'],
 ['팀원','정연우','통신·수집기, DB 및 이력 조회 화면'],
-['팀원','김동혁','실측, 시험 기록, 보고서·발표 자료']], [15,17,68],'tight')
+['팀원','김동혁','실측, 시험 기록, 보고서·발표 자료']], [15,17,68],'tight','ccl')
 pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>1) 팀원 구성 및 역할 분담</h3>'''+roles+'''<p class="small">상기 역할 분담은 기존 배정안을 기준으로 하며, 팀 회의를 거쳐 최종 확정한다.</p>
-<h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(1) 검사·분류·공급 시퀀스</h4>'''+process+cards([
+<h3>2) 공정 구성 및 제어 시퀀스</h3><h4>2-1) 검사·분류·공급 시퀀스</h4>'''+process+cards([
 ('검사 위치 해제','다음 조건을 모두 만족할 때 해제<br>① 검사 완료<br>② 목적지 수용 가능<br>③ 분류 구간 비점유'),
 ('세트 공급 허가','다음 조건을 모두 만족할 때 공급<br>① 유효·비보류 4셀 및 세트 편차 적합<br>② 수신측 준비 완료<br>③ 다른 세트 공급 없음'),
 ('공급 완료 확인','물리적 인계 완료 기준<br>① 실제 배출 수량 4셀<br>② 출구 감지·요청 ID별 수신 확인<br>③ 이력 저장 상태는 별도 관리')])+'''
 <p class="compact">측정 유효성 확인 후 셀 사양에 따른 상·하한을 적용한다. 측정 실패·LOT 미확인·LOT 보류는 부적합 확정과 구분하여 공급을 차단한다. 공급 직전 LOT 상태와 세트 편차를 재확인하고, 복구 시 실물 수량·요청 ID·내부 재고를 대조한다.</p>''',4))
 
 # Inspection scope: voltage bins, validity checks and measurement protocol.
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(2) 검사 기준 및 측정 조건</h4>
+pages.append(page('''<h4>2-2) 검사 기준 및 측정 조건</h4>
 <div class="keyline"><strong>A·B·C는 합격 셀의 전압 구간이다.</strong><br>구간명은 품질의 우열을 의미하지 않는다. 본 계획의 매칭은 전압 구간별 세트 구성 및 공급 제어 검증으로 한정한다. 용량·수명·종합 성능 매칭은 평가 범위에 포함하지 않는다.</div>
 <h4>측정 및 판정 조건 확정표</h4>'''+table(['확정 항목','시험 전 정의할 조건','남길 기록'],[
 ['셀 및 검사 규격','동일 비교군의 모델·화학계·제조 LOT 확인. 제조사 사양과 입고 조건에 따라 전압 상·하한 설정','셀 모델, 사양서, 적용 기준 및 개정 번호'],
@@ -199,7 +206,7 @@ pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제
 <p class="compact">측정 실패는 셀 불량으로 단정하지 않는다. 재측정 가능 횟수와 데이터 유효기간은 장비 확인 후 시험 전에 정한다. 미판독 LOT·모델 불일치는 식별 확인 전까지 보류한다. 구체적인 전압·저항 수치는 사용 셀과 장비의 사양 확인 후 확정한다.</p>
 <p class="small">기술 참고: <a href="https://www.ti.com/lit/an/slua340c/slua340c.pdf">TI, Cell Balancing Using the bq20zxx</a> / <a href="https://www.hioki.com/global/industries-solutions/manufacturing/liion-ocv-test.html">HIOKI, OCV Testing</a> / <a href="https://www.hioki.com/us-en/learning/usage/resistance-meters_2.html">HIOKI, Internal Resistance Testing</a></p>''',5))
 
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(3) 셀 판정·LOT 보류 및 재고 관리</h4>
+pages.append(page('''<h4>2-3) 셀 판정·LOT 보류 및 재고 관리</h4>
 <p>개별 셀의 검사 결과와 LOT의 공급 가능 상태를 별도로 관리한다. 부적합 확정 셀은 격리하고, 측정·식별 미확인 및 LOT 보류 셀은 검토 대기 상태로 관리한다.</p>'''+table(['상태','설정 조건','공급 및 재고 처리'],[
 ['합격','검사 유효·규격 적합','LOT 정상·세트 허용 편차 충족 시 공급 가능'],
 ['부적합 확정','유효 측정값의 규격 이탈','공급 금지, 격리 및 사유 기록. LOT의 확정 NG 누계에 반영'],
@@ -229,17 +236,17 @@ architecture+=arrow('M360 140V185H160V245',500,True,True)+label(165,207,'센서�
 architecture+=arrow('M400 140V210H550V245',500,True,True)+label(558,233,'상태·판정·공급 이력')
 architecture+=box(395,425,145,65,'DB',['셀 · 세트 · 시험'],True)+box(565,425,145,65,'조회 화면',['상태 · 알람 · 이력'],True)
 architecture+=arrow('M475 355V425',500)+arrow('M635 355V425',500)+arrow('M540 458H565',500)
-architecture+=box(10,415,305,75,'4조 · 후공정 연계',['제품 ID · LOT · 검사 결과 인계'])
+architecture+=box(10,415,305,75,'2B · 후공정 연계',['제품 ID · LOT · 검사 결과 인계'])
 architecture+=arrow('M315 453H395',500,True,True)+'</svg></div>'
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(4) 전체 시스템 및 I/O 연결 구성</h4>'''+architecture+'''
-<p class="legend">파란 테두리: 3조 설계 범위 / 회색: 연계 대상 / 점선: 통신·인터록 협의 대상</p>'''+table(['시스템 구성','교환 데이터 및 제어 신호','인터페이스 검증 항목'],[
+pages.append(page('''<h4>2-4) 전체 시스템 및 I/O 연결 구성</h4>'''+architecture+'''
+<p class="legend">파란 테두리: 2A 설계 범위 / 회색: 연계 대상 / 점선: 통신·인터록 협의 대상</p>'''+table(['시스템 구성','교환 데이터 및 제어 신호','인터페이스 검증 항목'],[
 ['가상 설비 ↔ PLC','센서·LOT 판독값 / 컨베이어·푸셔·블레이드 명령','신호 방향, 태그 중복, 통신 단절 시 동작'],
 ['실물 설비 ↔ PLC','검사 결과·준비 상태 / 공급 요청·수신 확인','실물 공정 담당 범위와 공급 허가 조건'],
 ['PLC ↔ 수집기 → DB·화면','셀 ID·세트 ID·구간·재고·이상·공급 이벤트','값의 갱신 주기, 이벤트 누락·중복, 조회 항목']], [25,40,35],'tight')+'''
 <p class="small">상기 도식은 전체 시스템의 기능 및 신호 연결을 정의하는 설계안이다. 전기 단자 결선도, 실물 통신 경로 및 로봇·비전 접속 방식은 기존 설비 구성 확인 후 확정한다. 가상 부품의 이동과 실물 배터리의 자동 반송은 구분하여 관리한다.</p>''',7))
 
 # Synchronization scope and fault-tolerant transfer are planned requirements.
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(5) 실물·가상 동기화 및 공급 거래 관리</h4>
+pages.append(page('''<h4>2-5) 실물·가상 동기화 및 공급 거래 관리</h4>
 <p>가상 전공정은 신규 설계안이며 실물 전공정의 복제 완료를 의미하지 않는다. 실물과 대응시키는 범위는 셀 검사 데이터, 설비 준비·이상 상태 및 공급 요청·수신 확인이다. 가상 부품 이동과 실물 배터리 반송은 별도로 검증한다.</p>'''+table(['운영 모드','동기화 범위','검증 및 보고 기준'],[
 ['사전 데이터 시험','실측 셀 ID·측정값을 가상 개체에 연결','입력 데이터 고정 및 재현 시험. 실시간 자동 연동으로 보고하지 않음'],
 ['온라인 연계 목표','셀 ID·측정 시각·상태와 준비·요청·수신 확인 교환','갱신 주기·허용 지연을 시험 전 확정. ID·상태·수량·시각 대조'],
@@ -256,31 +263,31 @@ pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제
 ['재시작·정전 복구','요청·완료 ID와 실제 수량을 복원·대조. 상태 보존 범위 확인 전 자동 운전 재개 금지']], [28,72],'tight')+'''
 <p class="small">상기 내용은 구현·검증할 요구사항이다. 타임아웃·갱신 주기·보존 장치는 실물 통신 구성 확인 후 확정한다. 기술 참고: <a href="https://www.nist.gov/programs-projects/digital-twins-advanced-manufacturing">NIST, Digital Twins for Advanced Manufacturing</a>.</p>''',8))
 
-# 6. Field-level interfaces and explicit boundary with the supplied 4조 plan.
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(6) I/O 신호 및 인계 데이터</h4>
+# 6. Field-level interfaces and explicit boundary with the supplied 2B plan.
+pages.append(page('''<h4>2-6) I/O 신호 및 인계 데이터</h4>
 <p>인터페이스는 설비 I/O, 공급 승인 인터록 및 이력 데이터로 구분한다. 아래 I/O 주소는 가상 설비 시연 기준이며, 공용 PLC 적용 전 기존 태그와의 중복 여부를 검증한다.</p>'''+table(['신호 구분','현재 가상 설비 연결','내용'],[
 ['비트 입력 19점','Coils 0~18 → M1000~M1018','위치 검출 7점, 푸셔 끝 센서 8점, 조작반 4점'],
 ['비트 출력 20점','M1100~M1119 → Discrete Inputs 0~19','컨베이어·푸셔·블레이드·투입·회수·표시등'],
 ['LOT 판독 1점','Holding Register 0 → D1000','가상 비전 판독값을 LOT 구분에 사용'],
-['시뮬레이션 상태','Coils 19 / 20 / 21','실행 / 일시정지 / 씬 초기화']], [25,38,37],'tight')+'''
+['시뮬레이션 상태','Coils 19 / 20 / 21','실행 / 일시정지 / 씬 초기화']], [25,38,37],'tight','ccl')+'''
 <h4>공급 승인 및 수신 확인 인터록</h4>'''+cards([
 ('① 준비 확인','설비 → 전공정<br>투입 가능·정지·이상 상태 확인'),
 ('② 세트 공급 요청','전공정 → 설비<br>세트 ID·구성 셀 ID·구간 전달'),
 ('③ 수신 확인','설비 → 전공정<br>요청 ID·수량 대조 후 물리적 인계 확정')])+'''
-<h4>공정 간 인계 데이터 및 추적성 관리 항목</h4>'''+table(['담당 구간','관리 단위·필드','연결 목적'],[
-['3조 · 전공정','셀 ID, LOT, 전압, 적용 시 내부저항, 분류 구간','셀별 검사·분류 결과 추적'],
-['3조 → 실물 설비','요청 ID, 세트 ID, 구성 셀 ID 4개, 공급 상태','4셀 구성과 수신 확인 대조'],
-['실물 설비 → 4조','제품 ID, LOT, 초기 전압, 검사 결과','4조 에이징·특성검사의 기준 데이터'],
-['4조 · 후공정','제품 ID, 재검 횟수, 박스 ID','재검 이력 및 포장 단위 추적']], [25,43,32],'tight')+'''
+<h4>공정 간 인계 데이터 및 추적성 관리 항목</h4><p class="compact">2A는 본 조(전공정), 2B는 후공정 담당 조이다. 셀은 2A에서 실물 조립·검사 설비를 거쳐 2B로 넘어가므로, 이력이 끊기지 않도록 구간별로 주고받을 항목을 함께 정리한다.</p>'''+table(['담당 구간','관리 단위·필드','연결 목적'],[
+['2A · 전공정','셀 ID, LOT, 전압, 적용 시 내부저항, 분류 구간','셀별 검사·분류 결과 추적'],
+['2A → 실물 설비','요청 ID, 세트 ID, 구성 셀 ID 4개, 공급 상태','4셀 구성과 수신 확인 대조'],
+['실물 설비 → 2B','제품 ID, LOT, 초기 전압, 검사 결과','2B 에이징·특성검사의 기준 데이터'],
+['2B · 후공정','제품 ID, 재검 횟수, 박스 ID','재검 이력 및 포장 단위 추적']], [25,43,32],'tight')+'''
 <div class="keyline"><strong>실물 공정 인계 규격</strong><br>가상 검증은 4셀 세트 단위로 수행한다. 실물 인계 단위와 세트 ID·제품 ID의 대응 관계는 조립·검사 공정의 요구에 따라 통합 전에 확정한다.</div>
 <p class="small">후공정과 공유하는 데이터의 단위, 입력·수신 방식 및 갱신 주기는 공동 인계 규격으로 관리한다. 조별 검사 기준과 디바이스 주소는 각각의 승인 규격을 적용한다.</p>''',9))
 
-# Address review: 4조 supplied plan versus current generated PoC ladder.
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제어 시퀀스</h3><h4>(7) PLC 디바이스 할당 및 인터페이스 관리</h4>
-<p>공용 PLC에 통합할 경우 각 조의 내부 릴레이·데이터 레지스터와 실물 I/O 영역을 분리한다. 기존 가상 시연은 독립 제어기를 사용하며, 통합 전 전체 디바이스 맵을 대조하여 전용 영역과 공용 인터록을 확정한다.</p>'''+table(['통합 전 재배정 대상','3조 기존 시연 용도','4조 계획서 용도'],[
-['M0','운전 자기유지','비상정지'],['M10','입고 요청','반입·바코드 스캔'],['M200','LOT 보류 영역의 시작 주소','자동창고 운전'],['D200','임시 전압 표의 시작 주소','자동창고 랙 번호']], [18,41,41],'tight')+'''
-<h4>3조 전용 디바이스 영역 배정안</h4>'''+table(['구분','기존 시연 주소','통합 배정안'],[
-['순차 제어·LOT 관리','M0 / M10 / M200','M3000 / M3010 / M3200'],['가상 센서·액추에이터','M1000~M1018 / M1100~M1119','M4000~M4018 / M4100~M4119'],['판정·검사 데이터','D200 / D1000','D3200 / D4000'],['3조 내부 디바이스 예약안','제어·LOT 관리와 가상 I/O 영역','M3000~M4999 / D3000~D4999']], [30,35,35],'tight')+'''
+# Address review: 2B supplied plan versus current generated PoC ladder.
+pages.append(page('''<h4>2-7) PLC 디바이스 할당 및 인터페이스 관리</h4>
+<p>공용 PLC에 통합할 경우 각 조의 내부 릴레이·데이터 레지스터와 실물 I/O 영역을 분리한다. 기존 가상 시연은 독립 제어기를 사용하며, 통합 전 전체 디바이스 맵을 대조하여 전용 영역과 공용 인터록을 확정한다.</p>'''+table(['통합 전 재배정 대상','2A 기존 시연 용도','2B 계획서 용도'],[
+['M0','운전 자기유지','비상정지'],['M10','입고 요청','반입·바코드 스캔'],['M200','LOT 보류 영역의 시작 주소','자동창고 운전'],['D200','임시 전압 표의 시작 주소','자동창고 랙 번호']], [18,41,41],'tight','ccc')+'''
+<h4>2A 전용 디바이스 영역 배정안</h4>'''+table(['구분','기존 시연 주소','통합 배정안'],[
+['순차 제어·LOT 관리','M0 / M10 / M200','M3000 / M3010 / M3200'],['가상 센서·액추에이터','M1000~M1018 / M1100~M1119','M4000~M4018 / M4100~M4119'],['판정·검사 데이터','D200 / D1000','D3200 / D4000'],['2A 내부 디바이스 예약안','제어·LOT 관리와 가상 I/O 영역','M3000~M4999 / D3000~D4999']], [30,35,35],'tight','ccc')+'''
 <p class="small">상기 주소는 통합 적용 전 확정할 배정안이다. 실제 PLC의 지원 범위와 기존 설비·타 조의 전체 태그맵을 확인한 후 적용한다. 타이머·카운터·인덱스 및 간접·일괄 접근 범위도 함께 대조한다.</p>
 <h4>실물 I/O 및 공용 인터록 확정 절차</h4>'''+cards([
 ('① X/Y 결선 확인','가상 I/O는 내부 디바이스로 관리. 실물 X/Y는 단자·모듈 구성과 기존 결선도 확인 후 할당'),
@@ -289,7 +296,7 @@ pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>2) 공정 구성 및 제
 <div class="keyline"><strong>통합 적용 조건</strong><br>M0·M10·M200·D200의 중복을 해소하고 실물 X/Y 할당표와 공용 태그를 승인한 후 통합한다. 송신측·수신측의 주소 소유권과 초기화 범위를 함께 관리한다.</div>''',10))
 
 # 7. Equipment and verification chain, with status consolidated here.
-pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>3) 제어설비 및 검증 계획</h3>'''+table(['구분','규격·용도','확보·적용 계획'],[
+pages.append(page('''<h3>3) 제어설비 및 검증 계획</h3>'''+table(['구분','규격·용도','확보·적용 계획'],[
 ['PLC','Mitsubishi MELSEC Q03UDE / 순차 제어·연계','공용 장비 사용 예정'],
 ['가상 설비','Factory I/O Modbus & OPC 에디션','기설치 / 전공정 배치'],
 ['제어 프로그램','GX Works2 / 실제 PLC 프로그램 검증','기설치 / 변환·컴파일'],
@@ -301,7 +308,7 @@ pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>3) 제어설비 및 검�
 ['컨베이어','6','입고 1, 메인 1, 구간 레인 3, 공급 1'],
 ['푸셔 / 스톱 블레이드','4 / 4','NG·구간 분류 / 검사 위치·레인 끝 정지'],
 ['검출 센서 / 가상 비전','7 / 1','위치·출구 감지 / LOT 판독'],
-['투입기 / 회수기 / 슈트','1 / 2 / 2','가상 셀 입고 / NG·공급 경로 회수']], [40,15,45],'tight')+'''
+['투입기 / 회수기 / 슈트','1 / 2 / 2','가상 셀 입고 / NG·공급 경로 회수']], [40,15,45],'tight','ccl')+'''
 <h4>사전 시연 및 후속 검증 범위</h4><p class="compact">2026년 11월 17일 작업 기록을 기준으로, 임시 검사값을 적용한 소프트 PLC 시연에서 씬 로드, 통신 및 분류 동작을 관찰하였다. 4셀 공급 통합 시험과 실물 PLC 연계는 후속 검증 범위이며, 수집기·DB·조회 화면은 개발 예정이다.</p>
 <h4>통합 검증 시나리오 및 시험 기록</h4>'''+table(['시험 구간','기대 동작','기록 자료'],[
 ['검사 → 분류','분류 구간과 실제 레인 일치','셀 ID·입력값·판정·진입 레인 대조표'],
@@ -314,15 +321,15 @@ pages.append(page('''<h2>3. 프로젝트 계획</h2><h3>3) 제어설비 및 검�
 phase_plan=table(['계획 기간','단계 및 주요 활동','선행 조건·조정 기준'],[
 ['11/17~11/19','범위·역할·인계 규격 설계 / 실측·통신 경로 확인','수업 시간표와 장비 사용 가능 시간 확인'],
 ['11/23~11/25','가상 전공정 배치 / 검사·분류 제어 구현','실습 가능 시간에 따라 배치·제어 작업 분담'],
-['11/26~12/1','세트 공급·이력 연계 / 비교 측정·통합 검증','조별 인터페이스 확정 및 장비 사용 시간 확보'],
-['12/7~12/8','미완료 검증 보완 / 시연·보고서·발표','수업·제출 일정에 맞춰 검증 범위 확정']], [23,44,33],'tight')
-pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>추진 기간: 2026. 11. 17 ~ 2026. 12. 8 / 3조</p><div class="keyline"><strong>정규 수업과 프로젝트를 병행하는 추진 계획</strong><br>기간 내 모든 수업일을 프로젝트 전일 작업일로 산정하지 않는다. 과제와 실습 가능 시간, 장비 사용 시간을 확인하여 주별 작업량과 담당을 조정한다.</div>'''+phase_plan+'''<p class="small">기간별 작업 범위와 완료 목표는 수업·실습 및 장비 사용 가능 시간에 따라 조정한다.</p>
+['11/26~11/27','세트 공급·이력 연계 / 첫 비교 측정','조별 인터페이스 확정 및 장비 사용 시간 확보'],
+['11/30~12/1','통합 검증·보완 / 시연·보고서·발표','수업·제출 일정에 맞춰 검증 범위 확정']], [23,44,33],'tight')
+pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>추진 기간: 2026. 11. 17 ~ 2026. 12. 1 / 2A</p><div class="keyline"><strong>정규 수업과 프로젝트를 병행하는 추진 계획</strong><br>기간 내 모든 수업일을 프로젝트 전일 작업일로 산정하지 않는다. 과제와 실습 가능 시간, 장비 사용 시간을 확인하여 주별 작업량과 담당을 조정한다.</div>'''+phase_plan+'''<p class="small">기간별 작업 범위와 완료 목표는 수업·실습 및 장비 사용 가능 시간에 따라 조정한다.</p>
 <h3>1) 단계별 완료 목표</h3>'''+table(['추진 일정','단계별 완료 및 검증 기준'],[
 ['11/19','실물 통신 경로, 조별 담당 범위·인계 단위·ID 대응 규칙 결정'],
 ['11/25','가상 배치 및 센서·블레이드·푸셔 동작 확정'],
 ['11/27','분류·공급 차단·전압 편차·공급률·잔여 재고의 첫 측정 결과'],
-['12/1','기능 동결, 보류·부분 공급·통신/DB 복구·이력 조회의 통합 시험 결과'],
-['12/7~12/8','시연 리허설, 최종 보고서·발표 자료 제출']], [22,78],'tight')+'''
+['11/30','기능 동결, 보류·부분 공급·통신/DB 복구·이력 조회의 통합 시험 결과'],
+['12/1','시연, 최종 보고서·발표 자료 제출']], [22,78],'tight')+'''
 <h3>2) 최종 산출물</h3>'''+cards([
 ('공정·제어 자료','Factory I/O 씬, 태그맵, PLC 프로그램, 통신·인계 규격'),
 ('이력·시험 자료','셀·세트 이력 구조와 조회 화면, 분류·공급 대조표, 편차 비교표'),
@@ -330,7 +337,7 @@ pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>추진 기간: 2026
 <h3>3) 사전 협의 및 범위 조정 기준</h3><p class="compact">실물 셀 수량, 검사 항목, 공용 PLC 주소 및 조별 인계 규격을 사전 확정한다. 수업 진행과 장비 사용 가능 시간에 따라 주별 가용 시간을 산정하고 검증 필수 항목을 우선 배정한다. 통신 확보 또는 수업 일정에 변동이 발생하면 완료 목표와 평가 범위를 조정하여 최종 산출물에 반영한다.</p>''',12))
 
 assert len(pages)==12
-assert not any(term in ''.join(pages) for term in ['C 라인','실물 C','C →','→ C','왕 성 식','A팀','B팀'])
-document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.14</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
-(BASE/'plan_v0.14.html').write_text(document,encoding='utf-8')
-print('Created',BASE/'plan_v0.14.html')
+assert not any(term in ''.join(pages) for term in ['C 라인','실물 C','C →','→ C','왕 성 식','A팀','B팀','3조','4조','12/7','12. 8'])
+document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2A 프로젝트 실시 계획서 v0.15</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
+(BASE/'plan_v0.15.html').write_text(document,encoding='utf-8')
+print('Created',BASE/'plan_v0.15.html')
