@@ -1,7 +1,7 @@
 """Draw a sectioned top-view equipment concept, without fabrication dimensions."""
 from pathlib import Path
 
-out = Path(__file__).resolve().parents[1] / 'assets/line-top-v0.13.svg'
+out = Path(__file__).resolve().parents[1] / 'assets/line-top-v0.14.svg'
 s = ['''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="380" viewBox="0 0 1100 380" role="img" aria-label="입고, 검사, NG 분리 및 구간별 버퍼, 공급 구역으로 나눈 평면 배치 개념도">
 <defs><marker id="flow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="#315e8e"/></marker><pattern id="reject" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M-2 2L2 -2M0 8L8 0M6 10L10 6" stroke="#c2cad3" stroke-width="1"/></pattern></defs>
 <rect width="1100" height="380" fill="white"/>

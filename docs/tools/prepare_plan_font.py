@@ -13,7 +13,7 @@ from fontTools.ttLib import TTFont
 
 base = Path(__file__).resolve().parents[1]
 source = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('C:/Windows/Fonts/H2HDRM.TTF')
-plan = base / (sys.argv[2] if len(sys.argv) > 2 else 'plan_v0.13.html')
+plan = base / (sys.argv[2] if len(sys.argv) > 2 else 'plan_v0.14.html')
 markup = plan.read_text(encoding='utf-8')
 headings = re.findall(r'<h[12][^>]*>(.*?)</h[12]>|<div class="task">(.*?)</div>', markup, re.S)
 text = html.unescape(' '.join(re.sub(r'<[^>]+>', ' ', a or b) for a, b in headings))
