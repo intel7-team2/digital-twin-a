@@ -7,7 +7,7 @@ const { pathToFileURL } = require('url');
  const executablePath = process.env.PLAN_BROWSER || ['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(p => fs.existsSync(p));
  const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}), headless: true });
  try {
-  const stem = process.argv[2] || 'plan_v0.10';
+  const stem = process.argv[2] || 'plan_v0.11';
   const qa = path.resolve(__dirname, '../.qa', stem);
   fs.mkdirSync(qa, { recursive: true });
   const page = await browser.newPage({ viewport: { width: 1100, height: 1200 }, deviceScaleFactor: 1 });
@@ -47,7 +47,7 @@ const { pathToFileURL } = require('url');
   await page.locator('section.page').nth(2).screenshot({ path: path.join(qa, 'phone-goals.png') });
   await page.locator('section.page').nth(4).screenshot({ path: path.join(qa, 'phone-io.png') });
   await page.locator('section.page').nth(5).screenshot({ path: path.join(qa, 'phone-interface.png') });
-  if (stem === 'plan_v0.10') {
+  if (stem === 'plan_v0.11') {
    await page.locator('section.page').nth(6).screenshot({ path: path.join(qa, 'phone-address.png') });
    await page.locator('section.page').nth(8).screenshot({ path: path.join(qa, 'phone-schedule.png') });
   }
