@@ -1,8 +1,8 @@
 """Draw a sectioned top-view equipment concept, without fabrication dimensions."""
 from pathlib import Path
 
-out = Path(__file__).resolve().parents[1] / 'assets/line-top-v0.11.svg'
-s = ['''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="380" viewBox="0 0 1100 380" role="img" aria-label="입고, 검사, NG 분리 및 등급별 버퍼, 공급 구역으로 나눈 평면 배치 개념도">
+out = Path(__file__).resolve().parents[1] / 'assets/line-top-v0.12.svg'
+s = ['''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="380" viewBox="0 0 1100 380" role="img" aria-label="입고, 검사, NG 분리 및 구간별 버퍼, 공급 구역으로 나눈 평면 배치 개념도">
 <defs><marker id="flow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="#315e8e"/></marker><pattern id="reject" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M-2 2L2 -2M0 8L8 0M6 10L10 6" stroke="#c2cad3" stroke-width="1"/></pattern></defs>
 <rect width="1100" height="380" fill="white"/>
 <g font-family="Malgun Gothic,sans-serif" fill="#233b54">''']
@@ -46,7 +46,7 @@ text(436,325,'NG 격리',17,700)
 for x,grade in [(535,'A'),(665,'B'),(795,'C')]:
     rect(x-17,82,34,16,'#91aac5','#315e8e')
     rect(x-24,159,48,125,'#e0e7ed','#7c91a5')
-    text(x,76,f'{grade} 등급',18,700)
+    text(x,76,f'{grade} 구간',18,700)
     for y in (182,207,232,257):
         s.append(f'<circle cx="{x}" cy="{y}" r="7" fill="white" stroke="#6d8399" stroke-width="1.7"/>')
     rect(x-26,279,52,7,'#315e8e','#315e8e',0)
@@ -55,7 +55,7 @@ for x,grade in [(535,'A'),(665,'B'),(795,'C')]:
 rect(497,309,548,36,'#dce6f0','#7c91a5')
 for x in (570,700,830,988): arrow(f'M{x} 327h40')
 text(665,366,'한 레인씩 배출',17)
-text(980,200,'동일 등급',19,700)
+text(980,200,'동일 구간',19,700)
 text(980,228,'4셀 단위',19,700)
 text(980,273,'수신 확인',18)
 text(980,297,'후 다음 세트',18)
