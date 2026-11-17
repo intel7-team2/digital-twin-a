@@ -52,6 +52,7 @@ body{color:var(--ink)}.cover .course{color:var(--accent);border-color:var(--acce
 }
 '''
 # v0.14: submission content; no changes to the Factory I/O or PLC prototype.
+# v0.16: 2-4) system diagram titles the collector box SCADA (Python is the sub-heading).
 # v0.15: team review (2026-11-18) - 2A/2B names, period to 12/1, 2-n) numbering, column alignment, B lane line.
 # Reference: user-supplied "디지털 트윈 2B 계획서.hwpx" (2B), 2026-11-17.
 # Its process/data/interface structure is referenced; numerical claims are not adopted.
@@ -99,7 +100,7 @@ def box(x,y,w,h,title,lines=(),owned=False):
         'MELSEC Q PLC': '<rect x="1" y="2" width="21" height="20" rx="1"/><path d="M7 3V21M14 3V21M3 7H5M9 7H12M16 7H20M16 11H20M16 15H20"/>',
         '로봇·실물 설비': '<path d="M2 22H22M7 22V18L15 12L9 6L13 2M15 12L20 7L23 9"/><circle cx="9" cy="6" r="3"/><circle cx="15" cy="12" r="3"/>',
         'Factory I/O · 가상 전공정': '<rect x="1" y="9" width="22" height="8" rx="4"/><circle cx="6" cy="13" r="2"/><circle cx="18" cy="13" r="2"/><path d="M5 17V22M19 17V22M8 9V3H16V9"/>',
-        'Python · 수집 및 통신': '<rect x="2" y="1" width="20" height="22" rx="2"/><path d="M3 8H21M3 15H21M6 5H8M6 12H8M6 19H8M11 5H18M11 12H18M11 19H18"/>',
+        'SCADA': '<rect x="2" y="1" width="20" height="22" rx="2"/><path d="M3 8H21M3 15H21M6 5H8M6 12H8M6 19H8M11 5H18M11 12H18M11 19H18"/>',
         'DB': '<ellipse cx="12" cy="4" rx="10" ry="3"/><path d="M2 4V20C2 24 22 24 22 20V4M2 12C2 16 22 16 22 12"/>',
         '조회 화면': '<rect x="1" y="2" width="22" height="16" rx="1"/><path d="M8 23H17M12 18V23M4 7H10M4 11H8M13 7H20M13 11H20"/>',
     }
@@ -129,7 +130,7 @@ overview+=arrow('M210 90H260',235,True,True)+arrow('M460 90H510',235,True,True)
 overview+=label(360,23,'배터리 전공정·조립 및 검사·후공정 통합 구성안')
 overview+=label(235,180,'공급 상태·ID')+label(485,180,'검사 결과·제품 ID')
 overview+=label(360,218,'점선: 조별 시스템 간 데이터·인터록 연계 계획 (실물 반송 경로와 구분)')+'</svg></div>'
-pages.append(page('''<p class="draft">v0.15</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
+pages.append(page('''<p class="draft">v0.16</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
 <h2>1. 프로젝트 개요</h2><h3>1) 추진 목적 및 적용 범위</h3>
 <p>본 프로젝트의 핵심 과제는 구간별 셀 공급이 순서별 구성 대비 세트 내 전압 편차를 줄이면서 필요한 공급량과 대기시간 조건을 충족하는지 검증하는 것이다. 이를 위해 배터리 조립·검사 공정과 연계할 가상 전공정을 설계한다. 부적합·보류 재고의 공급 차단과 셀·세트 ID 및 인계 수량의 일치를 필수 조건으로 두고 공급 방식의 채택 여부를 판단한다.</p><figure class="equipment-figure"><img src="assets/line-top-v0.14.svg" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><figcaption>개략 배치도</figcaption></figure><div class="scope-strip"><span><b>2A</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>2B</b> 가상 후공정</span></div>
 <h3>2) 주요 개발 범위 및 기능</h3>'''+cards([
@@ -224,14 +225,14 @@ pages.append(page('''<h4>2-3) 셀 판정·LOT 보류 및 재고 관리</h4>
 <p class="small">인계 완료 후 LOT 보류가 발생한 경우 이미 공급된 사실은 유지하고 품질 상태를 별도로 갱신한다. 후속 공정에서의 사용 보류 및 처리 범위는 대상 ID와 함께 공동 확인한다.</p>''',6))
 
 # 5. Full architecture: equipment, control, bridge, storage, and operator view.
-architecture=svg_start(500,'검사·비전, PLC, 로봇, Factory I/O, Python 수집기, 데이터베이스와 조회 화면을 연결하는 전체 시스템 설계')
+architecture=svg_start(500,'검사·비전, PLC, 로봇, Factory I/O, SCADA(Python 수집기), 데이터베이스와 조회 화면을 연결하는 전체 시스템 설계')
 architecture+=label(360,20,'실물 조립·검사 설비와 가상 전공정의 제어·데이터 연결 계획')
 architecture+=box(10,50,190,90,'검사·비전',['검사값 · 판독 결과','실물 공정 데이터'])
 architecture+=box(265,50,190,90,'MELSEC Q PLC',['순차 제어 · 분류·공급','준비 · 이상 · 수신 확인'],True)
 architecture+=box(520,50,190,90,'로봇·실물 설비',['조립 · 검사 · 투입','기존 공정 제어 범위'])
 architecture+=arrow('M200 95H265',500,True)+arrow('M455 95H520',500,True,True)
 architecture+=box(10,245,305,110,'Factory I/O · 가상 전공정',['센서 · 컨베이어 · 푸셔 · 블레이드','입고 → 검사 → 분류 → 4셀 공급'],True)
-architecture+=box(395,245,315,110,'Python · 수집 및 통신',['PLC 값 수집 · 셀/세트 ID 연결','이벤트 · 이상 · 검사 결과 저장'],True)
+architecture+=box(395,245,315,110,'SCADA',['Python · 수집 및 통신','PLC 값 수집 · 셀/세트 ID 연결','이벤트 · 이상 · 검사 결과 저장'],True)
 architecture+=arrow('M360 140V185H160V245',500,True,True)+label(165,207,'센서값 ↑ / 구동 명령 ↓')
 architecture+=arrow('M400 140V210H550V245',500,True,True)+label(558,233,'상태·판정·공급 이력')
 architecture+=box(395,425,145,65,'DB',['셀 · 세트 · 시험'],True)+box(565,425,145,65,'조회 화면',['상태 · 알람 · 이력'],True)
@@ -242,7 +243,7 @@ pages.append(page('''<h4>2-4) 전체 시스템 및 I/O 연결 구성</h4>'''+arc
 <p class="legend">파란 테두리: 2A 설계 범위 / 회색: 연계 대상 / 점선: 통신·인터록 협의 대상</p>'''+table(['시스템 구성','교환 데이터 및 제어 신호','인터페이스 검증 항목'],[
 ['가상 설비 ↔ PLC','센서·LOT 판독값 / 컨베이어·푸셔·블레이드 명령','신호 방향, 태그 중복, 통신 단절 시 동작'],
 ['실물 설비 ↔ PLC','검사 결과·준비 상태 / 공급 요청·수신 확인','실물 공정 담당 범위와 공급 허가 조건'],
-['PLC ↔ 수집기 → DB·화면','셀 ID·세트 ID·구간·재고·이상·공급 이벤트','값의 갱신 주기, 이벤트 누락·중복, 조회 항목']], [25,40,35],'tight')+'''
+['PLC ↔ SCADA<br>(수집기·DB·화면)','셀 ID·세트 ID·구간·재고·이상·공급 이벤트','값의 갱신 주기, 이벤트 누락·중복, 조회 항목']], [25,40,35],'tight')+'''
 <p class="small">상기 도식은 전체 시스템의 기능 및 신호 연결을 정의하는 설계안이다. 전기 단자 결선도, 실물 통신 경로 및 로봇·비전 접속 방식은 기존 설비 구성 확인 후 확정한다. 가상 부품의 이동과 실물 배터리의 자동 반송은 구분하여 관리한다.</p>''',7))
 
 # Synchronization scope and fault-tolerant transfer are planned requirements.
@@ -338,6 +339,6 @@ pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>추진 기간: 2026
 
 assert len(pages)==12
 assert not any(term in ''.join(pages) for term in ['C 라인','실물 C','C →','→ C','왕 성 식','A팀','B팀','3조','4조','12/7','12. 8'])
-document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2A 프로젝트 실시 계획서 v0.15</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
-(BASE/'plan_v0.15.html').write_text(document,encoding='utf-8')
-print('Created',BASE/'plan_v0.15.html')
+document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2A 프로젝트 실시 계획서 v0.16</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
+(BASE/'plan_v0.16.html').write_text(document,encoding='utf-8')
+print('Created',BASE/'plan_v0.16.html')
