@@ -7,12 +7,27 @@ const { pathToFileURL } = require('url');
  const executablePath = process.env.PLAN_BROWSER || ['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(p => fs.existsSync(p));
  const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}), headless: true });
  try {
-  const stem = process.argv[2] || 'plan_v0.7';
+  const stem = process.argv[2] || 'plan_v0.8';
   const qa = path.resolve(__dirname, '../.qa', stem);
   fs.mkdirSync(qa, { recursive: true });
   const page = await browser.newPage({ viewport: { width: 1100, height: 1200 }, deviceScaleFactor: 1 });
   await page.goto(pathToFileURL(path.resolve(__dirname, '../' + stem + '.html')).href);
   await page.evaluate(() => document.fonts.ready);
+  if (await page.evaluate(() => [...document.fonts].some(font => font.family === 'PlanHeadline'))) {
+   const cdp = await page.context().newCDPSession(page);
+   await cdp.send('DOM.enable');
+   await cdp.send('CSS.enable');
+   const { root } = await cdp.send('DOM.getDocument');
+   for (const selector of ['h1', 'h2', '.cover .task']) {
+    const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector });
+    const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
+    if (!fonts.length || fonts.some(font => font.postScriptName !== 'H2hdrM')) {
+     throw new Error('Reference headline font substituted: ' + selector);
+    }
+   }
+   await cdp.detach();
+   console.log('Verified HY헤드라인M rendering for title and section headings');
+  }
   const brokenImages = await page.locator('img').evaluateAll(images => images.filter(img => !img.complete || !img.naturalWidth).map(img => img.src));
   if (brokenImages.length) throw new Error('Missing images: ' + brokenImages.join(', '));
   await page.emulateMedia({ media: 'print' });

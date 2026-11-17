@@ -49,7 +49,7 @@ body{color:var(--ink)}.cover .course{color:var(--accent);border-color:var(--acce
  .diagram{overflow-x:auto}.diagram svg{min-width:720px}.draft{font-size:13px}.indent{margin-left:0}
 }
 '''
-# v0.7: submission content; no changes to the Factory I/O or PLC prototype.
+# v0.8: submission content; no changes to the Factory I/O or PLC prototype.
 # Reference: user-supplied "디지털 트윈 2B 계획서.hwpx" (4조), 2026-11-17.
 # Its process/data/interface structure is referenced; numerical claims are not adopted.
 css+='''
@@ -60,6 +60,16 @@ css+='''
 .keyline{border-left:3px solid var(--accent);padding:2mm 3mm;background:#f5f7fa;margin:3mm 0}
 .compact{font-size:9pt}.legend{font-size:8.5pt;color:#444;margin:1mm 0 3mm}
 @media screen and (max-width:820px){.cards{grid-template-columns:1fr}.card,.card b,.compact,.legend{font-size:16px}}
+'''
+# Title and heading styles read from the supplied 4조 HWPX charPr 13/10/15/21.
+# 휴먼명조 is unavailable locally; Batang is the HWPX-declared substitution.
+css+='''
+@font-face{font-family:PlanHeadline;src:url("assets/plan_v0.8-headline.ttf") format("truetype");font-weight:400;font-style:normal}
+h1{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:20pt;font-weight:400;color:#000;text-align:center;line-height:1.6;letter-spacing:0}
+h2{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:15pt;font-weight:400;color:#3a3c84;text-align:left;line-height:1.6;letter-spacing:0}
+h3,h4{font-family:"휴먼명조","Batang","바탕",serif;font-size:13pt;font-weight:700;color:#000;text-align:left;line-height:1.6;letter-spacing:0}
+.cover .course{font-family:"HY견고딕","HYGothic-Extra";font-size:20pt;font-weight:700;color:#0066ff;line-height:1.6;border-color:#3a3c84}
+.cover .task{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:20pt;font-weight:400;color:#000;line-height:1.6}
 '''
 pages=[]
 
@@ -93,7 +103,7 @@ overview+=arrow('M210 90H260',235,True,True)+arrow('M460 90H510',235,True,True)
 overview+=label(360,23,'배터리 전공정·조립 및 검사·후공정 통합 구성안')
 overview+=label(235,180,'공급 상태·ID')+label(485,180,'검사 결과·제품 ID')
 overview+=label(360,218,'점선: 조별 시스템 간 데이터·인터록 연계 계획 (실물 반송 경로와 구분)')+'</svg></div>'
-pages.append(page('''<p class="draft">v0.7 · 계획서 개정안</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
+pages.append(page('''<p class="draft">v0.8 · 계획서 개정안</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
 <h2>1. 프로젝트 개요</h2><h3>1) 추진 목적 및 적용 범위</h3>
 <p>본 프로젝트는 PLC·로봇·비전 기반 배터리 조립·검사 공정과 연계하여 셀 입고검사, 등급별 분류 및 매칭 공급을 수행하는 가상 전공정을 구축하는 것을 목적으로 한다. 셀의 합격 여부와 특성에 따른 세트 구성을 구분하여 관리하며, 가상 설비에서 분류 시퀀스와 공급 인터록을 검증한 후 실물 설비 연계 조건을 수립한다.</p>'''+overview+'''
 <h3>2) 주요 개발 범위 및 기능</h3>'''+cards([
@@ -235,6 +245,6 @@ pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>2026. 11. 17 ~ 2026
 
 assert len(pages)==8
 assert not any(term in ''.join(pages) for term in ['C 라인','실물 C','C →','→ C','왕 성 식','A팀','B팀'])
-document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.7</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
-(BASE/'plan_v0.7.html').write_text(document,encoding='utf-8')
-print('Created',BASE/'plan_v0.7.html')
+document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.8</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
+(BASE/'plan_v0.8.html').write_text(document,encoding='utf-8')
+print('Created',BASE/'plan_v0.8.html')
