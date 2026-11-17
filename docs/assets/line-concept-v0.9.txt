@@ -1,0 +1,14 @@
+Image generation record — 2026-11-17
+Tool: built-in image_gen (generation followed by reference-image edits).
+Purpose: report illustration of the proposed virtual upstream line; not a real installation or implementation screenshot. Hardware shape and layout are conceptual.
+
+Initial prompt:
+Create a refined engineering proposal illustration for an educational battery cell receiving, inspection, sorting and matched supply virtual manufacturing line. Wide landscape 3:1 composition, orthographic isometric technical 3D rendering on pure white background. Show ONLY the planned virtual upstream line: a small entry belt with cylindrical metallic battery cells standing in carriers, inspection station with a compact overhead camera and sensing gate, a main conveyor, one clearly separate reject chute toward front left, three parallel buffer belts with matching blue stop gates and four small cylindrical cells in carriers on each, merging toward one output belt. Accurate-looking industrial conveyors with thin steel legs, compact pushers and blade gates, restrained slate gray steel and one deep blue accent. Show all modules clearly, organized compact footprint with ample white margins, soft ambient shadows, crisp edges, CAD-like professional report quality. No buildings, no factory scenery, no people, no logos, no graphs, no text, no labels, no arrows. This is conceptual equipment layout, not a real installation photograph. Do not include a robotic arm, storage warehouse, cartons, or downstream equipment.
+
+First edit:
+Preserve the CAD illustration and equipment. Replace battery groups on the entry/inspection belt with individual cells; show four individual cells on each buffer lane. Request four cells on output. The output cell grouping remained incorrect, so that result was not used.
+
+Final prompt (reference image edit):
+Make one precise edit only. REMOVE the blue multi-cell tray and ALL battery cylinders on the far-right merged output conveyor, leaving that far-right output belt completely EMPTY. Keep all individual cells on entry belt and all three buffer lanes exactly as they are. Preserve every other equipment part, lighting, camera, white background and illustration style. No text or labels.
+
+Selected output: line-concept-v0.9.png
