@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A팀 계획서 초안 v0.2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 계획서 양식 순서(개요 · 목표 · 계획 · 일정)를 따르는 리포트. 파랑 = 가상(트윈), 주황 = 실물, 초록 = 핵심. */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --ink:#111A2B; --muted:#5A6578; --line:#D5DAE3;
+  --virtual:#1F5EFF; --virtual-soft:#E5EDFF; --real:#D9480F; --real-soft:#FFEDE3;
+  --ok:#1A7F4B; --ok-soft:#E0F3E8;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D121A; --surface:#161D28; --ink:#E9EDF4; --muted:#98A3B5; --line:#2A3443;
+  --virtual:#7AA5FF; --virtual-soft:#18274A; --real:#FF8F57; --real-soft:#3A2114;
+  --ok:#5CCB8E; --ok-soft:#15301F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D121A; --surface:#161D28; --ink:#E9EDF4; --muted:#98A3B5; --line:#2A3443;
+  --virtual:#7AA5FF; --virtual-soft:#18274A; --real:#FF8F57; --real-soft:#3A2114;
+  --ok:#5CCB8E; --ok-soft:#15301F; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65;
+  padding:24px 16px 72px}
+.page{max-width:920px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:clamp(24px,6vw,64px)}
+.cover{border-bottom:2px solid var(--ink);padding-bottom:28px;margin-bottom:8px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+h1{margin:0;font-size:clamp(28px,5vw,44px);line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:14px 0 0;font-size:18px;color:var(--muted);max-width:40em}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 24px;margin:24px 0 0;padding:0;list-style:none;font-size:14px}
+.meta b{display:block;font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:600}
+
+h2{margin:44px 0 12px;font-size:24px;line-height:1.3;padding-top:20px;border-top:1px solid var(--line)}
+h2 small{font-family:var(--mono);font-size:15px;color:var(--muted);margin-right:10px;font-weight:500}
+h3{margin:28px 0 8px;font-size:18px}
+p{margin:0 0 12px;max-width:44em}
+ul,ol{margin:0 0 12px;padding-left:1.3em;max-width:44em}
+li{margin:4px 0}
+.callout{background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:4px;padding:14px 16px;margin:16px 0;font-weight:600;font-size:18px;line-height:1.5;max-width:none}
+.draft{background:var(--real-soft);border-left:4px solid var(--real);border-radius:4px;padding:10px 14px;margin:16px 0;font-size:14px;max-width:none}
+.note{font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:12px;margin:10px 0 16px}
+
+.scroll{overflow-x:auto;margin:12px 0 16px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th{text-align:left;font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--muted);padding:8px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.k{font-weight:600;white-space:nowrap}
+td.m,code{font-family:var(--mono);font-size:13px;white-space:nowrap}
+td.c{text-align:center}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:3px;white-space:nowrap}
+.chip.real{background:var(--real-soft);color:var(--real)} .chip.virt{background:var(--virtual-soft);color:var(--virtual)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+
+.flow{display:flex;align-items:stretch;gap:8px;margin:14px 0}
+.node{flex:1;min-width:0;border:2px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.node b{font-size:15px;line-height:1.3}
+.node span{font-size:13px;color:var(--muted);line-height:1.4}
+.node.v{border-color:var(--virtual);background:var(--virtual-soft);border-style:dashed}
+.node.r{border-color:var(--real);background:var(--real-soft)}
+.node.g{border-color:var(--ok);background:var(--ok-soft)}
+.arr{align-self:center;color:var(--muted);font-size:18px;flex:none}
+
+figure{margin:16px 0}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+svg{display:block;width:100%;min-width:680px;height:auto}
+svg text{font-family:var(--sans);fill:var(--ink)}
+.conv{fill:var(--virtual-soft);stroke:var(--virtual);stroke-width:1.5}
+.lane{fill:var(--bg);stroke:var(--virtual);stroke-width:1.5}
+.act{fill:var(--virtual);stroke:none}
+.sens{fill:var(--surface);stroke:var(--real);stroke-width:2}
+.box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.realbox{fill:var(--real-soft);stroke:var(--real);stroke-width:1.5}
+.num circle{fill:var(--ink)} .num text{fill:var(--surface);font-size:12px;font-weight:700;text-anchor:middle}
+.lbl{font-size:12px} .lbl.s{fill:var(--muted);font-size:11px}
+.dir{stroke:var(--muted);stroke-width:1.5;fill:none;marker-end:url(#ah)}
+
+.gantt td.on{background:var(--virtual-soft)} .gantt td.gate{background:var(--real-soft)}
+.gantt th,.gantt td{padding:7px 4px;text-align:center;font-size:12px}
+.gantt td.k{text-align:left;padding-left:10px;font-size:14px}
+.gantt th{font-family:var(--mono);letter-spacing:0}
+
+@media (max-width:720px){.flow{flex-direction:column}.arr{transform:rotate(90deg)}}
+@media print{body{background:none;padding:0}.page{border:0;padding:0;max-width:none}h2{break-after:avoid}figure,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<article class="page">
+
+<header class="cover">
+  <p class="eyebrow">B 프로젝트 · A팀 계획서 초안 v0.2</p>
+  <h1>배터리 셀 입고검사 · 매칭 공급 라인 디지털 트윈</h1>
+  <p class="lede">실물 C 라인(18650 4셀 팩 검사 · 조립) 앞에 붙는 가상 전공정. 셀을 검사하고 LOT를 추적해서, 특성이 비슷한 4개를 한 세트로 묶어 C에 공급함.</p>
+  <ul class="meta">
+    <li><b>팀</b>A팀 · 5명</li>
+    <li><b>기간</b>11/17 ~ 12/8 · 수업일 12일</li>
+    <li><b>툴</b>Factory I/O · MELSEC Q · OPC 서버</li>
+    <li><b>상태</b>초안 · 팀 합의 전</li>
+  </ul>
+</header>
+
+<p class="draft">팀 회의에서 범위가 확정되기 전에 "현재 안"으로 쓴 초안. 목표 수치, 디바이스 번호, 부품 이름은 전부 잠정값이라 맨 아래 "정해야 할 것"을 먼저 보고 고치기.</p>
+
+<h2><small>1</small>개요</h2>
+
+<h3>왜 하는지</h3>
+<p>C 라인은 셀이 들어온 순서대로 슬롯 A~D에 넣음. 1차 검사는 전압만 보고 과방전 셀을 걸러낼 뿐이라, 전압이나 내부저항이 서로 다른 셀이 한 팩에 섞임. 직렬 팩은 셀 편차가 크면 약한 셀이 먼저 한계에 닿아서 팩 전체 용량과 수명이 줄어듦.</p>
+<p>실제 팩 공장은 조립 전에 셀을 검사하고 특성이 비슷한 것끼리 묶어서 넣음. 그런데 C는 스테이션 하나짜리 축소판이라 이 구간을 실물로 붙일 자리도 설비도 없음.</p>
+
+<p class="callout">C 앞단에 없는 "셀 입고검사 → LOT 추적 → NG 분리 → 특성별 분류 → 4셀 매칭 공급"을 Factory I/O에 만들고, 실제 PLC로 제어해서 C와 한 라인으로 묶기.</p>
+
+<h3>뭘 만드는지</h3>
+<ul>
+  <li><b>가상 전공정 라인.</b> Factory I/O에 컨베이어, 센서, 푸셔, 버퍼 레인을 놓고 MELSEC Q 래더로 제어.</li>
+  <li><b>셀 추적 로직.</b> Factory I/O 부품은 데이터를 못 달고 다녀서, PLC 안에서 셀마다 ID · LOT · 전압 · 내부저항 · 등급을 들고 컨베이어 위치를 따라가게 함.</li>
+  <li><b>매칭 공급과 LOT 보류.</b> 같은 등급 4개가 모이면 한 세트로 C에 공급. 특정 LOT에서 NG가 반복되면 그 LOT만 공급을 막음.</li>
+  <li><b>이력 화면.</b> PLC 값을 DB에 쌓고 라인 현황, 셀 이력, 알람을 화면으로 봄.</li>
+</ul>
+
+<h3>실물 C와 어떻게 이어지는지</h3>
+<div class="flow">
+  <div class="node v"><b>가상 전공정 (A팀)</b><span>검사 · 분류 · 4셀 세트 구성</span></div>
+  <div class="arr">⇄</div>
+  <div class="node r"><b>실물 C 라인</b><span>1차 검사 · 로봇 투입 · 2차 검사</span></div>
+  <div class="arr">→</div>
+  <div class="node v"><b>가상 후공정 (B팀)</b><span>완성 팩 창고 · 출고검사</span></div>
+</div>
+<div class="scroll">
+<table>
+  <thead><tr><th>방향</th><th>주고받는 것</th><th>쓰임</th></tr></thead>
+  <tbody>
+    <tr><td class="k">C → 전공정</td><td>1차 검사기로 잰 실물 셀 전압</td><td>가상 셀의 전압값으로 넣어서 등급을 매김</td></tr>
+    <tr><td class="k">C → 전공정</td><td>C 투입 가능 / 정지 상태</td><td>C가 멈추면 세트 공급을 멈춤</td></tr>
+    <tr><td class="k">전공정 → C</td><td>4셀 세트 준비 완료, 셀 ID 4개</td><td>로봇 투입 허가. 셀 ID는 C 슬롯 이력의 출발점</td></tr>
+    <tr><td class="k">전공정 → C</td><td>버퍼 고갈 / 라인 이상</td><td>공급할 세트가 없으면 C 투입 대기</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2><small>2</small>목표</h2>
+
+<h3>정량 목표</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>항목</th><th>비교 기준</th><th>목표 (초안)</th><th>측정 방법</th><th>근거</th></tr></thead>
+  <tbody>
+    <tr><td class="k">팩 내 전압 편차</td><td>온 순서대로 4개씩 묶었을 때</td><td>50% 이상 감소</td><td>실물 셀 전압을 재서 세트별 최대-최소(mV)를 양쪽 방식으로 계산</td><td><span class="chip real">실측</span></td></tr>
+    <tr><td class="k">분류 오류</td><td>-</td><td>100셀 중 0건</td><td>PLC가 정한 등급과 셀이 실제 들어간 레인을 대조</td><td><span class="chip virt">트윈</span></td></tr>
+    <tr><td class="k">NG · 이력 없는 셀 유출</td><td>분리 로직 없을 때 전부 통과</td><td>C 공급 0건</td><td>NG 셀을 정해진 개수만큼 섞어 넣고 공급 지점에서 확인</td><td><span class="chip virt">주입</span></td></tr>
+    <tr><td class="k">LOT 이상 보류</td><td>LOT 구분 없이 계속 공급</td><td>불량 LOT 셀 3개 안에 보류</td><td>한 LOT에만 NG를 몰아 넣고 보류까지 흘러간 셀 수를 셈</td><td><span class="chip virt">주입</span></td></tr>
+    <tr><td class="k">실물 전 로직 오류 발견</td><td>-</td><td>건수 기록</td><td>시험 시나리오별 통과 여부와 고친 내용을 표로 남김</td><td><span class="chip ok">기록</span></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">목표 수치는 내가 임의로 잡은 초안. 11/18 실측과 11/27 첫 측정 뒤에 조정. "주입"은 우리가 넣은 불량을 우리가 잡는 구조라 로직이 동작한다는 증명이지, 실제 불량률 얘기가 아니라는 걸 발표 때 먼저 밝히기.</p>
+
+<h3>역량 목표</h3>
+<ul>
+  <li>실제 PLC와 가상 설비를 OPC로 묶어서 하나의 제어기로 운전</li>
+  <li>시프트 레지스터 기반 추적, 버퍼 관리, 세트 구성 같은 데이터 로직을 래더로 구현</li>
+  <li>PLC → DB → 화면으로 이어지는 수집 구조와 셀 단위 이력 관리</li>
+</ul>
+
+<h2><small>3</small>계획</h2>
+
+<h3>3.1 역할 분담</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>구분</th><th>이름</th><th>맡는 일</th></tr></thead>
+  <tbody>
+    <tr><td class="k">팀장</td><td>최예현</td><td>총괄, PLC 로직: 세트 구성, LOT 보류, C 연계</td></tr>
+    <tr><td class="k">팀원</td><td>이순필</td><td>PLC 로직: 셀 추적, 검사 · 등급 판정, 분류</td></tr>
+    <tr><td class="k">팀원</td><td>박해준</td><td>Factory I/O 씬 제작, I/O 태그 연결, 고장 시나리오</td></tr>
+    <tr><td class="k">팀원</td><td>정연우</td><td>OPC 서버, 수집기, DB, 화면</td></tr>
+    <tr><td class="k">팀원</td><td>김동혁</td><td>실물 셀 실측, 시험 수행과 기록, 문서 · 발표</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.2 공정 시퀀스</h3>
+<div class="flow">
+  <div class="node v"><b>① 입고</b><span>셀 ID 부여, LOT 판별</span></div>
+  <div class="arr">→</div>
+  <div class="node v"><b>② 검사</b><span>전압 + 내부저항으로 합격 여부와 등급 결정</span></div>
+  <div class="arr">→</div>
+  <div class="node v"><b>③ NG 분리</b><span>불합격, 보류 LOT, 이력 없는 셀 배출</span></div>
+  <div class="arr">→</div>
+  <div class="node v"><b>④ 분류 · 버퍼</b><span>등급별 레인에 쌓기</span></div>
+  <div class="arr">→</div>
+  <div class="node g"><b>⑤ 4셀 세트 공급</b><span>같은 등급 4개를 C로</span></div>
+</div>
+<div class="scroll">
+<table>
+  <thead><tr><th>단계</th><th>동작</th><th>판단 · 인터록</th></tr></thead>
+  <tbody>
+    <tr><td class="k">① 입고</td><td>셀이 입고 센서를 지나면 PLC가 일련번호를 붙이고, 비전 센서가 읽은 부품 종류를 LOT로 기록</td><td>버퍼 레인이 전부 만재면 입고 정지</td></tr>
+    <tr><td class="k">② 검사</td><td>검사 위치에 셀을 세우고 그 셀의 전압 · 내부저항 값을 추적 테이블에 채움</td><td>값이 없거나 범위 밖이면 "이력 없음"으로 NG 처리</td></tr>
+    <tr><td class="k">③ NG 분리</td><td>NG 셀이 푸셔 앞에 오면 배출 슈트로 밀어냄. LOT별 NG 횟수를 셈</td><td>한 LOT의 NG가 기준 횟수를 넘으면 그 LOT 전체 공급 보류, 알람</td></tr>
+    <tr><td class="k">④ 분류 · 버퍼</td><td>합격 셀을 등급 A/B/C 레인으로 밀어 넣고 레인별 재고를 셈</td><td>해당 레인이 만재면 메인 컨베이어 대기</td></tr>
+    <tr><td class="k">⑤ 세트 공급</td><td>재고가 4개 이상인 레인에서 4개를 공급 컨베이어로 내보내고, 도착하면 C에 세트 준비 신호와 셀 ID 4개를 넘김</td><td>C가 투입 가능일 때만 공급. 한 등급만 몰려서 다른 레인이 안 차면 일정 시간 뒤 알람</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.3 Factory I/O 배치도 (위에서 본 모습)</h3>
+<div class="scroll">
+<figure>
+<svg viewBox="0 0 1000 470" role="img" aria-label="전공정 라인 배치도">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+
+  <!-- 메인 컨베이어 -->
+  <rect class="act" x="30" y="92" width="50" height="46" rx="4"/>
+  <rect class="conv" x="80" y="95" width="770" height="40"/>
+  <path class="dir" d="M100 115H160"/><path class="dir" d="M760 115H830"/>
+
+  <!-- 입고 센서, 비전 -->
+  <circle class="sens" cx="130" cy="82" r="7"/>
+  <rect class="sens" x="182" y="68" width="26" height="18" rx="3"/>
+  <!-- 검사 위치 -->
+  <rect class="act" x="287" y="90" width="6" height="50"/>
+  <circle class="sens" cx="270" cy="82" r="7"/>
+  <!-- NG 푸셔 + 슈트 -->
+  <circle class="sens" cx="352" cy="82" r="7"/>
+  <rect class="act" x="368" y="62" width="34" height="30" rx="3"/>
+  <rect class="lane" x="368" y="135" width="34" height="70"/>
+  <rect class="box" x="358" y="205" width="54" height="30" rx="4"/>
+  <path class="dir" d="M385 145V195"/>
+
+  <!-- 등급 푸셔 3개 + 레인 -->
+  <g>
+    <circle class="sens" cx="512" cy="82" r="7"/><rect class="act" x="528" y="62" width="34" height="30" rx="3"/>
+    <rect class="lane" x="528" y="135" width="34" height="185"/><rect class="act" x="524" y="300" width="42" height="6"/>
+    <circle class="sens" cx="576" cy="286" r="6"/><path class="dir" d="M545 150V280"/>
+    <text class="lbl" x="545" y="232" text-anchor="middle" font-weight="700">A</text>
+  </g>
+  <g>
+    <circle class="sens" cx="632" cy="82" r="7"/><rect class="act" x="648" y="62" width="34" height="30" rx="3"/>
+    <rect class="lane" x="648" y="135" width="34" height="185"/><rect class="act" x="644" y="300" width="42" height="6"/>
+    <circle class="sens" cx="696" cy="286" r="6"/><path class="dir" d="M665 150V280"/>
+    <text class="lbl" x="665" y="232" text-anchor="middle" font-weight="700">B</text>
+  </g>
+  <g>
+    <circle class="sens" cx="752" cy="82" r="7"/><rect class="act" x="768" y="62" width="34" height="30" rx="3"/>
+    <rect class="lane" x="768" y="135" width="34" height="185"/><rect class="act" x="764" y="300" width="42" height="6"/>
+    <circle class="sens" cx="816" cy="286" r="6"/><path class="dir" d="M785 150V280"/>
+    <text class="lbl" x="785" y="232" text-anchor="middle" font-weight="700">C</text>
+  </g>
+
+  <!-- 공급 컨베이어 -->
+  <rect class="conv" x="500" y="320" width="400" height="40"/>
+  <path class="dir" d="M830 340H885"/>
+  <circle class="sens" cx="870" cy="308" r="7"/>
+  <rect class="realbox" x="900" y="310" width="80" height="60" rx="4"/>
+  <text class="lbl" x="940" y="336" text-anchor="middle" font-weight="700">실물 C</text>
+  <text class="lbl s" x="940" y="353" text-anchor="middle">로봇 투입</text>
+
+  <!-- 조작반 -->
+  <rect class="box" x="30" y="300" width="290" height="80" rx="4"/>
+  <text class="lbl" x="46" y="326" font-weight="700">조작반</text>
+  <text class="lbl s" x="46" y="346">시작 · 정지 · 리셋 · 비상정지</text>
+  <text class="lbl s" x="46" y="364">경광등 · 알람 부저</text>
+
+  <!-- 번호 -->
+  <g class="num">
+    <circle cx="55" cy="60" r="11"/><text x="55" y="64">1</text>
+    <circle cx="100" cy="160" r="11"/><text x="100" y="164">2</text>
+    <circle cx="130" cy="50" r="11"/><text x="130" y="54">3</text>
+    <circle cx="195" cy="44" r="11"/><text x="195" y="48">4</text>
+    <circle cx="280" cy="50" r="11"/><text x="280" y="54">5</text>
+    <circle cx="385" cy="38" r="11"/><text x="385" y="42">6</text>
+    <circle cx="436" cy="220" r="11"/><text x="436" y="224">7</text>
+    <circle cx="665" cy="38" r="11"/><text x="665" y="42">8</text>
+    <circle cx="610" cy="200" r="11"/><text x="610" y="204">9</text>
+    <circle cx="610" cy="303" r="11"/><text x="610" y="307">10</text>
+    <circle cx="520" cy="385" r="11"/><text x="520" y="389">11</text>
+    <circle cx="870" cy="280" r="11"/><text x="870" y="284">12</text>
+    <circle cx="300" cy="290" r="11"/><text x="300" y="294">13</text>
+  </g>
+
+  <!-- 라벨 -->
+  <text class="lbl s" x="55" y="160" text-anchor="middle">셀 입고</text>
+  <text class="lbl s" x="280" y="160" text-anchor="middle">검사 위치</text>
+  <text class="lbl s" x="385" y="254" text-anchor="middle">NG 회수</text>
+  <text class="lbl s" x="665" y="20" text-anchor="middle">등급 푸셔 A · B · C</text>
+  <text class="lbl s" x="700" y="385" text-anchor="middle">공급 컨베이어</text>
+
+  <!-- 범례 -->
+  <g transform="translate(30,420)">
+    <rect class="conv" x="0" y="0" width="22" height="14"/><text class="lbl s" x="30" y="12">컨베이어</text>
+    <rect class="lane" x="110" y="0" width="22" height="14"/><text class="lbl s" x="140" y="12">버퍼 레인 · 슈트</text>
+    <rect class="act" x="260" y="0" width="22" height="14" rx="2"/><text class="lbl s" x="290" y="12">액추에이터 (PLC 출력)</text>
+    <circle class="sens" cx="446" cy="7" r="6"/><text class="lbl s" x="460" y="12">센서 (PLC 입력)</text>
+    <rect class="realbox" x="580" y="0" width="22" height="14"/><text class="lbl s" x="610" y="12">실물</text>
+  </g>
+</svg>
+<figcaption>번호는 아래 부품 표와 같음. 비율은 대략적이고 실제 칸 수는 씬을 만들면서 맞춤.</figcaption>
+</figure>
+</div>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>번호</th><th>역할</th><th>Factory I/O 부품</th><th>수량</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td class="c">1</td><td class="k">셀 입고</td><td>Emitter</td><td class="c">1</td><td>부품 종류 3가지를 섞어 내보냄 = LOT 3개</td></tr>
+    <tr><td class="c">2</td><td class="k">메인 컨베이어</td><td>Belt Conveyor</td><td class="c">3~4</td><td>구간별로 따로 구동</td></tr>
+    <tr><td class="c">3</td><td class="k">입고 감지</td><td>Diffuse Sensor</td><td class="c">1</td><td>여기서 셀 ID 부여</td></tr>
+    <tr><td class="c">4</td><td class="k">LOT 판별</td><td>Vision Sensor</td><td class="c">1</td><td>부품 종류(색)를 LOT로 읽음</td></tr>
+    <tr><td class="c">5</td><td class="k">검사 위치</td><td>Stop Blade + Diffuse Sensor</td><td class="c">1</td><td>셀을 세우고 측정값을 테이블에 채움</td></tr>
+    <tr><td class="c">6</td><td class="k">NG 배출</td><td>Pusher + Diffuse Sensor</td><td class="c">1</td><td></td></tr>
+    <tr><td class="c">7</td><td class="k">NG 회수</td><td>Chute + Remover</td><td class="c">1</td><td></td></tr>
+    <tr><td class="c">8</td><td class="k">등급 분류</td><td>Pusher + Diffuse Sensor</td><td class="c">3</td><td>등급 A · B · C</td></tr>
+    <tr><td class="c">9</td><td class="k">등급 버퍼 레인</td><td>Roller Conveyor</td><td class="c">3</td><td>레인당 6칸 정도</td></tr>
+    <tr><td class="c">10</td><td class="k">레인 출구</td><td>Stop Blade + Diffuse Sensor</td><td class="c">3</td><td>4개씩 내보내기, 재고 카운트</td></tr>
+    <tr><td class="c">11</td><td class="k">공급 컨베이어</td><td>Belt Conveyor</td><td class="c">2</td><td></td></tr>
+    <tr><td class="c">12</td><td class="k">세트 도착 · C 공급</td><td>Diffuse Sensor + Remover</td><td class="c">1</td><td>4개 세면 C에 세트 준비 신호</td></tr>
+    <tr><td class="c">13</td><td class="k">조작반</td><td>Push Button, Emergency Stop, Stack Light, Alarm Siren</td><td class="c">1식</td><td></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">부품 이름은 기억으로 적은 것. 쓰는 에디션의 부품 팔레트에서 이름과 유무를 확인해야 함. 특히 Vision Sensor가 구분할 수 있는 부품 종류 수.</p>
+
+<h3>3.4 I/O와 데이터 (태그맵 초안)</h3>
+<p>가상 설비 신호는 실물 C의 X/Y와 안 겹치게 내부 릴레이와 데이터 레지스터에 둠. 번호대는 제안이고 C 태그맵을 보고 조정.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>구분</th><th>디바이스 (제안)</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr><td class="k">가상 입력</td><td class="m">M1000 ~ M1031</td><td>센서 11개(입고, 검사 위치, NG 앞, 등급 푸셔 앞 3, 레인 출구 3, 세트 도착), 푸셔 전진/후진 끝 8, 조작반 버튼 4</td></tr>
+    <tr><td class="k">가상 입력 (워드)</td><td class="m">D1000</td><td>비전 센서 판별값 = LOT 번호</td></tr>
+    <tr><td class="k">가상 출력</td><td class="m">M1100 ~ M1131</td><td>컨베이어 구동 6, 푸셔 4, 스톱 블레이드 4, Emitter, Remover 2, 경광등 3, 부저</td></tr>
+    <tr><td class="k">셀 추적 테이블</td><td class="m">D1100 ~</td><td>위치 칸마다 셀 ID, LOT, 전압(mV), 내부저항(mΩ), 등급. 컨베이어가 한 칸 갈 때마다 시프트</td></tr>
+    <tr><td class="k">버퍼 · 세트</td><td class="m">D1300 ~</td><td>레인별 재고 수와 대기 셀 ID, 세트 번호, 세트 누계</td></tr>
+    <tr><td class="k">LOT 관리</td><td class="m">D1400 ~</td><td>LOT별 투입 수, NG 수, 보류 플래그</td></tr>
+    <tr><td class="k">C 연계</td><td class="m">D1500 ~</td><td>세트 준비 신호, 세트의 셀 ID 4개, C 투입 가능 상태, C 1차 검사 실측값 수신 영역</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.5 시스템 구성</h3>
+<div class="flow">
+  <div class="node r"><b>MELSEC Q</b><span>래더, 인터록, 셀 추적. 실물 C도 같이 제어</span></div>
+  <div class="arr">⇄</div>
+  <div class="node"><b>OPC 서버</b><span>PC에 설치</span></div>
+  <div class="arr">⇄</div>
+  <div class="node v"><b>Factory I/O</b><span>OPC Client 드라이버</span></div>
+</div>
+<div class="flow">
+  <div class="node"><b>수집기</b><span>PLC 값을 주기적으로 읽음</span></div>
+  <div class="arr">→</div>
+  <div class="node"><b>DB</b><span>셀 · 세트 · 이벤트. B팀과 같은 구조</span></div>
+  <div class="arr">→</div>
+  <div class="node"><b>화면</b><span>라인 현황, 셀 이력 조회, 알람</span></div>
+</div>
+<ul>
+  <li>Factory I/O에는 미쓰비시 전용 드라이버가 없어서 OPC 서버를 거쳐야 함.</li>
+  <li>멈추는 판단은 전부 래더가 함. 화면에서 PLC로 쓰는 건 시험용 고장 주입 정도로만.</li>
+  <li>화면을 상용 SCADA로 할지 직접 만들지는 미정.</li>
+</ul>
+
+<h3>3.6 검사값을 어떻게 넣는지</h3>
+<p>Factory I/O에는 전압이나 저항 개념이 없어서 측정값은 PLC 테이블로 넣어 줌.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>값</th><th>출처</th><th>근거 수준</th></tr></thead>
+  <tbody>
+    <tr><td class="k">전압</td><td>실물 셀을 C 1차 검사기로 잰 값. 미리 재서 표로 넣거나 실시간으로 받음</td><td><span class="chip real">실측</span></td></tr>
+    <tr><td class="k">내부저항</td><td>C 1차 검사가 안 재는 값. 가상 값으로 넣거나 C 검사기에 측정을 추가</td><td><span class="chip virt">가상</span> 또는 <span class="chip real">실측</span></td></tr>
+    <tr><td class="k">LOT</td><td>Factory I/O 부품 종류를 비전 센서로 읽음</td><td><span class="chip virt">트윈</span></td></tr>
+    <tr><td class="k">등급 기준</td><td>실측 전압 분포를 보고 구간을 나눔</td><td>11/18 실측 뒤 결정</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.7 제어설비</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>설비</th><th>사양</th><th>용도</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td class="k">PLC</td><td>MELSEC Q (Q03UDE)</td><td>전공정 제어, C와 공용</td><td>내장 이더넷</td></tr>
+    <tr><td class="k">트윈</td><td>Factory I/O</td><td>가상 전공정 라인</td><td>에디션의 OPC 드라이버 확인 필요</td></tr>
+    <tr><td class="k">OPC 서버</td><td>MX OPC Server 또는 Kepware 등</td><td>PLC ↔ Factory I/O 연결</td><td>미정</td></tr>
+    <tr><td class="k">PC</td><td>Windows</td><td>Factory I/O, OPC 서버, 수집기, DB, 화면</td><td></td></tr>
+    <tr><td class="k">1차 검사기</td><td>C 프로젝트 장비</td><td>실물 셀 전압 실측</td><td>C와 공유</td></tr>
+    <tr><td class="k">18650 셀</td><td>-</td><td>전압 분포 실측, 편차 비교</td><td>쓸 수 있는 개수 확인 필요</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2><small>4</small>일정</h2>
+<div class="scroll">
+<table class="gantt">
+  <thead><tr><th style="text-align:left;padding-left:10px">작업</th><th>11/17</th><th>18</th><th>19</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>30</th><th>12/1</th><th>7</th><th>8</th></tr></thead>
+  <tbody>
+    <tr><td class="k">주제 · 지표 확정, 계획서</td><td class="on"></td><td class="on"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">OPC 연결, 태그맵</td><td></td><td class="on"></td><td class="gate">연결</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">실물 셀 전압 실측</td><td></td><td class="on"></td><td class="on"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">Factory I/O 씬 제작</td><td></td><td></td><td class="on"></td><td class="on"></td><td class="on"></td><td class="gate">마감</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">추적 · 검사 · 분류 래더</td><td></td><td></td><td></td><td class="on"></td><td class="on"></td><td class="on"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">세트 공급, LOT 보류, C 연계</td><td></td><td></td><td></td><td></td><td></td><td class="on"></td><td class="on"></td><td class="on"></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">수집기 · DB · 화면</td><td></td><td></td><td></td><td></td><td class="on"></td><td class="on"></td><td class="on"></td><td class="on"></td><td class="on"></td><td></td><td></td><td></td></tr>
+    <tr><td class="k">시험 · 측정</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="on"></td><td class="gate">첫 수치</td><td class="on"></td><td class="gate">동결</td><td></td><td></td></tr>
+    <tr><td class="k">발표 자료 · 발표</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="on"></td><td class="on"></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">주황 칸은 밀리면 안 되는 날. 11/19에 실기 PLC 연결이 안 되면 GX Simulator 연동으로 내림. 11/25 뒤로는 씬 꾸미기 금지, 12/1 뒤로는 새 기능 금지.</p>
+
+<h2><small>5</small>정해야 할 것</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>항목</th><th>지금 잡아 둔 값</th><th>누가 · 언제</th></tr></thead>
+  <tbody>
+    <tr><td class="k">공정 범위</td><td>입고검사 · LOT 추적 · NG 분리 + 매칭 4셀 공급 + LOT 보류</td><td>팀 회의</td></tr>
+    <tr><td class="k">내부저항 값 출처</td><td>가상 값</td><td>C 검사기 담당과 상의</td></tr>
+    <tr><td class="k">등급 수와 기준</td><td>3등급, 실측 분포로 결정</td><td>11/18 실측 뒤</td></tr>
+    <tr><td class="k">LOT 보류 기준</td><td>NG 횟수 기준(값 미정)</td><td>팀 회의</td></tr>
+    <tr><td class="k">목표 수치</td><td>표의 값은 전부 초안</td><td>11/27 첫 측정 뒤</td></tr>
+    <tr><td class="k">OPC 서버</td><td>미정</td><td>11/19 전에 설치해서 붙여 보기</td></tr>
+    <tr><td class="k">화면</td><td>미정 (기존 HMI / 상용 SCADA / 직접 제작)</td><td>교수님께 인정 범위 확인</td></tr>
+    <tr><td class="k">실물 셀 개수</td><td>모름</td><td>확인</td></tr>
+    <tr><td class="k">B팀과 공유</td><td>태그 번호대, DB 구조, 셀 · 팩 ID 규칙</td><td>B팀과 같이</td></tr>
+    <tr><td class="k">역할 배정</td><td>이름은 채움. 누가 뭘 맡는지는 임의로 넣은 것</td><td>팀 회의</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">배경 논의와 B팀 쪽 내용은 <a href="archive/plan_v0.1.html">archive/plan_v0.1.html</a>에 있음.</p>
+
+</article>
+</body>
+</html>

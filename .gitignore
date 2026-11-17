@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+plc/softplc.log
+docs/.qa/
+factoryio/live-trace*.json
