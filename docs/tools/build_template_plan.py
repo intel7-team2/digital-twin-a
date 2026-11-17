@@ -49,7 +49,7 @@ body{color:var(--ink)}.cover .course{color:var(--accent);border-color:var(--acce
  .diagram{overflow-x:auto}.diagram svg{min-width:720px}.draft{font-size:13px}.indent{margin-left:0}
 }
 '''
-# v0.9: submission content; no changes to the Factory I/O or PLC prototype.
+# v0.10: submission content; no changes to the Factory I/O or PLC prototype.
 # Reference: user-supplied "디지털 트윈 2B 계획서.hwpx" (4조), 2026-11-17.
 # Its process/data/interface structure is referenced; numerical claims are not adopted.
 css+='''
@@ -64,7 +64,7 @@ css+='''
 # Title and heading styles read from the supplied 4조 HWPX charPr 13/10/15/21.
 # 휴먼명조 is unavailable locally; Batang is the HWPX-declared substitution.
 css+='''
-@font-face{font-family:PlanHeadline;src:url("assets/plan_v0.9-headline.ttf") format("truetype");font-weight:400;font-style:normal}
+@font-face{font-family:PlanHeadline;src:url("assets/plan_v0.10-headline.ttf") format("truetype");font-weight:400;font-style:normal}
 h1{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:20pt;font-weight:400;color:#000;text-align:center;line-height:1.6;letter-spacing:0}
 h2{font-family:PlanHeadline,"HY헤드라인M","HYHeadLine-Medium";font-size:15pt;font-weight:400;color:#3a3c84;text-align:left;line-height:1.6;letter-spacing:0}
 h3,h4{font-family:"휴먼명조","Batang","바탕",serif;font-size:13pt;font-weight:700;color:#000;text-align:left;line-height:1.6;letter-spacing:0}
@@ -125,9 +125,9 @@ overview+=arrow('M210 90H260',235,True,True)+arrow('M460 90H510',235,True,True)
 overview+=label(360,23,'배터리 전공정·조립 및 검사·후공정 통합 구성안')
 overview+=label(235,180,'공급 상태·ID')+label(485,180,'검사 결과·제품 ID')
 overview+=label(360,218,'점선: 조별 시스템 간 데이터·인터록 연계 계획 (실물 반송 경로와 구분)')+'</svg></div>'
-pages.append(page('''<p class="draft">v0.9 · 계획서 개정안</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
+pages.append(page('''<p class="draft">v0.10 · 계획서 개정안</p><h1>배터리 셀 입고검사 및 매칭 공급 라인<br>디지털 트윈 프로젝트 계획서</h1>
 <h2>1. 프로젝트 개요</h2><h3>1) 추진 목적 및 적용 범위</h3>
-<p>본 프로젝트는 PLC·로봇·비전 기반 배터리 조립·검사 공정과 연계하여 셀 입고검사, 등급별 분류 및 매칭 공급을 수행하는 가상 전공정을 구축하는 것을 목적으로 한다. 셀의 합격 여부와 특성에 따른 세트 구성을 구분하여 관리하며, 가상 설비에서 분류 시퀀스와 공급 인터록을 검증한 후 실물 설비 연계 조건을 수립한다.</p><figure class="equipment-figure"><img src="assets/line-concept-v0.9.png" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><div class="equipment-stages"><span>① 입고·이력 부여</span><span>② 검사·NG 분리</span><span>③ 등급별 버퍼</span><span>④ 4셀 공급</span></div><figcaption>가상 전공정 설계 개념도 · AI 생성 이미지 / 실제 구현 화면 및 확정 배치도 아님</figcaption></figure><div class="scope-strip"><span><b>3조</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>4조</b> 가상 후공정</span></div>
+<p>본 프로젝트는 PLC·로봇·비전 기반 배터리 조립·검사 공정과 연계하여 셀 입고검사, 등급별 분류 및 매칭 공급을 수행하는 가상 전공정을 구축하는 것을 목적으로 한다. 셀의 합격 여부와 특성에 따른 세트 구성을 구분하여 관리하며, 가상 설비에서 분류 시퀀스와 공급 인터록을 검증한 후 실물 설비 연계 조건을 수립한다.</p><figure class="equipment-figure"><img src="assets/line-cad-v0.10.png" alt="입고·검사 위치, NG 분리 경로, 세 개의 등급별 버퍼와 공급 컨베이어를 표현한 가상 전공정 설계 개념도"><div class="equipment-stages"><span>① 입고·이력 부여</span><span>② 검사·NG 분리</span><span>③ 등급별 버퍼</span><span>④ 4셀 공급</span></div><figcaption>가상 전공정 CAD 스타일 3D 배치도 · 배치 좌표 기반 / 부품 외형·치수 및 접합 상세 단순화</figcaption></figure><div class="scope-strip"><span><b>3조</b> 가상 전공정</span><i>↔</i><span>실물 조립·검사 설비</span><i>↔</i><span><b>4조</b> 가상 후공정</span></div>
 <h3>2) 주요 개발 범위 및 기능</h3>'''+cards([
 ('입고검사 및 등급 분류','셀 ID·LOT에 검사값을 연결하고 NG와 A·B·C 등급으로 분류'),
 ('공급 조건 검증','동일 등급 4셀 구성, 재고 확인, 설비 준비 상태에 따른 공급 허가'),
@@ -279,6 +279,6 @@ pages.append(page('''<h2>4. 프로젝트 추진일정</h2><p>추진 기간: 2026
 
 assert len(pages)==9
 assert not any(term in ''.join(pages) for term in ['C 라인','실물 C','C →','→ C','왕 성 식','A팀','B팀'])
-document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.9</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
-(BASE/'plan_v0.9.html').write_text(document,encoding='utf-8')
-print('Created',BASE/'plan_v0.9.html')
+document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3조 프로젝트 실시 계획서 v0.10</title><style>'+css+'</style></head><body class="p-brief">'+''.join(pages)+'</body></html>'
+(BASE/'plan_v0.10.html').write_text(document,encoding='utf-8')
+print('Created',BASE/'plan_v0.10.html')
