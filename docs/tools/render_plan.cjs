@@ -7,7 +7,7 @@ const { pathToFileURL } = require('url');
  const executablePath = process.env.PLAN_BROWSER || ['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(p => fs.existsSync(p));
  const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}), headless: true });
  try {
-  const stem = process.argv[2] || 'plan_v0.5';
+  const stem = process.argv[2] || 'plan_v0.6';
   const qa = path.resolve(__dirname, '../.qa', stem);
   fs.mkdirSync(qa, { recursive: true });
   const page = await browser.newPage({ viewport: { width: 1100, height: 1200 }, deviceScaleFactor: 1 });
@@ -30,6 +30,7 @@ const { pathToFileURL } = require('url');
   await page.screenshot({ path: path.join(qa, 'phone.png'), fullPage: true });
   await page.locator('section.page').nth(2).screenshot({ path: path.join(qa, 'phone-goals.png') });
   await page.locator('section.page').nth(4).screenshot({ path: path.join(qa, 'phone-io.png') });
+  await page.locator('section.page').nth(5).screenshot({ path: path.join(qa, 'phone-interface.png') });
   const mobile = await page.evaluate(() => ({ width: innerWidth, contentWidth: document.documentElement.scrollWidth }));
   console.log(JSON.stringify({ mobile }));
   if (mobile.contentWidth > mobile.width) throw new Error('Phone layout overflows');
