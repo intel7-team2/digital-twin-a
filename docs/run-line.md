@@ -28,8 +28,8 @@ Factory I/O는 Modbus TCP/IP Client, 소프트 PLC는 로컬 서버이다.
 | Register Inputs / Outputs | 1 / 0 |
 | 모든 Offset | 0 |
 
-Coils 0~18은 센서(`M1000~M1018`), 19/20/21은 실행/일시정지/씬 리셋이다.
-Holding Register 0은 비전(`D1000`), Discrete Inputs 0~19는 액추에이터(`M1100~M1119`)이다.
+Coils 0~18은 센서(`M2000~M2018`), 19/20/21은 실행/일시정지/씬 리셋이다.
+Holding Register 0은 비전(`D2000`), Discrete Inputs 0~19는 액추에이터(`M2100~M2119`)이다.
 씬에 태그 매핑이 저장되어 있다. 연결 성공은 우측 아래 초록 표시로 확인한다.
 
 `factoryio/auto.cfg`를 이 PC의 `Documents\Factory IO\auto.cfg`에 반영했다.

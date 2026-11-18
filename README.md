@@ -27,6 +27,7 @@ GX Works2나 실물 Q03UDE가 구동하는 것이 아니다. `plc/softplc.py`가
 docs/                 방향·결정 문서, 계획서
   plan_v0.x.hwp       계획서 (가장 높은 번호가 최신, v0.17부터 hwp만)
   design-notes.md     계획서에서 뺀 상세 규칙 (구현 참고용)
+  interface.md        PLC 디바이스 배정, Python 브리지 신호 규약 (초안)
   assets/cellect-*    팀 로고 (워드마크, 흰색 워드마크, 프사용 512px)
   assets/hwp/         계획서 그림 (html 원본과 png)
   tools/hwp/          계획서 hwp 생성 도구

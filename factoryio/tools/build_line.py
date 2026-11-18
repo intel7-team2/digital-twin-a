@@ -217,12 +217,12 @@ def main(scenes_dir, shell, out, tagmap):
         f.write(ET.tostring(root, encoding="unicode") + "\n")
 
     # ---- 태그맵
-    dev = {"BinaryInput": ("M", 1000), "BinaryOutput": ("M", 1100), "IntInput": ("D", 1000)}
+    dev = {"BinaryInput": ("M", 2000), "BinaryOutput": ("M", 2100), "IntInput": ("D", 2000)}
     title = {"BinaryInput": "Factory I/O 센서 -> PLC (비트 입력)", "BinaryOutput": "PLC -> Factory I/O 액추에이터 (비트 출력)",
              "IntInput": "Factory I/O -> PLC (워드 입력)"}
     lines = ["# 태그맵 (line_v0 씬)", "",
              "`factoryio/tools/build_line.py`가 씬과 같이 만드는 파일. 손으로 고치지 말고 스크립트를 고친 뒤 다시 생성.", "",
-             "PLC 디바이스는 제안값. 실물 C의 X/Y와 안 겹치게 내부 릴레이를 씀.", ""]
+             "PLC 디바이스는 2A 대역(2000~2999) 안. 실물 C의 X/Y와 안 겹치게 내부 릴레이를 씀. 전체 배정은 docs/interface.md.", ""]
     for tag in ("BinaryInput", "BinaryOutput", "IntInput"):
         lines += [f"## {title[tag]}", "", "| Factory I/O 주소 | 이름 | PLC 디바이스 | 비고 |", "|---|---|---|---|"]
         for t, n, name, forced in rows:

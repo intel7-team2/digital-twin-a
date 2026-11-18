@@ -1,456 +1,458 @@
 ; line_v0 래더 (명령어 목록). gen_ladder.py가 만든 파일
 
-; 첫 스캔: 판정 기준. D30 전압 하한(mV), D31 내부저항 상한(mΩ), D32 A등급 하한, D33 B등급 하한, D34 LOT 보류 NG 횟수
+; 첫 스캔: 판정 기준. D2200 전압 하한, D2201 전압 상한(mV), D2202 내부저항 상한(mΩ), D2203 A등급 하한, D2204 B등급 하한, D2205 LOT 보류 NG 횟수
     LD     SM402
-    MOV    K3500 D30
-    MOV    K60 D31
-    MOV    K3750 D32
-    MOV    K3650 D33
-    MOV    K3 D34
+    MOV    K3500 D2200
+    MOV    K3800 D2201
+    MOV    K60 D2202
+    MOV    K3750 D2203
+    MOV    K3650 D2204
+    MOV    K3 D2205
 
-; 첫 스캔: 셀 전압 표 D200~D207 (임시값. 실측값으로 바꿀 자리)
+; 첫 스캔: 셀 전압 표 D2600~D2607 (임시값. 실측값으로 바꿀 자리)
     LD     SM402
-    MOV    K3780 D200
-    MOV    K3690 D201
-    MOV    K3620 D202
-    MOV    K3760 D203
-    MOV    K3400 D204
-    MOV    K3660 D205
-    MOV    K3710 D206
-    MOV    K3790 D207
+    MOV    K3780 D2600
+    MOV    K3690 D2601
+    MOV    K3620 D2602
+    MOV    K3760 D2603
+    MOV    K3400 D2604
+    MOV    K3660 D2605
+    MOV    K3710 D2606
+    MOV    K3790 D2607
 
-; 첫 스캔: 셀 내부저항 표 D220~D227 (임시값)
+; 첫 스캔: 셀 내부저항 표 D2620~D2627 (임시값)
     LD     SM402
-    MOV    K35 D220
-    MOV    K38 D221
-    MOV    K42 D222
-    MOV    K36 D223
-    MOV    K40 D224
-    MOV    K75 D225
-    MOV    K37 D226
-    MOV    K39 D227
+    MOV    K35 D2620
+    MOV    K38 D2621
+    MOV    K42 D2622
+    MOV    K36 D2623
+    MOV    K40 D2624
+    MOV    K75 D2625
+    MOV    K37 D2626
+    MOV    K39 D2627
 
-; 운전 자기유지 M0. 정지와 비상정지 버튼은 B접점이라 안 눌렸을 때 ON
-    LD     M1015
-    OR     M0
-    AND    M1016
-    AND    M1018
-    ANI    M90
-    OUT    M0
+; 운전 자기유지 M2300. 정지와 비상정지 버튼은 B접점이라 안 눌렸을 때 ON
+    LD     M2015
+    OR     M2300
+    AND    M2016
+    AND    M2018
+    ANI    M2390
+    OUT    M2300
 
 ; 리셋: 이상, 진행 상태, LOT 보류와 집계를 지움
-    LD     M1017
-    RST    M90
-    RST    M10
-    RST    M11
-    RST    M12
-    RST    M13
-    RST    M30
-    RST    M31
-    RST    M60
-    RST    M61
-    RST    M62
-    RST    M63
-    RST    M70
-    RST    M71
-    RST    M72
-    RST    M73
-    RST    M41
-    RST    M42
-    RST    M43
-    FMOV   K0 D40 K4
-    FMOV   K0 D50 K4
-    FMOV   K0 D100 K10
-    BKRST  M200 K10
+    LD     M2017
+    RST    M2390
+    RST    M2310
+    RST    M2311
+    RST    M2312
+    RST    M2313
+    RST    M2330
+    RST    M2331
+    RST    M2360
+    RST    M2361
+    RST    M2362
+    RST    M2363
+    RST    M2370
+    RST    M2371
+    RST    M2372
+    RST    M2373
+    RST    M2341
+    RST    M2342
+    RST    M2343
+    FMOV   K0 D2440 K4
+    FMOV   K0 D2450 K4
+    FMOV   K0 D2500 K10
+    BKRST  M2500 K10
 
 ; 표시등: 시작등 = 운전 중
-    LD     M0
-    OUT    M1117
+    LD     M2300
+    OUT    M2117
 
 ; 표시등: 정지등 = 정지 또는 이상
-    LDI    M0
-    OR     M90
-    OUT    M1118
+    LDI    M2300
+    OR     M2390
+    OUT    M2118
 
 ; 표시등: 리셋등 = 이상 발생
-    LD     M90
-    OUT    M1119
+    LD     M2390
+    OUT    M2119
 
-; 푸셔가 미는 중이면 M20 (메인 컨베이어 일시 정지용)
-    LD     M60
+; 푸셔가 미는 중이면 M2320 (메인 컨베이어 일시 정지용)
+    LD     M2360
     AND    T10
-    LD     M61
+    LD     M2361
     AND    T11
     ORB
-    LD     M62
+    LD     M2362
     AND    T12
     ORB
-    LD     M63
+    LD     M2363
     AND    T13
     ORB
-    OUT    M20
+    OUT    M2320
 
 ; 컨베이어: 진입
-    LD     M0
-    OUT    M1101
+    LD     M2300
+    OUT    M2101
 
 ; 컨베이어: 메인. 푸셔가 밀 때는 멈춤
-    LD     M0
-    ANI    M20
-    OUT    M1102
+    LD     M2300
+    ANI    M2320
+    OUT    M2102
 
 ; 컨베이어: 레인 A/B/C, 공급
-    LD     M0
-    OUT    M1109
-    OUT    M1111
-    OUT    M1113
-    OUT    M1115
+    LD     M2300
+    OUT    M2109
+    OUT    M2111
+    OUT    M2113
+    OUT    M2115
 
-; 입고 요청 M10: 진입 구간과 검사 위치가 비어 있으면 셀 하나 투입
-    LD     M0
-    ANI    M10
-    ANI    M11
-    ANI    M12
-    ANI    M13
-    ANI    M1001
-    ANI    M90
-    SET    M10
+; 입고 요청 M2310: 진입 구간과 검사 위치가 비어 있으면 셀 하나 투입
+    LD     M2300
+    ANI    M2310
+    ANI    M2311
+    ANI    M2312
+    ANI    M2313
+    ANI    M2001
+    ANI    M2390
+    SET    M2310
 
-; Emitter를 0.1초 켬: 활성화 때 한 개 생성. 도착까지 M10 유지
-    LD     M10
+; Emitter를 0.1초 켬: 활성화 때 한 개 생성. 도착까지 M2310 유지
+    LD     M2310
     OUT    T0 K1
-    LD     M10
+    LD     M2310
     ANI    T0
-    AND    M0
-    OUT    M1100
+    AND    M2300
+    OUT    M2100
 
-; 비전 센서 값이 0이 아니면 D10에 기억 (지나가는 셀의 LOT. 1=파랑, 4=초록, 7=금속으로 가정)
-    LD<>   D1000 K0
-    MOV    D1000 D10
+; 비전 센서 값이 0이 아니면 D2410에 기억 (지나가는 셀의 LOT. 1=파랑, 4=초록, 7=금속으로 가정)
+    LD<>   D2000 K0
+    MOV    D2000 D2410
 
-; 검사 위치 도착(상승 에지): 셀 ID(D0) 부여, 표에서 전압(D20)과 내부저항(D21)을 꺼내고 LOT(D12)를 붙임
-    LDP    M1001
-    SET    M11
-    RST    M10
-    INC    D0
-    /      D0 K8 D2
-    MOV    D3 Z1
-    MOV    D200Z1 D20
-    MOV    D220Z1 D21
-    MOV    D10 D12
-    MOV    D12 Z0
-    MOV    K0 D10
+; 검사 위치 도착(상승 에지): 셀 ID(D2400) 부여, 표에서 전압(D2420)과 내부저항(D2421)을 꺼내고 LOT(D2412)를 붙임
+    LDP    M2001
+    SET    M2311
+    RST    M2310
+    INC    D2400
+    /      D2400 K8 D2402
+    MOV    D2403 Z1
+    MOV    D2600Z1 D2420
+    MOV    D2620Z1 D2421
+    MOV    D2410 D2412
+    MOV    D2412 Z0
+    MOV    K0 D2410
 
 ; 검사 시간 1초
-    LD     M11
+    LD     M2311
     OUT    T1 K10
 
-; NG 판정 M50: 전압 미달, 내부저항 초과, LOT 못 읽음(이력 없음), 보류 중인 LOT
-    LD<    D20 D30
-    OR>    D21 D31
-    OR=    D12 K0
-    OR     M200Z0
-    OUT    M50
+; NG 판정 M2350: 전압 미달·초과, 내부저항 초과, LOT 못 읽음(이력 없음), 보류 중인 LOT
+    LD<    D2420 D2200
+    OR>    D2420 D2201
+    OR>    D2421 D2202
+    OR=    D2412 K0
+    OR     M2500Z0
+    OUT    M2350
 
-; 목적지 D22: 0=NG, 1=A, 2=B, 3=C
-    LD     M50
-    MOV    K0 D22
-    LDI    M50
-    AND>=  D20 D32
-    MOV    K1 D22
-    LDI    M50
-    AND<   D20 D32
-    AND>=  D20 D33
-    MOV    K2 D22
-    LDI    M50
-    AND<   D20 D33
-    MOV    K3 D22
+; 목적지 D2422: 0=NG, 1=A, 2=B, 3=C
+    LD     M2350
+    MOV    K0 D2422
+    LDI    M2350
+    AND>=  D2420 D2203
+    MOV    K1 D2422
+    LDI    M2350
+    AND<   D2420 D2203
+    AND>=  D2420 D2204
+    MOV    K2 D2422
+    LDI    M2350
+    AND<   D2420 D2204
+    MOV    K3 D2422
     LD     SM400
-    MOV    D22 Z2
+    MOV    D2422 Z2
 
-; 목적지 수용 가능 M51: NG는 항상 가능, 레인은 예약 4개 미만이고 배출 중이 아닐 때
-    LD=    D22 K0
-    LD<    D40Z2 K4
-    ANI    M40Z2
+; 목적지 수용 가능 M2351: NG는 항상 가능, 레인은 예약 4개 미만이고 배출 중이 아닐 때
+    LD=    D2422 K0
+    LD<    D2440Z2 K4
+    ANI    M2340Z2
     ORB
-    OUT    M51
+    OUT    M2351
 
-; 검사 위치 출발 허가(1스캔 펄스 M14): 검사 끝, 수용 가능, 분류 구간 비어 있음
-    LD     M11
+; 검사 위치 출발 허가(1스캔 펄스 M2314): 검사 끝, 수용 가능, 분류 구간 비어 있음
+    LD     M2311
     AND    T1
-    AND    M51
-    ANI    M12
-    ANI    M13
-    OUT    M14
+    AND    M2351
+    ANI    M2312
+    ANI    M2313
+    OUT    M2314
 
-; 출발: 목적지를 분류 구간용 D23으로 넘기고 스톱 블레이드를 내림(M13)
-    LD     M14
-    MOV    D22 D23
-    SET    M13
+; 출발: 목적지를 분류 구간용 D2423으로 넘기고 스톱 블레이드를 내림(M2313)
+    LD     M2314
+    MOV    D2422 D2423
+    SET    M2313
 
 ; 출발: 레인행이면 그 레인 예약 수 +1
-    LD     M14
-    AND<>  D22 K0
-    INC    D40Z2
+    LD     M2314
+    AND<>  D2422 K0
+    INC    D2440Z2
 
 ; 출발: NG면 그 LOT의 NG 횟수 +1, 기준 이상이면 LOT 보류
-    LD     M14
-    AND    M50
-    INC    D100Z0
-    LD>=   D100Z0 D34
-    AND<>  D12 K0
-    AND    M11
-    SET    M200Z0
+    LD     M2314
+    AND    M2350
+    INC    D2500Z0
+    LD>=   D2500Z0 D2205
+    AND<>  D2412 K0
+    AND    M2311
+    SET    M2500Z0
 
-; 셀이 검사 센서를 벗어나고 0.3초 뒤 블레이드를 다시 올리고 분류 구간 사용 중(M12)으로
-    LD     M13
-    ANI    M1001
+; 셀이 검사 센서를 벗어나고 0.3초 뒤 블레이드를 다시 올리고 분류 구간 사용 중(M2312)으로
+    LD     M2313
+    ANI    M2001
     OUT    T2 K3
     LD     T2
-    RST    M13
-    RST    M11
-    SET    M12
+    RST    M2313
+    RST    M2311
+    SET    M2312
 
 ; 검사 위치 스톱 블레이드: 평소에는 올림, 출발 때만 내림
-    LD     M0
-    ANI    M13
-    OUT    M1103
+    LD     M2300
+    ANI    M2313
+    OUT    M2103
 
 ; 푸셔 NG: 자기 앞 센서에 셀이 오고 목적지가 0이면 밀기 요청
-    LD     M1004
-    AND=   D23 K0
-    AND    M12
-    SET    M60
+    LD     M2004
+    AND=   D2423 K0
+    AND    M2312
+    SET    M2360
 
 ; 푸셔 NG: 센서에서 푸셔 중심까지 가는 시간 (조정 필요)
-    LD     M60
+    LD     M2360
     OUT    T10 K3
-    LD     M60
+    LD     M2360
     AND    T10
-    ANI    M70
-    AND    M0
-    OUT    M1104
+    ANI    M2370
+    AND    M2300
+    OUT    M2104
 
 ; 푸셔 NG: 전진 끝에 닿으면 복귀
-    LD     M60
-    AND    M1002
-    SET    M70
+    LD     M2360
+    AND    M2002
+    SET    M2370
 
-; 푸셔 NG: 복귀 끝에 닿으면 완료(M80, 1스캔)
-    LD     M70
-    AND    M1003
-    OUT    M80
+; 푸셔 NG: 복귀 끝에 닿으면 완료(M2380, 1스캔)
+    LD     M2370
+    AND    M2003
+    OUT    M2380
 
 ; 푸셔 NG: 완료 처리. 분류 구간 비움
-    LD     M80
-    RST    M60
-    RST    M70
-    RST    M12
+    LD     M2380
+    RST    M2360
+    RST    M2370
+    RST    M2312
 
 ; 푸셔 A: 자기 앞 센서에 셀이 오고 목적지가 1이면 밀기 요청
-    LD     M1007
-    AND=   D23 K1
-    AND    M12
-    SET    M61
+    LD     M2007
+    AND=   D2423 K1
+    AND    M2312
+    SET    M2361
 
 ; 푸셔 A: 센서에서 푸셔 중심까지 가는 시간 (조정 필요)
-    LD     M61
+    LD     M2361
     OUT    T11 K3
-    LD     M61
+    LD     M2361
     AND    T11
-    ANI    M71
-    AND    M0
-    OUT    M1105
+    ANI    M2371
+    AND    M2300
+    OUT    M2105
 
 ; 푸셔 A: 전진 끝에 닿으면 복귀
-    LD     M61
-    AND    M1005
-    SET    M71
+    LD     M2361
+    AND    M2005
+    SET    M2371
 
-; 푸셔 A: 복귀 끝에 닿으면 완료(M81, 1스캔)
-    LD     M71
-    AND    M1006
-    OUT    M81
+; 푸셔 A: 복귀 끝에 닿으면 완료(M2381, 1스캔)
+    LD     M2371
+    AND    M2006
+    OUT    M2381
 
 ; 푸셔 A: 완료 처리. 분류 구간 비움, 레인 A 재고 +1
-    LD     M81
-    RST    M61
-    RST    M71
-    RST    M12
-    INC    D51
+    LD     M2381
+    RST    M2361
+    RST    M2371
+    RST    M2312
+    INC    D2451
 
 ; 푸셔 B: 자기 앞 센서에 셀이 오고 목적지가 2이면 밀기 요청
-    LD     M1010
-    AND=   D23 K2
-    AND    M12
-    SET    M62
+    LD     M2010
+    AND=   D2423 K2
+    AND    M2312
+    SET    M2362
 
 ; 푸셔 B: 센서에서 푸셔 중심까지 가는 시간 (조정 필요)
-    LD     M62
+    LD     M2362
     OUT    T12 K3
-    LD     M62
+    LD     M2362
     AND    T12
-    ANI    M72
-    AND    M0
-    OUT    M1106
+    ANI    M2372
+    AND    M2300
+    OUT    M2106
 
 ; 푸셔 B: 전진 끝에 닿으면 복귀
-    LD     M62
-    AND    M1008
-    SET    M72
+    LD     M2362
+    AND    M2008
+    SET    M2372
 
-; 푸셔 B: 복귀 끝에 닿으면 완료(M82, 1스캔)
-    LD     M72
-    AND    M1009
-    OUT    M82
+; 푸셔 B: 복귀 끝에 닿으면 완료(M2382, 1스캔)
+    LD     M2372
+    AND    M2009
+    OUT    M2382
 
 ; 푸셔 B: 완료 처리. 분류 구간 비움, 레인 B 재고 +1
-    LD     M82
-    RST    M62
-    RST    M72
-    RST    M12
-    INC    D52
+    LD     M2382
+    RST    M2362
+    RST    M2372
+    RST    M2312
+    INC    D2452
 
 ; 푸셔 C: 자기 앞 센서에 셀이 오고 목적지가 3이면 밀기 요청
-    LD     M1013
-    AND=   D23 K3
-    AND    M12
-    SET    M63
+    LD     M2013
+    AND=   D2423 K3
+    AND    M2312
+    SET    M2363
 
 ; 푸셔 C: 센서에서 푸셔 중심까지 가는 시간 (조정 필요)
-    LD     M63
+    LD     M2363
     OUT    T13 K3
-    LD     M63
+    LD     M2363
     AND    T13
-    ANI    M73
-    AND    M0
-    OUT    M1107
+    ANI    M2373
+    AND    M2300
+    OUT    M2107
 
 ; 푸셔 C: 전진 끝에 닿으면 복귀
-    LD     M63
-    AND    M1011
-    SET    M73
+    LD     M2363
+    AND    M2011
+    SET    M2373
 
-; 푸셔 C: 복귀 끝에 닿으면 완료(M83, 1스캔)
-    LD     M73
-    AND    M1012
-    OUT    M83
+; 푸셔 C: 복귀 끝에 닿으면 완료(M2383, 1스캔)
+    LD     M2373
+    AND    M2012
+    OUT    M2383
 
 ; 푸셔 C: 완료 처리. 분류 구간 비움, 레인 C 재고 +1
-    LD     M83
-    RST    M63
-    RST    M73
-    RST    M12
-    INC    D53
+    LD     M2383
+    RST    M2363
+    RST    M2373
+    RST    M2312
+    INC    D2453
 
-; 운전 중 분류 구간에 20초 넘게 머물면 이상(M90)
-    LD     M12
-    AND    M0
+; 운전 중 분류 구간에 20초 넘게 머물면 이상(M2390)
+    LD     M2312
+    AND    M2300
     OUT    T40 K200
     LD     T40
-    SET    M90
+    SET    M2390
 
 ; 입고 후 검사 위치 미도착 또는 블레이드 해제 후 미출발 감시
-    LD     M10
-    AND    M0
+    LD     M2310
+    AND    M2300
     OUT    T41 K200
-    LD     M13
-    AND    M0
+    LD     M2313
+    AND    M2300
     OUT    T42 K50
     LD     T41
     OR     T42
-    SET    M90
+    SET    M2390
 
-; 레인 A: 재고 4개, 이동 중인 세트 없음, C 투입 가능(M32가 OFF)이면 배출 시작
-    LD>=   D51 K4
-    ANI    M30
-    ANI    M32
-    ANI    M41
-    AND    M0
-    SET    M41
-    SET    M30
+; 레인 A: 재고 4개, 이동 중인 세트 없음, C 투입 가능(M2332가 OFF)이면 배출 시작
+    LD>=   D2451 K4
+    ANI    M2330
+    ANI    M2332
+    ANI    M2341
+    AND    M2300
+    SET    M2341
+    SET    M2330
 
 ; 레인 A: 마지막 셀 이동을 포함해 12초 동안 블레이드를 내려 4개 배출
-    LD     M41
+    LD     M2341
     OUT    T21 K120
     LD     T21
-    RST    M41
-    MOV    K0 D51
-    MOV    K0 D41
+    RST    M2341
+    MOV    K0 D2451
+    MOV    K0 D2441
 
 ; 레인 A 스톱 블레이드
-    LD     M0
-    ANI    M41
-    OUT    M1110
+    LD     M2300
+    ANI    M2341
+    OUT    M2110
 
-; 레인 B: 재고 4개, 이동 중인 세트 없음, C 투입 가능(M32가 OFF)이면 배출 시작
-    LD>=   D52 K4
-    ANI    M30
-    ANI    M32
-    ANI    M42
-    AND    M0
-    SET    M42
-    SET    M30
+; 레인 B: 재고 4개, 이동 중인 세트 없음, C 투입 가능(M2332가 OFF)이면 배출 시작
+    LD>=   D2452 K4
+    ANI    M2330
+    ANI    M2332
+    ANI    M2342
+    AND    M2300
+    SET    M2342
+    SET    M2330
 
 ; 레인 B: 마지막 셀 이동을 포함해 12초 동안 블레이드를 내려 4개 배출
-    LD     M42
+    LD     M2342
     OUT    T22 K120
     LD     T22
-    RST    M42
-    MOV    K0 D52
-    MOV    K0 D42
+    RST    M2342
+    MOV    K0 D2452
+    MOV    K0 D2442
 
 ; 레인 B 스톱 블레이드
-    LD     M0
-    ANI    M42
-    OUT    M1112
+    LD     M2300
+    ANI    M2342
+    OUT    M2112
 
-; 레인 C: 재고 4개, 이동 중인 세트 없음, C 투입 가능(M32가 OFF)이면 배출 시작
-    LD>=   D53 K4
-    ANI    M30
-    ANI    M32
-    ANI    M43
-    AND    M0
-    SET    M43
-    SET    M30
+; 레인 C: 재고 4개, 이동 중인 세트 없음, C 투입 가능(M2332가 OFF)이면 배출 시작
+    LD>=   D2453 K4
+    ANI    M2330
+    ANI    M2332
+    ANI    M2343
+    AND    M2300
+    SET    M2343
+    SET    M2330
 
 ; 레인 C: 마지막 셀 이동을 포함해 12초 동안 블레이드를 내려 4개 배출
-    LD     M43
+    LD     M2343
     OUT    T23 K120
     LD     T23
-    RST    M43
-    MOV    K0 D53
-    MOV    K0 D43
+    RST    M2343
+    MOV    K0 D2453
+    MOV    K0 D2443
 
 ; 레인 C 스톱 블레이드
-    LD     M0
-    ANI    M43
-    OUT    M1114
+    LD     M2300
+    ANI    M2343
+    OUT    M2114
 
 ; 세트의 실제 출구 감지를 기억 (타이머만으로 성공 처리하지 않음)
-    LD     M30
-    AND    M1014
-    SET    M31
+    LD     M2330
+    AND    M2014
+    SET    M2331
 
 ; 출구 감지 후 배출이 끝나고 출구가 8초 비었을 때만 완료
-    LD     M30
-    AND    M31
-    ANI    M41
-    ANI    M42
-    ANI    M43
-    ANI    M1014
+    LD     M2330
+    AND    M2331
+    ANI    M2341
+    ANI    M2342
+    ANI    M2343
+    ANI    M2014
     OUT    T30 K80
     LD     T30
-    RST    M30
-    RST    M31
-    INC    D60
+    RST    M2330
+    RST    M2331
+    INC    D2460
 
 ; 공급 배출이 40초 내 완료되지 않으면 이상 정지
-    LD     M30
-    AND    M0
+    LD     M2330
+    AND    M2300
     OUT    T31 K400
     LD     T31
-    SET    M90
+    SET    M2390
 
 ; 끝
     END

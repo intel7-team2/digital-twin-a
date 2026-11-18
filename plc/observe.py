@@ -22,7 +22,7 @@ def main():
         prev_exit = at_exit
         mem = state['memory']
         reduced = {k: mem.get(k, 0) for k in
-                   ('D0', 'D23', 'D51', 'D52', 'D53', 'D60', 'M90', 'M41', 'M42', 'M43')}
+                   ('D2400', 'D2423', 'D2451', 'D2452', 'D2453', 'D2460', 'M2390', 'M2341', 'M2342', 'M2343')}
         reduced.update(exit=at_exit, exits=exits, outputs=state['outputs'])
         if reduced != last:
             events.append({'elapsed': round(time.monotonic()-start, 3), **reduced})

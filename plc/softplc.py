@@ -140,19 +140,19 @@ class Runtime:
                 self.plc = Ladder()
             self.running = True
             for i in range(19):
-                self.plc.mem[f'M{1000+i}'] = int(self.coils[i])
+                self.plc.mem[f'M{2000+i}'] = int(self.coils[i])
             if start:
-                self.plc.mem['M1015'] = 1  # ▶ starts a fresh simulation cycle.
-            self.plc.mem['D1000'] = self.registers[0]
+                self.plc.mem['M2015'] = 1  # ▶ starts a fresh simulation cycle.
+            self.plc.mem['D2000'] = self.registers[0]
             self.plc.scan(dt)
             for i in range(20):
-                self.outputs[i] = bool(self.plc.mem[f'M{1100+i}'])
+                self.outputs[i] = bool(self.plc.mem[f'M{2100+i}'])
             # Remove actuating energy on Stop, E-stop or fault in the same scan.
-            if not self.plc.mem['M0']:
+            if not self.plc.mem['M2300']:
                 for i in range(17):
                     self.outputs[i] = False
             self.outputs[8] = self.outputs[16] = True
-            state = tuple(self.plc.mem[k] for k in ('D0', 'D23', 'M90', 'D51', 'D52', 'D53', 'D60'))
+            state = tuple(self.plc.mem[k] for k in ('D2400', 'D2423', 'M2390', 'D2451', 'D2452', 'D2453', 'D2460'))
             if state != self.last_state:
                 self.events.append({'time': time.strftime('%H:%M:%S'), 'state': state})
                 self.last_state = state
