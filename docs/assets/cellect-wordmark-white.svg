@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="16 50 274 84">
+  <title>Cellect</title>
+  <text x="110" y="120" text-anchor="end" font-family="'Segoe UI Semibold','Segoe UI',Pretendard,'Noto Sans KR',Arial,sans-serif" font-weight="600" font-size="72" fill="#FFFFFF">Ce</text>
+  <rect x="118" y="68" width="22" height="52" rx="4" fill="#FFFFFF"/>
+  <rect x="124" y="62" width="10" height="7" rx="1.5" fill="#FFFFFF"/>
+  <rect x="150" y="68" width="22" height="52" rx="4" fill="#22B573"/>
+  <rect x="156" y="62" width="10" height="7" rx="1.5" fill="#22B573"/>
+  <path d="M155 94 L160 101 L168 85" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="180" y="120" font-family="'Segoe UI Semibold','Segoe UI',Pretendard,'Noto Sans KR',Arial,sans-serif" font-weight="600" font-size="72" fill="#FFFFFF">ect</text>
+</svg>
