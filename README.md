@@ -5,7 +5,7 @@
 인텔 과정 B 프로젝트(디지털 트윈) 2A **Cellect**(Cell + Select) 저장소.
 배터리 조립·검사 공정과 연계할 **가상 전공정**을 Factory I/O + MELSEC Q로 만든다.
 
-현재 계획은 [v0.16 제출용 계획서](docs/plan_v0.16.html) 참고. [인쇄용 PDF](docs/plan_v0.16.pdf)도 제공한다. 프로젝트 실시 계획서 양식과 2D 배치도를 유지하고 검사·측정 조건, LOT 보류 재고 처리, 공급·이력 복구 규칙과 비교시험 지표를 보강했다. 팀 구분은 2A(후공정은 2B), 지도교수는 김유성 교수님이다. [검토·인계 노트](docs/handoff/HANDOFF_2026-11-17.md)에 문제 정의와 미확정 항목을 정리했다.
+현재 계획서는 [v0.18 (hwp)](docs/plan_v0.18.hwp)다. 교수님 피드백(계획서는 hwp로 통일, 보고서처럼 너무 자세하지 않게)에 맞춰 과정 양식과 1조a 계획서 구성을 섞어 다시 썼다. 계획서에서 뺀 상세 규칙은 [설계 메모](docs/design-notes.md)에 있다. 팀 구분은 2A(후공정은 2B), 지도교수는 김유성 교수님이다. [검토·인계 노트](docs/handoff/HANDOFF_2026-11-17.md)에 문제 정의와 미확정 항목을 정리했다.
 
 ## 이 PC에서 시연하기
 
@@ -25,8 +25,11 @@ GX Works2나 실물 Q03UDE가 구동하는 것이 아니다. `plc/softplc.py`가
 
 ```
 docs/                 방향·결정 문서, 계획서
-  plan_v0.x.*         계획 문서 (가장 높은 번호가 최신. html / docx / hwp)
+  plan_v0.x.hwp       계획서 (가장 높은 번호가 최신, v0.17부터 hwp만)
+  design-notes.md     계획서에서 뺀 상세 규칙 (구현 참고용)
   assets/cellect-*    팀 로고 (워드마크, 흰색 워드마크, 프사용 512px)
+  assets/hwp/         계획서 그림 (html 원본과 png)
+  tools/hwp/          계획서 hwp 생성 도구
   archive/            지나간 버전 (참고용)
 factoryio/
   scenes/             Factory I/O 씬 파일 (.factoryio)
@@ -47,6 +50,7 @@ plc/
 ## 규칙
 
 - 문서는 `docs/`에만. 루트에 파일 늘리지 않기.
-- 계획은 `plan_v0.x.html`로 번호를 올려 가며 쓰기. 새 번호가 나오면 이전 것은 `docs/archive/`로.
+- 계획서는 `plan_v0.x.hwp`로 번호를 올려 가며 쓰기. 새 번호가 나오면 이전 것은 `docs/archive/`로.
+- v0.17 hwp는 `docs/tools/hwp/BuildPlan.java`로 만들었다. 틀로 쓴 1조a 계획서와 hwplib(1.1.11) jar는 저장소에 넣지 않았다. 이후 수정은 한글에서 직접 해도 된다.
 - 태그맵은 `plc/` 한 곳에서만 관리하고 나머지는 그걸 참조.
 - 씬, 태그맵, 래더는 스크립트가 만든 파일이라 손으로 고치지 말고 `tools/`의 스크립트를 고쳐서 다시 생성.
