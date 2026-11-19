@@ -1,0 +1,2053 @@
+﻿<FactoryIO Type="MySavedScene" Year="2026" Month="11" Day="18" Hour="15" Minute="38" Second="10" Version="2.5.10" GUID="00000000-0000-0000-0000-000000000000">
+  <Description Data="" />
+  <Camera>
+    <CameraPosition Name="Current" Type="FlyCamera">
+      <Data>
+        <CameraPosition X="12.8816" Y="6.624638" Z="34.01271" />
+        <CameraRotation X="0.04850516" Y="0.9017546" Z="-0.1050223" W="0.4164809" />
+      </Data>
+    </CameraPosition>
+  </Camera>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="2b9d72e8-b43a-4706-8aa4-5c0656b7f6e7">
+      <Position X="36" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z1_BELT" Address="0" Key="a8f9b125-4d6d-4631-af32-0eead7cd745e" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Emitter" Key="90b0aeb4-2a34-4d43-bc59-6cfec3ae84bc">
+      <Position X="24" Y="9" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Emitter_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z1_EMITTER" Address="1" Key="8239498b-df9b-4551-aaa7-dc46b00ed698" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Emitter MinTimeToEmit="2" MaxTimeToEmit="3" UpTo="0" RandomPartPosition="False" RandomPartOrientation="False">
+      <Bases />
+      <Parts RawMaterialBlue="True" RawMaterialGreen="True" RawMaterialMetal="True" />
+    </Emitter>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="c71bd4ca-e322-4e06-ba11-b2fb5b92fd1a">
+      <Position X="31" Y="8" Z="146" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z1_IN_SENS" Address="0" Key="aaf5f365-9494-497d-8e7d-93570c991e2c" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="VisionSensor" Key="27dd1874-a95b-483c-ab8f-eb1d3a81707a">
+      <Position X="42" Y="16" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="10" />
+    <OperatingMode Description="$C_VisionSensor_OM_DetectsAllNumerical_NAME">
+      <GroupIO Description="Default">
+        <IntInput Name="Z1_LOT_VISION" Address="0" Key="49bad4eb-870b-445f-89c0-8ac2683818cd" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="StopBlade" Key="160ad0f8-f893-44f3-826c-743790548047">
+      <Position X="52" Y="6" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_GATE" Address="2" Key="91d59b8f-88b3-415a-a7e2-00d2e5e612db" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="40623415-2667-411c-843f-367b4bf81cad">
+      <Position X="50" Y="8" Z="146" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z2_AT_GATE" Address="1" Key="89867967-75de-458d-8f81-ec0dfd96c970" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="25a62032-7c08-48c7-9209-cdbbbec0b8b5">
+      <Position X="69" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_BELT" Address="3" Key="98be1f93-0b67-4e8a-bdcf-a21f3ed69b7f" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="bd1d6978-91f2-4aab-8f74-c85fbefe35e7">
+      <Position X="55" Y="8" Z="146" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z2_AT_PUSH_1" Address="2" Key="bbf60718-1bd7-42ba-a75c-fea94cc23c7b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Pusher" Key="c2f85268-8840-428f-afd3-25eb6a2a1f24">
+      <Position X="60" Y="6" Z="135" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Pusher_OM_Monostable_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_PUSH_1" Address="4" Key="bfcd86c9-9d95-4b70-ad79-2d40cc1b3e73" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Front">
+        <BinaryInput Name="Z2_PUSH_1_FWD" Address="3" Key="cb94d101-35d8-4ed1-8429-8afabef8ff59" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Back">
+        <BinaryInput Name="Z2_PUSH_1_BWD" Address="4" Key="589f0b62-b41f-44b8-b6f2-f050c9cad322" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="61c2f0e8-7c37-4e23-b7be-ad592f114acf">
+      <Position X="60" Y="3" Z="162" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_TO_ST1_BELT_1" Address="5" Key="ec4c8332-22d5-45e4-ae2f-05d9987d6087" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="777e5a6f-634b-408f-8029-ec0ab0ff160c">
+      <Position X="60" Y="3" Z="187" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_TO_ST1_BELT_2" Address="6" Key="b425d30f-3118-4888-82cc-039c67d16867" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="0d52c564-1e0c-41cc-8997-7b6dfb2342c7">
+      <Position X="73" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="4" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z2_AT_PUSH_3" Address="5" Key="ea3b634b-bfd0-4d69-ae1e-d841d88fba25" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Pusher" Key="7001100a-36c1-490c-b9b2-b4dd61b4edfc">
+      <Position X="78" Y="6" Z="149" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Pusher_OM_Monostable_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_PUSH_3" Address="7" Key="e034196b-33b8-47a9-8552-3a2ab4f0e29a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Front">
+        <BinaryInput Name="Z2_PUSH_3_FWD" Address="6" Key="4875aedb-d814-4e20-aabd-6ec7ee55aee7" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Back">
+        <BinaryInput Name="Z2_PUSH_3_BWD" Address="7" Key="53883398-4a04-4df8-8c80-551cf8e8d720" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="e118bb99-9f3b-4352-abcd-6865db187387">
+      <Position X="78" Y="3" Z="122" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="4" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_TO_ST3_BELT_1" Address="8" Key="e80506c7-419a-404f-970b-0fe2cf5be11b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="c67f9a65-f995-4cfd-bc12-1e2a33c41748">
+      <Position X="78" Y="3" Z="97" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z2_TO_ST3_BELT_2" Address="9" Key="164a7a25-c5c4-43a8-a893-e756e30f1bfa" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="28fd4082-2be8-417e-a8bb-08d81c3c8780">
+      <Position X="59" Y="3" Z="198" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST1_FEED_BELT" Address="10" Key="c24e71bd-7dd7-430b-9f8a-3ffb1577a954" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="157aaebf-e4b7-4ee3-ad57-e40e58d8eeb3">
+      <Position X="76" Y="3" Z="198" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="4" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST1_IN_BELT" Address="11" Key="3c902787-f77f-48cd-b385-e6ad73559176" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="4a37049f-d64f-466d-91c7-854f63287059">
+      <Position X="83" Y="8" Z="194" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="5" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_ST1_IN" Address="8" Key="59fdc2d1-119a-4e46-a6f9-988c09791204" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="MachiningCenter" Key="5b573d4f-3cc5-4c12-9f5b-59cc7b0d206c">
+      <Position X="106" Y="9" Z="209" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="produceLids">
+        <BinaryOutput Name="Z3_ST1_LIDS" Address="12" Key="e1e58ea1-2eef-4498-a5a2-cf0c45c07b05" OpenCircuit="False" ShortCircuit="False" UseForcedValue="True" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="start">
+        <BinaryOutput Name="Z3_ST1_START" Address="13" Key="2249a222-4fac-4ba6-bfcc-3d5831e18ff2" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="stop">
+        <BinaryOutput Name="Z3_ST1_STOP" Address="14" Key="9ad65b88-c320-4d01-8fe4-1067f058d86e" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="reset">
+        <BinaryOutput Name="Z3_ST1_RESET" Address="15" Key="dafee28d-231e-4295-a21a-e3322535f3f6" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="isBusy">
+        <BinaryInput Name="Z3_ST1_BUSY" Address="9" Key="d90c6f31-12b3-4940-9625-e5f30e19d705" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="hasError">
+        <BinaryInput Name="Z3_ST1_ERROR" Address="10" Key="1212dfdd-b619-46a4-abec-e13c4122726b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="door">
+        <BinaryInput Name="Z3_ST1_OPEN" Address="11" Key="0c4e7486-1589-4146-96cf-65dfe93f6a5b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="progress">
+        <IntInput Name="Z3_ST1_PROGRESS" Address="1" Key="3cb95f6c-b1bc-4963-8d1f-ffca54f4fce0" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="30814a42-38a4-4961-9e10-682e23bca64f">
+      <Position X="137" Y="3" Z="198" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="5" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST1_OUT_BELT" Address="16" Key="6b3b2de7-5c16-4547-93e5-2917b9412187" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="b334d4f8-f5ec-4a34-921a-a211ae2990de">
+      <Position X="162" Y="3" Z="198" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="5" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST1_EXT_BELT" Address="17" Key="ae6e76f0-1201-458f-82e3-575557eba491" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="4dbad071-fff1-4994-94c8-1fc80e4dc9be">
+      <Position X="174" Y="8" Z="194" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="6" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_ST1_OUT" Address="12" Key="1cf9c09f-0a09-4937-a0e6-83beb479bcad" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="6e9b1f76-208f-4a60-aa81-6ee19d8cfdff">
+      <Position X="94" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="6" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST2_IN_BELT" Address="18" Key="6e60b4bc-47d5-4b79-8efa-7cf60f2dbec5" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="d55e6677-6126-4a05-8ba1-812754d96593">
+      <Position X="101" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="7" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_ST2_IN" Address="13" Key="e63c6097-309f-4eb1-9360-5aa64aaf8cf7" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="MachiningCenter" Key="23f9ac26-dc73-4de5-96de-b58cd3e4b7b7">
+      <Position X="124" Y="9" Z="153" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="produceLids">
+        <BinaryOutput Name="Z3_ST2_LIDS" Address="19" Key="baf5072d-a94c-4b14-b753-9fcb43936353" OpenCircuit="False" ShortCircuit="False" UseForcedValue="True" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="start">
+        <BinaryOutput Name="Z3_ST2_START" Address="20" Key="94b7f01d-8149-433c-b166-2b2960750892" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="stop">
+        <BinaryOutput Name="Z3_ST2_STOP" Address="21" Key="c257ecd3-1f52-4983-89a6-38fbc3b8fa85" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="reset">
+        <BinaryOutput Name="Z3_ST2_RESET" Address="22" Key="32ee3c82-53c7-4f21-bc63-ef8353565b57" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="isBusy">
+        <BinaryInput Name="Z3_ST2_BUSY" Address="14" Key="1a60552e-db40-4839-bf10-fd77d3dbba71" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="hasError">
+        <BinaryInput Name="Z3_ST2_ERROR" Address="15" Key="3f67c869-f090-45a4-b8ae-571e1d95724a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="door">
+        <BinaryInput Name="Z3_ST2_OPEN" Address="16" Key="421dc13b-7842-485c-941e-d1d29bdfbbd4" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="progress">
+        <IntInput Name="Z3_ST2_PROGRESS" Address="2" Key="4968b374-b13c-416f-988c-80668c9d3c0e" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="bde4c110-43df-4c95-93d1-9f8ba977d85f">
+      <Position X="155" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="7" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST2_OUT_BELT" Address="23" Key="1fddadb4-5e27-4909-b61f-5974af607189" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="68809415-9cb4-4807-a0f7-8822df837d9f">
+      <Position X="159" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="8" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_ST2_OUT" Address="17" Key="11bd9213-c361-4d5a-9f72-2eb1cf1515d2" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="e4dc16fa-bbd8-4c41-933b-d532703e7c40">
+      <Position X="77" Y="3" Z="86" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="8" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST3_FEED_BELT" Address="24" Key="ecc85cd5-7c82-4d89-90de-7a61ef58ac35" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="76173454-f70d-48be-b34b-cd1572c2a905">
+      <Position X="94" Y="3" Z="86" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="9" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST3_IN_BELT" Address="25" Key="06bc092a-33bb-4f6d-9d50-6faf358d2b6b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="de71be24-abe9-4065-8128-49eacbdd26b0">
+      <Position X="101" Y="8" Z="82" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="9" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_ST3_IN" Address="18" Key="a3a29e0b-d6dc-47b0-8ef5-e89e3c991368" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="MachiningCenter" Key="d54a0049-5db7-46b9-b80e-381a39edf1b7">
+      <Position X="124" Y="9" Z="97" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="produceLids">
+        <BinaryOutput Name="Z3_ST3_LIDS" Address="26" Key="07311b34-8082-4dbe-b971-f14167604a7f" OpenCircuit="False" ShortCircuit="False" UseForcedValue="True" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="start">
+        <BinaryOutput Name="Z3_ST3_START" Address="27" Key="5e13a516-c79c-410e-aae3-fe4c96203d5a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="stop">
+        <BinaryOutput Name="Z3_ST3_STOP" Address="28" Key="22d8f2e1-256d-46bf-a0f0-e9abc3f36ec0" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="reset">
+        <BinaryOutput Name="Z3_ST3_RESET" Address="29" Key="46b986d8-11df-487e-ab65-5ba5b266da31" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="isBusy">
+        <BinaryInput Name="Z3_ST3_BUSY" Address="19" Key="2a0001ea-aea6-4e9f-b56b-ab1e5377a467" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="hasError">
+        <BinaryInput Name="Z3_ST3_ERROR" Address="20" Key="4e9bc62b-cebd-40a0-89ce-e6ca6da75602" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="door">
+        <BinaryInput Name="Z3_ST3_OPEN" Address="21" Key="bc6d247d-1340-4d2a-88dd-edd38e95d6c9" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="progress">
+        <IntInput Name="Z3_ST3_PROGRESS" Address="3" Key="46edd081-f721-4e58-8b83-c76065fe89c7" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="37a5fbc9-e5bf-4dd7-862b-6734c41bea8c">
+      <Position X="155" Y="3" Z="86" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="10" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST3_OUT_BELT" Address="30" Key="f52a347f-e44f-456f-9051-c617d7423f89" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="72f218b2-6449-4ecc-9f24-631551662299">
+      <Position X="180" Y="3" Z="86" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="6" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_ST3_EXT_BELT" Address="31" Key="bc8db3ad-020b-401f-ba13-af5ffa0973ff" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="974cb2b3-7ced-4269-8d46-3eeab741ddb9">
+      <Position X="192" Y="8" Z="82" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="10" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_ST3_OUT" Address="22" Key="cc4af20a-5642-4147-ac4c-a87b22db1042" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Aligner2" Key="937b27f7-c247-4b61-b1b0-74288d96b1c3">
+      <Position X="74" Y="8" Z="195" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Aligner2" Key="5201aafc-ab9f-4656-a47e-d371f86472cd">
+      <Position X="74" Y="8" Z="201" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Aligner2" Key="823ebb4c-711b-47da-936f-a7790275a4cc">
+      <Position X="74" Y="8" Z="83" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Aligner2" Key="5c6c607f-5177-44a6-afa9-cc6ff220875d">
+      <Position X="74" Y="8" Z="89" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="WheelAligner" Key="c2b21eb7-f746-4fc9-98b3-269d6715c1f0">
+      <Position X="65" Y="8" Z="193" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="WheelAligner" Key="56483c75-a1e0-4647-97f8-06cc9dbdd58a">
+      <Position X="82" Y="8" Z="91" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor6M" Key="8a030db1-1dfb-4844-8fbd-64cd8cdfd634">
+      <Position X="188" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_COLLECT_BELT" Address="32" Key="77099630-de8d-45b4-8b1e-2162bdc94384" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor6M" Key="9ce01626-e0e7-4aaa-9e79-cff6fb198de1">
+      <Position X="181" Y="3" Z="186" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_FROM_ST1_BELT_1" Address="33" Key="7870f071-f433-43fc-b2ca-62d2071a331a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="e3b69359-3329-40ac-93c4-f34885733f0b">
+      <Position X="181" Y="3" Z="153" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="11" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_FROM_ST1_BELT_2" Address="34" Key="f1435970-0c8e-4944-909a-f4f4d2e8331a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="c188b4ce-e2cb-4c6e-99aa-43301de06629">
+      <Position X="174" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="11" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_MERGE_1" Address="23" Key="93932e32-d2d1-46c9-bacd-c786430e073f" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor6M" Key="a53042b0-7755-4898-972d-b1c54514f491">
+      <Position X="199" Y="3" Z="98" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_FROM_ST3_BELT_1" Address="35" Key="4e60a1da-72f7-4417-a95e-84a33086a326" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="18b58b45-4ac5-4a2f-aa4d-48a11df5332d">
+      <Position X="199" Y="3" Z="131" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="12" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z3_FROM_ST3_BELT_2" Address="36" Key="cf14e622-bb02-4c6f-b69f-9ed8454cae0d" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="47bc6876-6309-450e-a83c-7c101cb0ef2a">
+      <Position X="192" Y="8" Z="146" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="12" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z3_MERGE_3" Address="24" Key="c2045055-ad61-49ec-b4d1-16bf77c83240" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor6M" Key="824cdbe3-d9d8-40e7-8e0a-2748c311e50e">
+      <Position X="237" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="4" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_BELT_1" Address="37" Key="9fee09d2-2493-445b-a525-d3f474278a3c" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="VisionSensor" Key="f5195f9c-1af3-432d-b7bc-8bc3e904130d">
+      <Position X="229" Y="16" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="10" />
+    <OperatingMode Description="$C_VisionSensor_OM_DetectsAllNumerical_NAME">
+      <GroupIO Description="Default">
+        <IntInput Name="Z4_QR_RESCAN" Address="4" Key="84021c62-91aa-42ac-8cd9-545305792f3d" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="55fb0764-0944-49b8-ac0e-77936516437a">
+      <Position X="244" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="13" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_AT_PUSH_NG" Address="25" Key="cdd7d8b1-0c5a-45d5-b8a7-3ba033c99dcc" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Pusher" Key="25ecaee7-39f5-4901-9188-d05a65e0b394">
+      <Position X="249" Y="6" Z="149" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Pusher_OM_Monostable_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_PUSH_NG" Address="38" Key="883dc848-d899-4dc3-8e3f-ce25a7234450" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Front">
+        <BinaryInput Name="Z4_PUSH_NG_FWD" Address="26" Key="1b8bcf74-7c9a-4d02-bcdf-71d9186913d0" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Back">
+        <BinaryInput Name="Z4_PUSH_NG_BWD" Address="27" Key="170e3f84-ea13-410d-8e76-0ef21bda1fd9" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor2M" Key="743022dc-dcca-46ef-8699-fad65ff0746c">
+      <Position X="249" Y="3" Z="130" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="13" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_NG_BELT" Address="39" Key="b74e25e3-07b2-478d-ad96-0aca80decd18" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="CapacitiveSensor" Key="cf10ee32-40c9-4aed-a469-a879f8c40b09">
+      <Position X="249" Y="7" Z="134" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_NG_CONFIRM" Address="28" Key="eb5be032-5c8d-434e-8e9d-a6a4e6c3da1d" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="0.2" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="ChuteConveyor" Key="825ba2d4-25ae-48b9-9bba-1156719e0962">
+      <Position X="249" Y="4" Z="114" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Remover" Key="52606e90-edd1-4636-8d4d-28ab49de2a4f">
+      <Position X="249" Y="1" Z="100" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Remover_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_NG_REMOVER" Address="40" Key="9be6ea4a-8eaf-4456-9262-904c29af37ef" OpenCircuit="False" ShortCircuit="False" UseForcedValue="True" ForcedValue="True" />
+      </GroupIO>
+    </OperatingMode>
+    <Remover>
+      <Bases Pallet="True" SquarePallet="True" StackableBox="True" />
+      <Parts BoxS="True" BoxM="True" BoxL="True" PalletizingBox="True" RawMaterialBlue="True" RawMaterialGreen="True" RawMaterialMetal="True" ProductBaseBlue="True" ProductBaseGreen="True" ProductBaseMetal="True" ProductLidBlue="True" ProductLidGreen="True" ProductLidMetal="True" StackableBox="True" />
+    </Remover>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor6M" Key="5b24149b-1dd4-4f13-82c4-f2846272a52c">
+      <Position X="286" Y="3" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="5" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_BELT_2" Address="41" Key="1acc0cf8-921f-4231-a040-ec9f242c4bd8" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="d2746e3c-7529-4abb-a059-4866edc75ede">
+      <Position X="263" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="14" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_AT_PUSH_A" Address="29" Key="852793b7-22c1-43e5-bf6b-123239f526b7" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Pusher" Key="e0e83641-c491-4d97-a530-68aa2b025e31">
+      <Position X="268" Y="6" Z="149" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="4" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Pusher_OM_Monostable_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_PUSH_A" Address="42" Key="4ffb07cd-bd9a-43ee-b9f4-a661b2d488b9" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Front">
+        <BinaryInput Name="Z4_PUSH_A_FWD" Address="30" Key="980a1590-916c-41e3-bc27-4c705104dab2" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Back">
+        <BinaryInput Name="Z4_PUSH_A_BWD" Address="31" Key="f092e172-0981-462d-967f-272c7de45a81" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="e0513988-1546-4e71-b074-c1040a34640b">
+      <Position X="268" Y="3" Z="122" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="7" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_LANE_A" Address="43" Key="0fa95193-837e-4683-b567-e706e34ada9d" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="dcdcdaf9-4bf0-4804-8718-c9ed8ddfc30d">
+      <Position X="264" Y="8" Z="134" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="15" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_LANE_A_FULL" Address="32" Key="23c117a1-830b-4d32-88b2-6a23dac1a0e8" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="a1392327-3d3d-40ce-b044-8991ae9b92b0">
+      <Position X="264" Y="8" Z="108" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="16" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_LANE_A_HEAD" Address="33" Key="a85f4d30-d7af-42c8-91f4-c9cf25280d17" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="StopBlade" Key="a4bdded8-adb0-4f3d-8dc4-86648af0a018">
+      <Position X="268" Y="6" Z="106" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_LANE_A_STOP" Address="44" Key="b8e07b22-6843-4201-83f7-7ebb1f2b6a3d" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="544d7072-73d8-43c6-b95d-dc126c75dcd8">
+      <Position X="279" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="17" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_AT_PUSH_B" Address="34" Key="5682f888-f25a-4f86-98ab-2c457e99ff70" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Pusher" Key="d827a010-97c4-4c4b-8fda-8d148c733c81">
+      <Position X="284" Y="6" Z="149" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="5" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Pusher_OM_Monostable_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_PUSH_B" Address="45" Key="d13b9581-a956-4f22-9e44-80436e557b62" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Front">
+        <BinaryInput Name="Z4_PUSH_B_FWD" Address="35" Key="ea046a9b-49ce-4f6e-a3ad-bd24b6791a20" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Back">
+        <BinaryInput Name="Z4_PUSH_B_BWD" Address="36" Key="bfa66c0b-ccf7-4e2d-8053-1d44f63a57e4" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="4c31cfed-40ca-4936-a88f-1b46c37da97d">
+      <Position X="284" Y="3" Z="122" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="8" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_LANE_B" Address="46" Key="ab2a969f-ecbe-4c12-a47a-cb67c9f2f11c" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="26362711-9a39-478c-802a-3ceec895c06d">
+      <Position X="280" Y="8" Z="134" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="18" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_LANE_B_FULL" Address="37" Key="22075157-69f8-4120-8b92-0a7456ac046f" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="31ffc8e0-bc71-4c13-944c-33bf6669d39c">
+      <Position X="280" Y="8" Z="108" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="19" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_LANE_B_HEAD" Address="38" Key="b684132d-4d34-47e2-945e-aa7f823aa10b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="StopBlade" Key="d2352a40-fd59-4508-9e79-c0fb4eb26f1b">
+      <Position X="284" Y="6" Z="106" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_LANE_B_STOP" Address="47" Key="601a7638-1493-4edf-b62a-888aac6a89c9" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="03242368-c3c7-467c-86ef-dd2e03c87dfe">
+      <Position X="295" Y="8" Z="138" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="20" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_AT_PUSH_C" Address="39" Key="06eaf58a-b4bb-4080-8264-91d10aae1a6e" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Pusher" Key="32ee8ca6-587f-483a-bcd5-731eacf2d075">
+      <Position X="300" Y="6" Z="149" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="6" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Pusher_OM_Monostable_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_PUSH_C" Address="48" Key="6fe3e286-0986-4116-899b-5685418997e7" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Front">
+        <BinaryInput Name="Z4_PUSH_C_FWD" Address="40" Key="a6f898c0-ab65-4e87-b0f0-30873eced0eb" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="Back">
+        <BinaryInput Name="Z4_PUSH_C_BWD" Address="41" Key="5e5a4bbd-98da-4cb5-8b6a-6a37a8a3cd04" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="731c0430-f3cf-4835-ac97-8179b8b37e1a">
+      <Position X="300" Y="3" Z="122" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="9" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_LANE_C" Address="49" Key="6d45ef9b-f2ed-4948-8657-a535295d450c" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="390a41ab-c646-44a1-931e-e349230b8f31">
+      <Position X="296" Y="8" Z="134" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="21" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_LANE_C_FULL" Address="42" Key="13a5883f-bf15-40bb-ad8e-d168303615a9" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="87c5b838-dbf0-403d-9bda-a71a4904132e">
+      <Position X="296" Y="8" Z="108" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="22" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z4_LANE_C_HEAD" Address="43" Key="2a438243-ad82-4233-8761-e86038e28979" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="StopBlade" Key="8cae7a17-9bfb-41dd-bf2e-aba47d8c26c0">
+      <Position X="300" Y="6" Z="106" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="4" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z4_LANE_C_STOP" Address="50" Key="499ebb61-be1c-46d0-8596-f5cfca5fb561" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="ChuteConveyor" Key="e64bf8c1-4aa7-49a6-9165-c9b53d915ceb">
+      <Position X="318" Y="4" Z="142" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Remover" Key="63e2780c-1cb0-49dd-ac92-0b2427958586">
+      <Position X="332" Y="1" Z="142" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Remover_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="END_REMOVER" Address="51" Key="42097264-d5c3-41cf-8588-259feeae3397" OpenCircuit="False" ShortCircuit="False" UseForcedValue="True" ForcedValue="True" />
+      </GroupIO>
+    </OperatingMode>
+    <Remover>
+      <Bases Pallet="True" SquarePallet="True" StackableBox="True" />
+      <Parts BoxS="True" BoxM="True" BoxL="True" PalletizingBox="True" RawMaterialBlue="True" RawMaterialGreen="True" RawMaterialMetal="True" ProductBaseBlue="True" ProductBaseGreen="True" ProductBaseMetal="True" ProductLidBlue="True" ProductLidGreen="True" ProductLidMetal="True" StackableBox="True" />
+    </Remover>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor6M" Key="38b11471-6a71-4899-9207-9b9b5abbfd11">
+      <Position X="286" Y="3" Z="102" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="6" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z5_COLLECT_BELT" Address="52" Key="fa5d91fc-797d-409a-9156-0d4d9f4cdd0e" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="DiffusePhotoelectricSensor" Key="a109289f-5ef3-4cb1-a43a-8c5ff2e48ce1">
+      <Position X="312" Y="8" Z="98" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="23" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z5_CELL_COUNT" Address="44" Key="fe5701f3-43bb-43f3-951a-1ee96e8d997f" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="BeltConveyor4M" Key="d7d3423b-1886-4113-acc0-dc8bbf3123a1">
+      <Position X="327" Y="3" Z="102" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="10" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_BeltConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z5_FEED_BELT" Address="53" Key="cf86d929-9a0a-4dce-bdc1-efc2d1da247a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Aligner2" Key="dfd76df5-e144-40f8-8833-f58c677760d3">
+      <Position X="333" Y="8" Z="99" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Aligner2" Key="a987a1fa-c417-40dd-8eb3-09d62cf82135">
+      <Position X="333" Y="8" Z="105" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="-1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" Color="7" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="RetroreflectivePhotoelectricSensor" Key="4610fc0b-ac97-4813-aaf4-c5e601dc7064">
+      <Position X="341" Y="8" Z="98" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z5_AT_PICK" Address="45" Key="a330b45e-4a0d-4fb0-b546-3b15fc2a3242" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1.0" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="RetroreflectiveMirror" Key="20684ca0-f700-4bda-9a24-fbcfbbeacbaa">
+      <Position X="341" Y="8" Z="106" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="PickNPlace" Key="14245fc3-0e27-453a-be13-7b78bf58cf40">
+      <Position X="345" Y="11" Z="102" />
+      <Rotation X="0" Y="1" Z="0" W="6.123234e-17" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="-1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="-1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="1" />
+    <OperatingMode Description="$C_PickNPlace_OM_Analogue_NAME">
+      <GroupIO Description="beamVoltage">
+        <AnalogueOutput Name="Z5_PNP_SP_Y" Address="0" Key="211609d8-f1f3-421b-a8fa-41b62405a75b" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+      <GroupIO Description="pickerVoltage">
+        <AnalogueOutput Name="Z5_PNP_SP_Z" Address="1" Key="945c69ca-7c78-424b-8903-808ab8317ee1" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+      <GroupIO Description="headVoltage">
+        <AnalogueOutput Name="Z5_PNP_SP_X" Address="2" Key="a01de132-3ed0-458b-ade1-6f2c563085b0" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+      <GroupIO Description="beamDistance">
+        <AnalogueInput Name="Z5_PNP_Y" Address="0" Key="b5875dbe-0240-4d60-b985-64b21ea6e5b5" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+      <GroupIO Description="pickerDistance">
+        <AnalogueInput Name="Z5_PNP_Z" Address="1" Key="7a7defac-61de-4920-81df-09cc746112ce" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+      <GroupIO Description="headDistance">
+        <AnalogueInput Name="Z5_PNP_X" Address="2" Key="0fa1006c-9d42-4091-ba38-a938491f4c92" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="0" />
+      </GroupIO>
+      <GroupIO Description="boxDetected">
+        <BinaryInput Name="Z5_PNP_DETECTED" Address="46" Key="d63b60b3-ffb6-422b-9424-46a2f099cc11" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="gripperLimit">
+        <BinaryInput Name="Z5_PNP_C_LIMIT" Address="47" Key="42496e6e-8076-4a4a-aa08-58fe35b60309" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="turnGripper">
+        <BinaryOutput Name="Z5_PNP_C_TURN" Address="54" Key="cb52eaeb-0a17-4cea-ab2a-bf7839a04ee6" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+      <GroupIO Description="grab">
+        <BinaryOutput Name="Z5_PNP_GRAB" Address="55" Key="8561cacf-22ca-490f-85f2-0417949aa27d" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Emitter" Key="79d501e7-1a83-4047-bf85-aab226e568cb">
+      <Position X="348" Y="6" Z="80" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Emitter_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z5_PALLET_EMIT" Address="56" Key="ab5c72b0-74e2-4b1b-be76-57089ab528ac" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Emitter MinTimeToEmit="0.1" MaxTimeToEmit="0.1" UpTo="0" RandomPartPosition="False" RandomPartOrientation="False">
+      <Bases Pallet="True" />
+      <Parts />
+    </Emitter>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="RollerConveyor6M" Key="8c3226a5-41cd-4531-9f57-de575fcb76b3">
+      <Position X="348" Y="2" Z="99" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_RollerConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z5_PALLET_ROLLER" Address="57" Key="60f369be-5aa3-4b34-9bcc-06a889d241f3" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="RetroreflectivePhotoelectricSensor" Key="6d0066e8-f1f6-4530-b4ce-649e0b0f36c4">
+      <Position X="344" Y="5" Z="106" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_DefaultSensor_OM_Binary_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="Z5_PALLET_AT_PLACE" Address="48" Key="53e467a9-ff8c-49d2-ae03-ba4217e85188" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Sensor Range="1.184086" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="RetroreflectiveMirror" Key="f9509894-50cb-41f5-bcba-2a863e50e8aa">
+      <Position X="352" Y="5" Z="106" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="RollerConveyor4M" Key="6f2ee1cc-aa65-4fba-b23f-b5276a740048">
+      <Position X="348" Y="2" Z="140" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_RollerConveyor_OM_SingleBinary_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z5_EXIT_ROLLER" Address="58" Key="2eecebad-fc1f-486f-93f2-7ee290a6b2a5" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+    <Encoder Enabled="False" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Remover" Key="91e4f241-7eb8-473d-818b-576ddd1faff2">
+      <Position X="348" Y="6" Z="151" />
+      <Rotation X="0" Y="0" Z="0" W="1" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="0" Y="0" Z="1" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="1" Y="0" Z="0" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Remover_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="Z5_TO_2B" Address="59" Key="790709af-c4cc-427f-b898-e906883b2cee" OpenCircuit="False" ShortCircuit="False" UseForcedValue="True" ForcedValue="True" />
+      </GroupIO>
+    </OperatingMode>
+    <Remover>
+      <Bases Pallet="True" SquarePallet="True" StackableBox="True" />
+      <Parts BoxS="True" BoxM="True" BoxL="True" PalletizingBox="True" RawMaterialBlue="True" RawMaterialGreen="True" RawMaterialMetal="True" ProductBaseBlue="True" ProductBaseGreen="True" ProductBaseMetal="True" ProductLidBlue="True" ProductLidGreen="True" ProductLidMetal="True" StackableBox="True" />
+    </Remover>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="ElectricSwitchboard" Key="02428439-afaf-4733-93cc-34f15511844c">
+      <Position X="36" Y="12" Z="160" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="-1" CurrentOperatingMode="0" />
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="EmergencyStopButton" Key="4930b2b4-9589-48ed-8c34-14be5045fdee">
+      <Position X="37" Y="13" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="PB_ESTOP" Address="49" Key="00a140a3-cd1d-4ad2-8e56-fb8e079fd96e" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="StartPushButton" Key="1ad06e00-861f-479d-9368-1ad445450c33">
+      <Position X="37" Y="12" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" Color="0" />
+    <OperatingMode Description="$C_PushButton_OM_MomentaryAction_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="PB_START" Address="50" Key="c8b6728e-e383-44de-9203-32e2aabe89af" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+        <BinaryOutput Name="PB_START_LAMP" Address="60" Key="4979b933-2b2b-4274-8667-a0c054c87c6a" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="StopPushButton" Key="a0bcbfb7-1d2f-4a49-b4e0-3f664b5ebbd2">
+      <Position X="36" Y="12" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" Color="0" />
+    <OperatingMode Description="$C_PushButton_OM_MomentaryAction_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="PB_STOP" Address="51" Key="e464a377-34ab-4f1b-a34a-9d0200b82672" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+        <BinaryOutput Name="PB_STOP_LAMP" Address="61" Key="0c5d2e09-fb5c-4bad-bc2d-b61784a55fad" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="ResetPushButton" Key="b269f855-8d21-4ed5-8079-b881066b0ab4">
+      <Position X="35" Y="12" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" Color="0" />
+    <OperatingMode Description="$C_PushButton_OM_MomentaryAction_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="PB_RESET" Address="52" Key="528394d0-73c2-49ce-a9bf-b0f883fd4f10" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+        <BinaryOutput Name="PB_RESET_LAMP" Address="62" Key="9900df06-af2a-42cc-a228-d51dbe4c2364" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="Selector" Key="837b3083-321f-41db-9942-55c5ba59c281">
+      <Position X="35" Y="13" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" />
+    <OperatingMode Description="$C_Selector_Type1_NAME">
+      <GroupIO Description="Default">
+        <BinaryInput Name="SEL_ASSY_READY" Address="53" Key="440e3d34-1d09-439e-accc-8bf7f9279dd3" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="LightIndicator" Key="f62216e9-6155-4684-9955-620e917b59cc">
+      <Position X="37" Y="11" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="1" CurrentOperatingMode="0" Color="2" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="LAMP_GREEN_RUN" Address="63" Key="4e5813cd-f93f-4180-ae28-6722440164aa" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="LightIndicator" Key="cd01ee69-7c12-4af5-a453-99dc26b99794">
+      <Position X="36" Y="11" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="2" CurrentOperatingMode="0" Color="1" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="LAMP_YELLOW_HOLD" Address="64" Key="b22576fc-ee0e-444f-a2f2-6c7b57959aae" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Object Locked="False" GroupKey="00000000-0000-0000-0000-000000000000">
+    <Proxy PrefabName="LightIndicator" Key="47e7d411-f8aa-4638-84cf-61b8594c993e">
+      <Position X="35" Y="11" Z="162" />
+      <Rotation X="0" Y="0.7071068" Z="0" W="-0.7071068" />
+      <FineRotation>0</FineRotation>
+      <FinePosition>0</FinePosition>
+      <Forward X="-1" Y="0" Z="0" />
+      <Up X="0" Y="1" Z="0" />
+      <Right X="0" Y="0" Z="1" />
+    </Proxy>
+    <ComponentIO Index="3" CurrentOperatingMode="0" Color="0" />
+    <OperatingMode Description="$C_OM_Default_NAME">
+      <GroupIO Description="Default">
+        <BinaryOutput Name="LAMP_RED_ALARM" Address="65" Key="87b52a1f-62e9-4f35-8f48-036049c92c8f" OpenCircuit="False" ShortCircuit="False" UseForcedValue="False" ForcedValue="False" />
+      </GroupIO>
+    </OperatingMode>
+  </Object>
+  <Instructor Password="" LockCurrentParts="False" RunModeOnly="False" HideFailures="False" />
+  <Drivers CurrentDriver="64" RunInputKey="bf3cdcc0-42f9-49a4-87a1-af228d0b9145" PauseInputKey="29eedd17-8926-439b-bff4-a13f238177a5" ResetInputKey="96a91340-f277-4b18-9283-17b4ee448ede" TimeScaleInputKey="a137aba7-d917-429b-b375-93bf6c3e951b" RunOutputKey="42662736-4a78-4c0c-a816-9fe9aaaeeeb2" PauseOutputKey="2aaed814-ebb7-4a12-83ec-8ceb965320bb" ResetOutputKey="4bd2403f-3add-4584-94ed-453db9575708" CameraIndexOutputKey="b7664083-e89a-4291-82e6-e5f408def60c">
+    <Advantech4750>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="0" NumericOutputCount="0" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties BoardCount="1">
+        <Board InvertBitInputs="False" InvertBitOutputs="False" />
+      </Properties>
+    </Advantech4750>
+    <Advantech4704>
+      <PointIOCount BitInputCount="8" BitOutputCount="8" FloatInputCount="2" FloatOutputCount="8" IntInputCount="0" IntOutputCount="0" NumericInputCount="0" NumericOutputCount="0" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties BoardCount="1">
+        <Board InvertBitInputs="False" InvertBitOutputs="False" />
+      </Properties>
+    </Advantech4704>
+    <AllenBradleyLogix5000>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="4" FloatOutputCount="4" IntInputCount="4" IntOutputCount="4" NumericInputCount="0" NumericOutputCount="0" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties BitInputPrefix="BOOL_IN_" BitOutputPrefix="BOOL_OUT_" FloatInputPrefix="FLOAT_IN_" FloatOutputPrefix="FLOAT_OUT_" IntInputPrefix="INT_IN_" IntOutputPrefix="INT_OUT_" />
+    </AllenBradleyLogix5000>
+    <AllenBradleyMicro800>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="4" FloatOutputCount="4" IntInputCount="4" IntOutputCount="4" NumericInputCount="0" NumericOutputCount="0" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties BitInputPrefix="BOOL_IN_" BitOutputPrefix="BOOL_OUT_" FloatInputPrefix="FLOAT_IN_" FloatOutputPrefix="FLOAT_OUT_" IntInputPrefix="INT_IN_" IntOutputPrefix="INT_OUT_" />
+    </AllenBradleyMicro800>
+    <AllenBradleyMicroLogix>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="4" FloatOutputCount="4" IntInputCount="4" IntOutputCount="4" NumericInputCount="0" NumericOutputCount="0" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="4" IntInputOffset="0" IntOutputOffset="4" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties BitInputPrefix="B3:" BitOutputPrefix="O:0." FloatInputPrefix="F8:" FloatOutputPrefix="F8:" IntInputPrefix="N7:" IntOutputPrefix="N7:" />
+    </AllenBradleyMicroLogix>
+    <AllenBradleySLC5>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="4" FloatOutputCount="4" IntInputCount="4" IntOutputCount="4" NumericInputCount="0" NumericOutputCount="0" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="4" IntInputOffset="0" IntOutputOffset="4" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties BitInputPrefix="B3:" BitOutputPrefix="O:2." FloatInputPrefix="F8:" FloatOutputPrefix="F8:" IntInputPrefix="N7:" IntOutputPrefix="N7:" />
+    </AllenBradleySLC5>
+    <Automgen>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="8" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="200" NumericOutputOffset="300" />
+      <Properties ScaleFactor="100" />
+    </Automgen>
+    <ControlIO />
+    <MHJ>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="8" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="100" NumericOutputOffset="100" />
+    </MHJ>
+    <ModbusTCPClient>
+      <PointIOCount BitInputCount="57" BitOutputCount="66" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="3" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="0" NumericOutputOffset="0" />
+      <BitOutput0 PointIOKey="a8f9b125-4d6d-4631-af32-0eead7cd745e" />
+      <BitOutput1 PointIOKey="8239498b-df9b-4551-aaa7-dc46b00ed698" />
+      <BitInput0 PointIOKey="aaf5f365-9494-497d-8e7d-93570c991e2c" />
+      <NumericInput0 PointIOKey="49bad4eb-870b-445f-89c0-8ac2683818cd" />
+      <BitOutput2 PointIOKey="91d59b8f-88b3-415a-a7e2-00d2e5e612db" />
+      <BitInput1 PointIOKey="89867967-75de-458d-8f81-ec0dfd96c970" />
+      <BitOutput3 PointIOKey="98be1f93-0b67-4e8a-bdcf-a21f3ed69b7f" />
+      <BitInput2 PointIOKey="bbf60718-1bd7-42ba-a75c-fea94cc23c7b" />
+      <BitOutput4 PointIOKey="bfcd86c9-9d95-4b70-ad79-2d40cc1b3e73" />
+      <BitInput3 PointIOKey="cb94d101-35d8-4ed1-8429-8afabef8ff59" />
+      <BitInput4 PointIOKey="589f0b62-b41f-44b8-b6f2-f050c9cad322" />
+      <BitOutput5 PointIOKey="ec4c8332-22d5-45e4-ae2f-05d9987d6087" />
+      <BitOutput6 PointIOKey="b425d30f-3118-4888-82cc-039c67d16867" />
+      <BitInput5 PointIOKey="ea3b634b-bfd0-4d69-ae1e-d841d88fba25" />
+      <BitOutput7 PointIOKey="e034196b-33b8-47a9-8552-3a2ab4f0e29a" />
+      <BitInput6 PointIOKey="4875aedb-d814-4e20-aabd-6ec7ee55aee7" />
+      <BitInput7 PointIOKey="53883398-4a04-4df8-8c80-551cf8e8d720" />
+      <BitOutput8 PointIOKey="e80506c7-419a-404f-970b-0fe2cf5be11b" />
+      <BitOutput9 PointIOKey="164a7a25-c5c4-43a8-a893-e756e30f1bfa" />
+      <BitOutput10 PointIOKey="c24e71bd-7dd7-430b-9f8a-3ffb1577a954" />
+      <BitOutput11 PointIOKey="3c902787-f77f-48cd-b385-e6ad73559176" />
+      <BitInput8 PointIOKey="59fdc2d1-119a-4e46-a6f9-988c09791204" />
+      <BitOutput12 PointIOKey="e1e58ea1-2eef-4498-a5a2-cf0c45c07b05" />
+      <BitOutput13 PointIOKey="2249a222-4fac-4ba6-bfcc-3d5831e18ff2" />
+      <BitOutput14 PointIOKey="9ad65b88-c320-4d01-8fe4-1067f058d86e" />
+      <BitOutput15 PointIOKey="dafee28d-231e-4295-a21a-e3322535f3f6" />
+      <BitInput9 PointIOKey="d90c6f31-12b3-4940-9625-e5f30e19d705" />
+      <BitInput10 PointIOKey="1212dfdd-b619-46a4-abec-e13c4122726b" />
+      <BitInput11 PointIOKey="0c4e7486-1589-4146-96cf-65dfe93f6a5b" />
+      <NumericInput1 PointIOKey="3cb95f6c-b1bc-4963-8d1f-ffca54f4fce0" />
+      <BitOutput16 PointIOKey="6b3b2de7-5c16-4547-93e5-2917b9412187" />
+      <BitOutput17 PointIOKey="ae6e76f0-1201-458f-82e3-575557eba491" />
+      <BitInput12 PointIOKey="1cf9c09f-0a09-4937-a0e6-83beb479bcad" />
+      <BitOutput18 PointIOKey="6e60b4bc-47d5-4b79-8efa-7cf60f2dbec5" />
+      <BitInput13 PointIOKey="e63c6097-309f-4eb1-9360-5aa64aaf8cf7" />
+      <BitOutput19 PointIOKey="baf5072d-a94c-4b14-b753-9fcb43936353" />
+      <BitOutput20 PointIOKey="94b7f01d-8149-433c-b166-2b2960750892" />
+      <BitOutput21 PointIOKey="c257ecd3-1f52-4983-89a6-38fbc3b8fa85" />
+      <BitOutput22 PointIOKey="32ee3c82-53c7-4f21-bc63-ef8353565b57" />
+      <BitInput14 PointIOKey="1a60552e-db40-4839-bf10-fd77d3dbba71" />
+      <BitInput15 PointIOKey="3f67c869-f090-45a4-b8ae-571e1d95724a" />
+      <BitInput16 PointIOKey="421dc13b-7842-485c-941e-d1d29bdfbbd4" />
+      <NumericInput2 PointIOKey="4968b374-b13c-416f-988c-80668c9d3c0e" />
+      <BitOutput23 PointIOKey="1fddadb4-5e27-4909-b61f-5974af607189" />
+      <BitInput17 PointIOKey="11bd9213-c361-4d5a-9f72-2eb1cf1515d2" />
+      <BitOutput24 PointIOKey="ecc85cd5-7c82-4d89-90de-7a61ef58ac35" />
+      <BitOutput25 PointIOKey="06bc092a-33bb-4f6d-9d50-6faf358d2b6b" />
+      <BitInput18 PointIOKey="a3a29e0b-d6dc-47b0-8ef5-e89e3c991368" />
+      <BitOutput26 PointIOKey="07311b34-8082-4dbe-b971-f14167604a7f" />
+      <BitOutput27 PointIOKey="5e13a516-c79c-410e-aae3-fe4c96203d5a" />
+      <BitOutput28 PointIOKey="22d8f2e1-256d-46bf-a0f0-e9abc3f36ec0" />
+      <BitOutput29 PointIOKey="46b986d8-11df-487e-ab65-5ba5b266da31" />
+      <BitInput19 PointIOKey="2a0001ea-aea6-4e9f-b56b-ab1e5377a467" />
+      <BitInput20 PointIOKey="4e9bc62b-cebd-40a0-89ce-e6ca6da75602" />
+      <BitInput21 PointIOKey="bc6d247d-1340-4d2a-88dd-edd38e95d6c9" />
+      <NumericInput3 PointIOKey="46edd081-f721-4e58-8b83-c76065fe89c7" />
+      <BitOutput30 PointIOKey="f52a347f-e44f-456f-9051-c617d7423f89" />
+      <BitOutput31 PointIOKey="bc8db3ad-020b-401f-ba13-af5ffa0973ff" />
+      <BitInput22 PointIOKey="cc4af20a-5642-4147-ac4c-a87b22db1042" />
+      <BitOutput32 PointIOKey="77099630-de8d-45b4-8b1e-2162bdc94384" />
+      <BitOutput33 PointIOKey="7870f071-f433-43fc-b2ca-62d2071a331a" />
+      <BitOutput34 PointIOKey="f1435970-0c8e-4944-909a-f4f4d2e8331a" />
+      <BitInput23 PointIOKey="93932e32-d2d1-46c9-bacd-c786430e073f" />
+      <BitOutput35 PointIOKey="4e60a1da-72f7-4417-a95e-84a33086a326" />
+      <BitOutput36 PointIOKey="cf14e622-bb02-4c6f-b69f-9ed8454cae0d" />
+      <BitInput24 PointIOKey="c2045055-ad61-49ec-b4d1-16bf77c83240" />
+      <BitOutput37 PointIOKey="9fee09d2-2493-445b-a525-d3f474278a3c" />
+      <NumericInput4 PointIOKey="84021c62-91aa-42ac-8cd9-545305792f3d" />
+      <BitInput25 PointIOKey="cdd7d8b1-0c5a-45d5-b8a7-3ba033c99dcc" />
+      <BitOutput38 PointIOKey="883dc848-d899-4dc3-8e3f-ce25a7234450" />
+      <BitInput26 PointIOKey="1b8bcf74-7c9a-4d02-bcdf-71d9186913d0" />
+      <BitInput27 PointIOKey="170e3f84-ea13-410d-8e76-0ef21bda1fd9" />
+      <BitOutput39 PointIOKey="b74e25e3-07b2-478d-ad96-0aca80decd18" />
+      <BitInput28 PointIOKey="eb5be032-5c8d-434e-8e9d-a6a4e6c3da1d" />
+      <BitOutput40 PointIOKey="9be6ea4a-8eaf-4456-9262-904c29af37ef" />
+      <BitOutput41 PointIOKey="1acc0cf8-921f-4231-a040-ec9f242c4bd8" />
+      <BitInput29 PointIOKey="852793b7-22c1-43e5-bf6b-123239f526b7" />
+      <BitOutput42 PointIOKey="4ffb07cd-bd9a-43ee-b9f4-a661b2d488b9" />
+      <BitInput30 PointIOKey="980a1590-916c-41e3-bc27-4c705104dab2" />
+      <BitInput31 PointIOKey="f092e172-0981-462d-967f-272c7de45a81" />
+      <BitOutput43 PointIOKey="0fa95193-837e-4683-b567-e706e34ada9d" />
+      <BitInput32 PointIOKey="23c117a1-830b-4d32-88b2-6a23dac1a0e8" />
+      <BitInput33 PointIOKey="a85f4d30-d7af-42c8-91f4-c9cf25280d17" />
+      <BitOutput44 PointIOKey="b8e07b22-6843-4201-83f7-7ebb1f2b6a3d" />
+      <BitInput34 PointIOKey="5682f888-f25a-4f86-98ab-2c457e99ff70" />
+      <BitOutput45 PointIOKey="d13b9581-a956-4f22-9e44-80436e557b62" />
+      <BitInput35 PointIOKey="ea046a9b-49ce-4f6e-a3ad-bd24b6791a20" />
+      <BitInput36 PointIOKey="bfa66c0b-ccf7-4e2d-8053-1d44f63a57e4" />
+      <BitOutput46 PointIOKey="ab2a969f-ecbe-4c12-a47a-cb67c9f2f11c" />
+      <BitInput37 PointIOKey="22075157-69f8-4120-8b92-0a7456ac046f" />
+      <BitInput38 PointIOKey="b684132d-4d34-47e2-945e-aa7f823aa10b" />
+      <BitOutput47 PointIOKey="601a7638-1493-4edf-b62a-888aac6a89c9" />
+      <BitInput39 PointIOKey="06eaf58a-b4bb-4080-8264-91d10aae1a6e" />
+      <BitOutput48 PointIOKey="6fe3e286-0986-4116-899b-5685418997e7" />
+      <BitInput40 PointIOKey="a6f898c0-ab65-4e87-b0f0-30873eced0eb" />
+      <BitInput41 PointIOKey="5e5a4bbd-98da-4cb5-8b6a-6a37a8a3cd04" />
+      <BitOutput49 PointIOKey="6d45ef9b-f2ed-4948-8657-a535295d450c" />
+      <BitInput42 PointIOKey="13a5883f-bf15-40bb-ad8e-d168303615a9" />
+      <BitInput43 PointIOKey="2a438243-ad82-4233-8761-e86038e28979" />
+      <BitOutput50 PointIOKey="499ebb61-be1c-46d0-8596-f5cfca5fb561" />
+      <BitOutput51 PointIOKey="42097264-d5c3-41cf-8588-259feeae3397" />
+      <BitOutput52 PointIOKey="fa5d91fc-797d-409a-9156-0d4d9f4cdd0e" />
+      <BitInput44 PointIOKey="fe5701f3-43bb-43f3-951a-1ee96e8d997f" />
+      <BitOutput53 PointIOKey="cf86d929-9a0a-4dce-bdc1-efc2d1da247a" />
+      <BitInput45 PointIOKey="a330b45e-4a0d-4fb0-b546-3b15fc2a3242" />
+      <NumericOutput0 PointIOKey="211609d8-f1f3-421b-a8fa-41b62405a75b" />
+      <NumericOutput1 PointIOKey="945c69ca-7c78-424b-8903-808ab8317ee1" />
+      <NumericOutput2 PointIOKey="a01de132-3ed0-458b-ade1-6f2c563085b0" />
+      <NumericInput5 PointIOKey="b5875dbe-0240-4d60-b985-64b21ea6e5b5" />
+      <NumericInput6 PointIOKey="7a7defac-61de-4920-81df-09cc746112ce" />
+      <NumericInput7 PointIOKey="0fa1006c-9d42-4091-ba38-a938491f4c92" />
+      <BitInput46 PointIOKey="d63b60b3-ffb6-422b-9424-46a2f099cc11" />
+      <BitInput47 PointIOKey="42496e6e-8076-4a4a-aa08-58fe35b60309" />
+      <BitOutput54 PointIOKey="cb52eaeb-0a17-4cea-ab2a-bf7839a04ee6" />
+      <BitOutput55 PointIOKey="8561cacf-22ca-490f-85f2-0417949aa27d" />
+      <BitOutput56 PointIOKey="ab5c72b0-74e2-4b1b-be76-57089ab528ac" />
+      <BitOutput57 PointIOKey="60f369be-5aa3-4b34-9bcc-06a889d241f3" />
+      <BitInput48 PointIOKey="53e467a9-ff8c-49d2-ae03-ba4217e85188" />
+      <BitOutput58 PointIOKey="2eecebad-fc1f-486f-93f2-7ee290a6b2a5" />
+      <BitOutput59 PointIOKey="790709af-c4cc-427f-b898-e906883b2cee" />
+      <BitInput49 PointIOKey="00a140a3-cd1d-4ad2-8e56-fb8e079fd96e" />
+      <BitInput50 PointIOKey="c8b6728e-e383-44de-9203-32e2aabe89af" />
+      <BitOutput60 PointIOKey="4979b933-2b2b-4274-8667-a0c054c87c6a" />
+      <BitInput51 PointIOKey="e464a377-34ab-4f1b-a34a-9d0200b82672" />
+      <BitOutput61 PointIOKey="0c5d2e09-fb5c-4bad-bc2d-b61784a55fad" />
+      <BitInput52 PointIOKey="528394d0-73c2-49ce-a9bf-b0f883fd4f10" />
+      <BitOutput62 PointIOKey="9900df06-af2a-42cc-a228-d51dbe4c2364" />
+      <BitInput53 PointIOKey="440e3d34-1d09-439e-accc-8bf7f9279dd3" />
+      <BitOutput63 PointIOKey="4e5813cd-f93f-4180-ae28-6722440164aa" />
+      <BitOutput64 PointIOKey="b22576fc-ee0e-444f-a2f2-6c7b57959aae" />
+      <BitOutput65 PointIOKey="87b52a1f-62e9-4f35-8f48-036049c92c8f" />
+      <BitInput54 PointIOKey="bf3cdcc0-42f9-49a4-87a1-af228d0b9145" />
+      <BitInput55 PointIOKey="29eedd17-8926-439b-bff4-a13f238177a5" />
+      <BitInput56 PointIOKey="96a91340-f277-4b18-9283-17b4ee448ede" />
+      <Properties ReadCoils="False" ReadHoldingRegisters="False" ScaleFactor="100" />
+    </ModbusTCPClient>
+    <ModbusTCPServer>
+      <PointIOCount BitInputCount="8" BitOutputCount="8" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="1" NumericOutputCount="1" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="0" NumericOutputOffset="0" />
+      <Properties ReadInputDiscretes="False" WriteCoils="False" ReadInputRegisters="False" WriteHoldingRegisters="False" ScaleFactor="100" />
+    </ModbusTCPServer>
+    <OPCClientDA>
+      <Server Url="" Name="" ItemCount="0" MaxItemCount="32" StartsWithFilter="" ContainsFilter="" />
+    </OPCClientDA>
+    <SiemensLOGOTCP>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="2" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="200" NumericOutputOffset="0" />
+      <LOGOProperties WriteDiscreteToVM="False" WriteNumericToVM="False" ScaleFactor="100" />
+    </SiemensLOGOTCP>
+    <SiemensS7300S7400TCP>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="3" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="200" NumericOutputOffset="4" />
+      <S7Properties UseWords="False" />
+      <S7-200Properties WriteDiscreteToVM="False" WriteNumericToVM="False" />
+    </SiemensS7300S7400TCP>
+    <SiemensS71200S71500TCP>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="8" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="100" NumericOutputOffset="100" />
+      <S7Properties UseWords="False" />
+    </SiemensS71200S71500TCP>
+    <SiemensS7PLCSIM>
+      <PointIOCount BitInputCount="16" BitOutputCount="16" FloatInputCount="0" FloatOutputCount="0" IntInputCount="0" IntOutputCount="0" NumericInputCount="8" NumericOutputCount="8" />
+      <PointIOOffset BitInputOffset="0" BitOutputOffset="0" FloatInputOffset="0" FloatOutputOffset="0" IntInputOffset="0" IntOutputOffset="0" NumericInputOffset="30" NumericOutputOffset="30" />
+      <Properties UseWords="False" InstanceName="factoryio" />
+    </SiemensS7PLCSIM>
+  </Drivers>
+  <Screenshot Data="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" />
+</FactoryIO>
