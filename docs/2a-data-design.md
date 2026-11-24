@@ -123,8 +123,12 @@ Factory I/O ─Modbus─ 브리지 ─MX/Modbus─ PLC
                  대시보드/트윈 화면 ←──┘  (이력 = DB, 현재 = 캐시)
 ```
 
-- **조작 HMI는 PLC 쪽(브리지 경유)에 붙는다.** 운전/정지/리셋, 기준값(D2200~), 알람 확인, LOT 보류 해제. DB가 죽어도 라인을 조작할 수 있어야 하므로 DB를 거치지 않는다. 기준값 변경은 브리지가 PLC에 쓰고 동시에 `setpoint_change`에 기록.
-- **대시보드·트윈 화면은 DB + 라이브 캐시를 읽기만 한다.** 제어 쓰기 없음.
+> **11/24 제안 (미확정):** 전 팀 공통 구조 제안은 battery-db [docs/architecture-proposal.md](https://github.com/intel7-team2/battery-db/blob/main/docs/architecture-proposal.md).
+> 요약: 수집기는 **API로** DB에 쓰고(API 키, HTTPS), 모니터링은 **Grafana를 전 팀 공통 방식**으로(SQL 직결, `grafana` 계정, 대시보드 JSON은 battery-db `grafana/<팀>/`), 조작은 아래처럼 **라인별 HMI → 브리지 → PLC**. 2A 작업도 이 방향을 고려해서 한다.
+
+- **조작 HMI는 PLC 쪽(브리지 경유)에 붙는다.** 운전/정지/리셋, 기준값(D2200~), 알람 확인, LOT 보류 해제. DB가 죽어도 라인을 조작할 수 있어야 하므로 DB를 거치지 않는다. 기준값 변경은 브리지가 PLC에 쓰고 결과를 이벤트로 남긴다 (DB에서는 `criteria_set`에 새 행, `changed_by`·`source='hmi'`).
+- **대시보드·트윈 화면은 DB + 라이브 캐시를 읽기만 한다.** 제어 쓰기 없음. 앱·스크립트 조회는 API, Grafana는 SQL.
+- **수집기는 PLC 메일박스를 읽어 API `POST /events`로 보낸다** (DB 비밀번호 대신 API 키, 재전송 안전). 메일박스·ACK 합의 전이라 미구현.
 - 화면상 HMI 위치: 투입부(운전·비상정지), 검사기 뱅크(레인 상태·알람), 박스 배출부(C 인계 상태) 3곳이면 충분.
 - 팩 라인(pack-production)은 자기 수집기가 battery-db의 팩 테이블에 쓰고, 인계는 `supply_handoff`로 맞춘다.
 
@@ -142,7 +146,8 @@ DB는 팀 공통 저장소 [intel7-team2/battery-db](https://github.com/intel7-t
   - `cell.status`에 `retest`, `criteria_set.retest_limit`
   - `equipment_state`(상태 전이), `alarm`
   - 뷰: `v_run_yield`, `v_tester_stats`, `v_box_spread`, `v_set_spread_compare`(순서별 vs 등급별 세트 편차 감소율), `v_lot_status`, `v_pack_trace`, `v_equipment_time`, `v_alarm_open`
-- 수집기 쓰기 규칙: `event_log.event_id` = uuid v5(`run:<run_id>/seq:<메일박스 순번>`), `INSERT ... ON CONFLICT DO NOTHING`.
+- 수집기 쓰기 규칙: `event_log.event_id` = uuid v5(`run:<run_id>/seq:<메일박스 순번>`), `INSERT ... ON CONFLICT DO NOTHING`. API `POST /events`가 이 규칙을 그대로 구현한다 (battery-db `api/README.md`).
+- 화면 개발용 가짜 운전: `sim_run.purpose = 'fake'` (battery-db `schema/test/fake_run.sql`). 실제 데이터가 들어오면 지운다.
 
 ## 5. 정해야 할 것
 
@@ -151,4 +156,5 @@ DB는 팀 공통 저장소 [intel7-team2/battery-db](https://github.com/intel7-t
 - [ ] 이벤트 메일박스 대역 `D2700~D2799` 사용 협의
 - [ ] 재검 허용 횟수 (제안: 1회)
 - [x] DB: battery-db (PostgreSQL 16, Oracle VM). 스키마는 battery-db `schema/`
-- [ ] 셀·박스 ID 형식 팩 팀과 확인 (제안: 셀 `R0012-000037`, 박스 `B0012-A-3`)
+- [ ] 셀·박스 ID 형식 팩 팀과 확인 (제안: 셀 `R0012-000037`, 박스 `B0012-A003`. 가짜 데이터가 이 형식)
+- [ ] 공통 구조 제안 합의 (쓰기 = API, 모니터링 = 공통 Grafana, 조작 = 라인별 HMI): battery-db `docs/architecture-proposal.md`
