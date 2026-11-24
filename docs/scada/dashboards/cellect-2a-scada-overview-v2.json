@@ -1,0 +1,2609 @@
+{
+  "id": null,
+  "uid": "cellect-2a-scada-overview-v2",
+  "title": "Cellect 2A - SCADA Overview v2",
+  "description": "2A 생산 관제. PostgreSQL 조회, 회차별 설비 상태 전이와 품질 기록.",
+  "tags": [
+    "cellect",
+    "2a",
+    "scada",
+    "production-db",
+    "overview"
+  ],
+  "timezone": "Asia/Seoul",
+  "schemaVersion": 41,
+  "version": 3,
+  "editable": false,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "10s",
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "run_id",
+        "label": "시연 회차",
+        "description": "비워 두면 가장 최근에 시작한 2A 실행을 사용합니다.",
+        "type": "textbox",
+        "hide": 0,
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      },
+      {
+        "name": "cell_id",
+        "label": "Cell ID",
+        "description": "전기검사 패널을 좁히고 ID 검색을 실행합니다.",
+        "type": "textbox",
+        "hide": 0,
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      },
+      {
+        "name": "kit_id",
+        "label": "Kit ID",
+        "description": "Kit ID로 구성 셀과 인계 이력을 검색합니다.",
+        "type": "textbox",
+        "hide": 0,
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 40,
+      "type": "stat",
+      "title": "총 투입 셀",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#38BDF8"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "총 투입 셀"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 41,
+      "type": "stat",
+      "title": "외관 PASS",
+      "gridPos": {
+        "x": 3,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#34D399"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "외관 PASS"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 42,
+      "type": "stat",
+      "title": "외관 NG",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#FB7185"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "외관 NG"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 43,
+      "type": "stat",
+      "title": "최종 전기 PASS",
+      "gridPos": {
+        "x": 9,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#34D399"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "최종 전기 PASS"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 44,
+      "type": "stat",
+      "title": "최종 전기 NG",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#FB7185"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "최종 전기 NG"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 45,
+      "type": "stat",
+      "title": "재검 대기",
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#FBBF24"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "재검 대기"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 46,
+      "type": "stat",
+      "title": "완료 Kit",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#38BDF8"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "완료 Kit"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 47,
+      "type": "stat",
+      "title": "열린 알람",
+      "gridPos": {
+        "x": 21,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#FB7185"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "미수집",
+                  "color": "#94A3B8"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "kpi"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "열린 알람"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량"
+              ]
+            }
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 36
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": "canvas",
+      "title": "2A 공정 흐름",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 15,
+        "h": 9
+      },
+      "description": "정적 공정 배치도입니다. 설비 상태 전이는 오른쪽에 표시됩니다.",
+      "options": {
+        "inlineEditing": false,
+        "showAdvancedTypes": false,
+        "root": {
+          "name": "root",
+          "type": "frame",
+          "elements": [
+            {
+              "name": "id",
+              "type": "rectangle",
+              "placement": {
+                "left": 15,
+                "top": 29,
+                "width": 115,
+                "height": 65,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "Cell ID 부여"
+                },
+                "color": {
+                  "fixed": "#E2E8F0"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#13283C"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "arrow-0",
+              "type": "text",
+              "placement": {
+                "left": 130,
+                "top": 46,
+                "width": 21,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "→"
+                },
+                "color": {
+                  "fixed": "#38BDF8"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 19
+              }
+            },
+            {
+              "name": "vision",
+              "type": "rectangle",
+              "placement": {
+                "left": 151,
+                "top": 29,
+                "width": 115,
+                "height": 65,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "외관검사"
+                },
+                "color": {
+                  "fixed": "#E2E8F0"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#13283C"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "arrow-1",
+              "type": "text",
+              "placement": {
+                "left": 266,
+                "top": 46,
+                "width": 21,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "→"
+                },
+                "color": {
+                  "fixed": "#38BDF8"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 19
+              }
+            },
+            {
+              "name": "electrical",
+              "type": "rectangle",
+              "placement": {
+                "left": 287,
+                "top": 29,
+                "width": 115,
+                "height": 65,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "OCV / IR · T1–T4"
+                },
+                "color": {
+                  "fixed": "#E2E8F0"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#13283C"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "arrow-2",
+              "type": "text",
+              "placement": {
+                "left": 402,
+                "top": 46,
+                "width": 21,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "→"
+                },
+                "color": {
+                  "fixed": "#38BDF8"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 19
+              }
+            },
+            {
+              "name": "sort",
+              "type": "rectangle",
+              "placement": {
+                "left": 423,
+                "top": 29,
+                "width": 115,
+                "height": 65,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "A / B / C 분류"
+                },
+                "color": {
+                  "fixed": "#E2E8F0"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#13283C"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "arrow-3",
+              "type": "text",
+              "placement": {
+                "left": 538,
+                "top": 46,
+                "width": 21,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "→"
+                },
+                "color": {
+                  "fixed": "#38BDF8"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 19
+              }
+            },
+            {
+              "name": "kit",
+              "type": "rectangle",
+              "placement": {
+                "left": 559,
+                "top": 29,
+                "width": 115,
+                "height": 65,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "동일군 4셀 Kit"
+                },
+                "color": {
+                  "fixed": "#E2E8F0"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#13283C"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "arrow-4",
+              "type": "text",
+              "placement": {
+                "left": 674,
+                "top": 46,
+                "width": 21,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "→"
+                },
+                "color": {
+                  "fixed": "#38BDF8"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 19
+              }
+            },
+            {
+              "name": "handoff",
+              "type": "rectangle",
+              "placement": {
+                "left": 695,
+                "top": 29,
+                "width": 115,
+                "height": 65,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "팩 라인 인계"
+                },
+                "color": {
+                  "fixed": "#E2E8F0"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#13283C"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "retest-in",
+              "type": "text",
+              "placement": {
+                "left": 296,
+                "top": 112,
+                "width": 112,
+                "height": 30,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "↘ 재검 대상"
+                },
+                "color": {
+                  "fixed": "#FBBF24"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              }
+            },
+            {
+              "name": "retest",
+              "type": "rectangle",
+              "placement": {
+                "left": 413,
+                "top": 106,
+                "width": 105,
+                "height": 42,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "RT 재검"
+                },
+                "color": {
+                  "fixed": "#FBBF24"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              },
+              "background": {
+                "color": {
+                  "fixed": "#352B1B"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#365472"
+                },
+                "width": 1,
+                "radius": 8
+              }
+            },
+            {
+              "name": "retest-out",
+              "type": "text",
+              "placement": {
+                "left": 518,
+                "top": 112,
+                "width": 96,
+                "height": 30,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "PASS ↗"
+                },
+                "color": {
+                  "fixed": "#FBBF24"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 15
+              }
+            },
+            {
+              "name": "feed-status",
+              "type": "text",
+              "placement": {
+                "left": 15,
+                "top": 170,
+                "width": 400,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "실시간 센서 · Buffer 점유량  미수집"
+                },
+                "color": {
+                  "fixed": "#94A3B8"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 14
+              }
+            }
+          ],
+          "background": {
+            "color": {
+              "fixed": "#0B1523"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "검사기 상태 · 실적",
+      "gridPos": {
+        "x": 15,
+        "y": 4,
+        "w": 9,
+        "h": 9
+      },
+      "description": "선택 회차의 마지막 상태 전이와 전기검사 실적입니다. 끝난 구간은 종료로 표시합니다.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\ncore AS (\nWITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\ntotals AS (\n  SELECT count(*) FILTER (WHERE e.result_code IN (1, 2, 3) AND c.status <> 'retest') AS final_pass,\n         count(*) FILTER (WHERE e.result_code = 9 AND c.status IN ('rejected','scrapped')) AS final_ng,\n         count(*) FILTER (WHERE c.status = 'retest') AS retest_pending,\n         count(*) FILTER (WHERE c.grade = 'A' AND e.result_code = 1 AND c.status <> 'retest') AS group_a,\n         count(*) FILTER (WHERE c.grade = 'B' AND e.result_code = 2 AND c.status <> 'retest') AS group_b,\n         count(*) FILTER (WHERE c.grade = 'C' AND e.result_code = 3 AND c.status <> 'retest') AS group_c\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  LEFT JOIN v_cell_electrical_latest e USING (cell_id)\n  GROUP BY r.run_id\n), retest_attempts AS (\n  SELECT c.run_id, count(i.id) AS attempts\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  LEFT JOIN cell_inspection i ON i.cell_id = c.cell_id AND i.kind = 'electrical' AND i.attempt > 1\n  GROUP BY c.run_id\n), rows AS (\n  SELECT m.section, m.position, m.item, m.value, m.unit, m.detail\n  FROM (VALUES (1)) AS anchor(n)\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_run_yield y ON y.run_id = r.run_id\n  LEFT JOIN totals t ON true\n  LEFT JOIN retest_attempts a ON a.run_id = r.run_id\n  LEFT JOIN v_set_spread_compare p ON p.run_id = r.run_id AND y.cells_in IS NOT NULL\n  CROSS JOIN LATERAL (VALUES\n    ('production', 1, '셀 투입', y.cells_in::numeric, '셀', '등록 셀 기준'),\n    ('production', 2, '외관 NG', y.appearance_ng, '셀', '외관 결과 코드 9'),\n    ('production', 3, '1차 전기 PASS', y.first_pass_ok, '셀', '시도 1, 결과 코드 1/2/3'),\n    ('production', 4, '최종 전기 PASS', t.final_pass, '셀', '최대 시도, 재검 대기 제외'),\n    ('production', 5, '최종 전기 NG', t.final_ng, '셀', '최대 시도 NG, 최종 제거 상태'),\n    ('group', 1, 'A', t.group_a, '셀', '셀 특성군·전기 결과 일치'),\n    ('group', 2, 'B', t.group_b, '셀', '셀 특성군·전기 결과 일치'),\n    ('group', 3, 'C', t.group_c, '셀', '셀 특성군·전기 결과 일치'),\n    ('retest', 1, '재검 검사 건수', a.attempts, '건', 'attempt > 1'),\n    ('retest', 2, '재검한 셀', y.retested, '셀', '중복 셀 제외'),\n    ('retest', 3, '재검 합격', y.retest_recovered, '셀', '팀 실행 수율 정의'),\n    ('retest', 4, '재검 대기', t.retest_pending, '셀', '셀 상태 retest'),\n    ('retest', 5, '최종 전기 NG', t.final_ng, '셀', '외관 NG 및 재검 대기 제외'),\n    ('spread', 1, '비교 대상 세트', p.sets, '세트', '팀 뷰 비교 대상'),\n    ('spread', 2, '투입 순서 평균 편차', p.seq_avg_spread_mv / 1000.0, 'V', '투입 순서 4셀 기준'),\n    ('spread', 3, '실제 Kit 평균 편차', p.grade_avg_spread_mv / 1000.0, 'V', '특성군별 포장 기준'),\n    ('spread', 4, '평균 편차 감소율', p.reduction_pct, '%', '순서별 평균 편차 대비')\n  ) AS m(section, position, item, value, unit, detail)\n  UNION ALL\n  SELECT 'tester', v.position, v.station_code, s.tests, '건',\n         CASE WHEN s.station_code IS NOT NULL THEN\n           format('NG %s · 평균 검사 %s', coalesce(s.ng_pct::text || '%', '미수집'),\n             coalesce(s.avg_test_s::text || '초', '미수집')) END\n  FROM (VALUES (1,'2A-T1'),(2,'2A-T2'),(3,'2A-T3'),(4,'2A-T4'),(5,'2A-RT')) v(position,station_code)\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_tester_stats s ON s.run_id = r.run_id AND s.station_code = v.station_code\n)\nSELECT section AS \"영역\", item AS \"항목\", value AS \"수량\", unit AS \"단위\", detail AS \"상세\"\nFROM rows ORDER BY section, position\n), inspections AS (\n  SELECT count(*) FILTER (WHERE i.kind = 'appearance') AS appearances,\n         count(DISTINCT i.cell_id) FILTER (WHERE i.kind = 'appearance' AND i.result_code = 0) AS appearance_pass,\n         count(*) FILTER (WHERE i.kind = 'electrical') AS electrical\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  JOIN cell_inspection i ON i.cell_id = c.cell_id AND i.kind IN ('appearance','electrical')\n), kit_state AS (\n  SELECT b.grade, b.spread_mv,\n         b.status IN ('full','handed_over','consumed') AND b.packed_at IS NOT NULL\n         AND b.cells = 4 AND count(DISTINCT c.box_slot) = 4\n         AND bool_and(c.grade IS NOT DISTINCT FROM b.grade AND c.run_id IS NOT DISTINCT FROM b.run_id) AS complete\n  FROM selected_run r JOIN v_box_spread b ON b.run_id = r.run_id\n  LEFT JOIN cell c ON c.box_id = b.box_id\n  GROUP BY b.box_id, b.grade, b.spread_mv, b.status, b.packed_at, b.cells\n), alarm_state AS (\n  SELECT CASE WHEN count(a.id) > 0\n              THEN count(a.id) FILTER (WHERE open_alarm.id IS NOT NULL)\n         END AS open_count\n  FROM alarm a LEFT JOIN station s ON s.station_code = a.station_code\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_alarm_open open_alarm ON open_alarm.id = a.id\n  WHERE a.run_id = r.run_id OR (a.run_id IS NULL AND s.line = '2A')\n), tester_state AS (\n  SELECT v.station_code, v.position, m.\"수량\", m.\"상세\", stats.ng_pct, stats.avg_test_s,\n         CASE WHEN e.state IS NULL THEN '미수집'\n              WHEN e.ended_at IS NOT NULL THEN '종료: ' || e.state\n              ELSE e.state END AS state\n  FROM (VALUES (1,'2A-T1'),(2,'2A-T2'),(3,'2A-T3'),(4,'2A-T4'),(5,'2A-RT')) v(position, station_code)\n  LEFT JOIN core m ON m.\"영역\" = 'tester' AND m.\"항목\" = v.station_code\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_tester_stats stats ON stats.run_id = r.run_id AND stats.station_code = v.station_code\n  LEFT JOIN LATERAL (\n    SELECT e.state, e.ended_at\n    FROM equipment_state e\n    WHERE e.run_id = r.run_id AND e.station_code = v.station_code\n    ORDER BY e.started_at DESC, e.id DESC LIMIT 1\n  ) e ON true\n), v2_rows AS (\n  SELECT \"영역\" AS area, \"항목\" AS label,\n         CASE WHEN i.electrical = 0 AND (\"영역\" = 'retest' OR \"항목\" = '1차 전기 PASS')\n              THEN NULL ELSE \"수량\" END AS amount,\n         \"단위\" AS unit, \"상세\" AS detail,\n         NULL::text AS state, NULL::numeric AS ng_pct, NULL::numeric AS average_s,\n         NULL::bigint AS kit_count, NULL::double precision AS spread_v\n  FROM core CROSS JOIN inspections i\n  UNION ALL\n  SELECT 'kpi', x.label, x.amount, x.unit, NULL, NULL, NULL, NULL, NULL, NULL\n  FROM inspections i CROSS JOIN alarm_state a\n  CROSS JOIN LATERAL (VALUES\n    ('총 투입 셀', (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '셀 투입'), '셀'),\n    ('외관 PASS', CASE WHEN i.appearances > 0 THEN i.appearance_pass END, '셀'),\n    ('외관 NG', CASE WHEN i.appearances > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '외관 NG') END, '셀'),\n    ('최종 전기 PASS', CASE WHEN i.electrical > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '최종 전기 PASS') END, '셀'),\n    ('최종 전기 NG', CASE WHEN i.electrical > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '최종 전기 NG') END, '셀'),\n    ('재검 대기', CASE WHEN i.electrical > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'retest' AND \"항목\" = '재검 대기') END, '셀'),\n    ('완료 Kit', (SELECT CASE WHEN count(*) > 0 THEN count(*) FILTER (WHERE complete) END FROM kit_state), 'Kit'),\n    ('열린 알람', a.open_count, '건')\n  ) x(label, amount, unit)\n  UNION ALL\n  SELECT 'testers_v2', station_code, \"수량\", '건', \"상세\", state, ng_pct, avg_test_s, NULL, NULL\n  FROM tester_state\n  UNION ALL\n  SELECT 'groups_v2', c.\"항목\",\n         CASE WHEN i.electrical > 0 THEN c.\"수량\" END, '셀', NULL, NULL, NULL, NULL,\n         CASE WHEN EXISTS (SELECT 1 FROM kit_state) THEN\n             (SELECT count(*) FROM kit_state b WHERE b.complete AND b.grade = c.\"항목\") END,\n         (SELECT (avg(b.spread_mv) / 1000.0)::double precision\n          FROM kit_state b WHERE b.complete AND b.grade = c.\"항목\")\n  FROM core c CROSS JOIN inspections i WHERE c.\"영역\" = 'group'\n)\nSELECT area AS \"영역\", label AS \"항목\", amount AS \"수량\", unit AS \"단위\", detail AS \"상세\",\n       state AS \"상태\", ng_pct AS \"NG율 (%)\", average_s AS \"평균 검사 (초)\",\n       kit_count AS \"Kit 수\", spread_v AS \"평균 Kit 편차 (V)\"\nFROM v2_rows\nORDER BY area, CASE label WHEN '2A-RT' THEN 2 ELSE 1 END, label\n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "상태"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "idle": {
+                        "text": "idle",
+                        "color": "#94A3B8"
+                      },
+                      "busy": {
+                        "text": "busy",
+                        "color": "#38BDF8"
+                      },
+                      "blocked": {
+                        "text": "blocked",
+                        "color": "#FB7185"
+                      },
+                      "starved": {
+                        "text": "starved",
+                        "color": "#FBBF24"
+                      },
+                      "fault": {
+                        "text": "fault",
+                        "color": "#FB7185"
+                      },
+                      "stopped": {
+                        "text": "stopped",
+                        "color": "#CBD5E1"
+                      },
+                      "미수집": {
+                        "text": "미수집",
+                        "color": "#94A3B8"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "NG율 (%)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "평균 (초)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "testers_v2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "상태",
+                "수량",
+                "NG율 (%)",
+                "평균 검사 (초)"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "상태": 1,
+              "수량": 2,
+              "NG율 (%)": 3,
+              "평균 검사 (초)": 4
+            },
+            "renameByName": {
+              "항목": "검사기",
+              "수량": "검사 건수",
+              "평균 검사 (초)": "평균 (초)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "OCV 검사 추이",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "description": "선택 기간의 원본 검사값입니다. Cell ID로 필터링합니다.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nobservations AS (\n  SELECT i.id, i.measured_at, i.cell_id, i.station_code, i.attempt, i.ocv_mv, i.ir_mohm,\n         i.result_code, i.reason_code\n  FROM selected_run r\n  JOIN cell c ON c.run_id = r.run_id\n  JOIN cell_inspection i ON i.cell_id = c.cell_id\n  WHERE i.kind = 'electrical'\n    AND i.measured_at >= $__timeFrom() AND i.measured_at < $__timeTo()\n    AND (NULLIF(btrim(${cell_id:sqlstring}), '') IS NULL OR c.cell_id = btrim(${cell_id:sqlstring}))\n  ORDER BY i.measured_at DESC, i.id DESC\n  LIMIT 500\n)\nSELECT measured_at AS \"time\", id::text AS \"검사 ID\", cell_id AS \"Cell ID\",\n       station_code AS \"검사기\", attempt AS \"시도\",\n       (ocv_mv / 1000.0)::double precision AS \"OCV (V)\", ir_mohm AS \"IR (mΩ)\",\n       CASE WHEN result_code IN (1,2,3) THEN 'PASS' WHEN result_code = 5 THEN '대기'\n            WHEN result_code = 9 THEN 'FAIL' END AS \"시도 결과\",\n       reason_code AS \"사유 코드\"\nFROM observations\nORDER BY measured_at, id"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "time",
+                "OCV (V)"
+              ]
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "decimals": 3,
+          "noValue": "미수집",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#38BDF8"
+          },
+          "custom": {
+            "drawStyle": "points",
+            "showPoints": "always",
+            "pointSize": 5,
+            "spanNulls": false,
+            "fillOpacity": 0
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "IR 검사 추이",
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "description": "선택 기간의 원본 검사값입니다. Cell ID로 필터링합니다.",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 7,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "time",
+                "IR (mΩ)"
+              ]
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: mΩ",
+          "decimals": 1,
+          "noValue": "미수집",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#A78BFA"
+          },
+          "custom": {
+            "drawStyle": "points",
+            "showPoints": "always",
+            "pointSize": 5,
+            "spanNulls": false,
+            "fillOpacity": 0
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "type": "barchart",
+      "title": "A/B/C 특성군별 셀 · Kit 수량",
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "description": "A/B/C는 OCV·IR 유사 특성군입니다. 셀 수는 분류를 확인한 셀, Kit 수는 완료된 동일군 4셀 구성입니다.",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "groups_v2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "수량",
+                "config": {
+                  "id": "isNotNull",
+                  "options": {}
+                }
+              },
+              {
+                "fieldName": "Kit 수",
+                "config": {
+                  "id": "isNotNull",
+                  "options": {}
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "수량",
+                "Kit 수"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "수량": 1,
+              "Kit 수": 2
+            },
+            "renameByName": {
+              "항목": "특성군",
+              "수량": "셀 수"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "셀 수"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#38BDF8"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Kit 수"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#34D399"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "horizontal",
+        "stacking": "none",
+        "groupWidth": 0.72,
+        "barWidth": 0.78,
+        "showValue": "always",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "type": "barchart",
+      "title": "OCV 평균 편차 · 투입 순서와 실제 Kit",
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "description": "팀 뷰가 같은 셀을 투입 순서로 4개씩 묶은 기준과 실제 특성군 Kit의 평균 OCV 편차를 비교합니다.",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "spread"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "투입 순서 평균 편차"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "실제 Kit 평균 편차"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "수량",
+                "config": {
+                  "id": "isNotNull",
+                  "options": {}
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "수량"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "수량": 1
+            },
+            "renameByName": {
+              "항목": "비교 기준",
+              "수량": "평균 편차 (V)"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "min": 0,
+          "unit": "volt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "평균 편차 (V)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#A78BFA"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "horizontal",
+        "stacking": "none",
+        "groupWidth": 0.72,
+        "barWidth": 0.78,
+        "showValue": "always",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "title": "열린 알람 이력",
+      "description": "선택 회차 알람과 2A 스테이션의 회차 미지정 알람입니다. 표에 행이 없으면 등록된 열린 알람 기록이 없는 상태입니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nstation_state AS (\n  SELECT s.station_code, s.name, s.kind, s.sort_order, e.state, e.started_at, e.ended_at, t.seconds\n  FROM station s\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN LATERAL (\n    SELECT es.state, es.started_at, es.ended_at\n    FROM equipment_state es\n    WHERE es.station_code = s.station_code AND es.run_id = r.run_id\n    ORDER BY es.started_at DESC, es.id DESC\n    LIMIT 1\n  ) e ON true\n  LEFT JOIN v_equipment_time t\n    ON t.station_code = s.station_code AND t.run_id = r.run_id AND t.state = e.state\n  WHERE s.line = '2A'\n), run_lots AS (\n  SELECT c.lot_code, count(*) AS cells\n  FROM cell c JOIN selected_run r ON r.run_id = c.run_id\n  GROUP BY c.lot_code\n), visible_alarms AS (\n  SELECT a.id, a.station_code, a.code, a.severity, a.raised_at, a.acked_at, a.message\n  FROM v_alarm_open a\n  LEFT JOIN station s ON s.station_code = a.station_code\n  LEFT JOIN selected_run r ON true\n  WHERE a.run_id = r.run_id OR (a.run_id IS NULL AND s.line = '2A')\n), rows AS (\n  SELECT 'overview' AS section, -1 AS position, '선택 실행'::text AS item,\n         COALESCE(r.run_id::text, '미수집 / 회차 없음') AS state,\n         r.started_at AS started, r.ended_at AS ended,\n         NULL::numeric AS amount, r.purpose AS detail\n  FROM (VALUES (1)) AS anchor(n) LEFT JOIN selected_run r ON true\n  UNION ALL\n  SELECT 'overview', s.sort_order, s.station_code || ' · ' || s.name,\n         CASE WHEN s.state IS NULL THEN '미수집'\n              WHEN s.ended_at IS NOT NULL THEN s.state || ' · 종료'\n              ELSE s.state END,\n         s.started_at, s.ended_at, s.seconds, s.kind\n  FROM station_state s\n  UNION ALL\n  SELECT 'lot', 0, l.lot_code, CASE WHEN l.is_held THEN '보류' ELSE '보류 아님' END,\n         l.last_held_at, NULL, x.cells,\n         format('공용 DB 셀 %s · 최신 전기 NG %s', l.cells, l.confirmed_ng)\n  FROM v_lot_status l LEFT JOIN run_lots x USING (lot_code)\n  UNION ALL\n  SELECT 'alarm', -a.severity, COALESCE(a.station_code, '회차 공통') || ' · ' || a.code,\n         CASE WHEN a.acked_at IS NULL THEN '미확인' ELSE '확인됨' END,\n         a.raised_at, a.acked_at, a.severity,\n         '#' || a.id::text || COALESCE(' · ' || a.message, '')\n  FROM visible_alarms a\n)\nSELECT section AS \"영역\", item AS \"항목\", state AS \"상태\", started AS \"시각\",\n       ended AS \"종료·확인 시각\", amount AS \"값\", detail AS \"상세\"\nFROM rows\nORDER BY section, position, CASE WHEN section = 'alarm' THEN started END DESC, item"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "alarm"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "항목": "스테이션 / 코드",
+              "시각": "발생",
+              "종료·확인 시각": "확인",
+              "값": "심각도"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "LOT 보류 현황",
+      "description": "보류와 상세 NG 값은 공용 DB 전체의 현재 상태입니다. 선택 회차 셀 수는 별도 열입니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 29,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "lot"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true,
+              "종료·확인 시각": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "항목": "LOT",
+              "시각": "마지막 보류 시각",
+              "값": "회차 셀 수"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "type": "table",
+      "title": "1차 전기 PASS · 재검 실적",
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 12,
+        "h": 8
+      },
+      "description": "재검 건과 셀 수를 구분합니다. 최종 전기 NG에서 외관 NG와 재검 대기 건을 제외합니다.",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "retest"
+                  }
+                }
+              },
+              {
+                "fieldName": "항목",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "1차 전기 PASS"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "수량",
+                "단위"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "수량": 1,
+              "단위": 2
+            },
+            "renameByName": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "type": "table",
+      "title": "특성군별 4셀 Kit 평균 OCV 편차",
+      "gridPos": {
+        "x": 12,
+        "y": 37,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "평균 Kit 편차 (V)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 3
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "groups_v2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "Kit 수",
+                "평균 Kit 편차 (V)"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "Kit 수": 1,
+              "평균 Kit 편차 (V)": 2
+            },
+            "renameByName": {
+              "항목": "특성군"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "스테이션 상태 전이 · 회차",
+      "description": "등록 스테이션과 선택 회차의 최신 상태 전이입니다. 열린 상태 구간은 기록상 진행 상태이며 실시간 센서 신호와 별개입니다. 누적 초는 표시된 상태의 회차 내 총 기록 시간입니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 13,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "overview"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "항목": "스테이션 / 실행",
+              "시각": "상태 시작 / 실행 시작",
+              "종료·확인 시각": "종료",
+              "값": "상태 누적 (초)",
+              "상세": "유형 / 목적"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "table",
+      "title": "OCV 편차 비교 상세",
+      "gridPos": {
+        "x": 13,
+        "y": 45,
+        "w": 11,
+        "h": 8
+      },
+      "description": "",
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "spread"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "수량",
+                "단위",
+                "상세"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "수량": 1,
+              "단위": 2,
+              "상세": 3
+            },
+            "renameByName": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "title": "전기검사 원본 기록",
+      "description": "선택 기간의 최근 500건입니다. 같은 시각의 검사 결과도 검사 ID와 시도로 구분합니다. Cell ID를 입력하면 해당 셀만 조회합니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 24,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "time",
+            "desc": true
+          }
+        ]
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 7,
+          "withTransforms": false
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Kit 슬롯 · 편차 · 인계 기록",
+      "description": "선택 기간의 최근 Kit 200건. 슬롯, 특성군 일치, 편차와 최신 인계 요청 상태를 조회합니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 62,
+        "w": 24,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nboxes AS (\n  SELECT b.box_id, b.grade, b.status, b.run_id, b.packed_at, b.cells, b.spread_mv\n  FROM selected_run r JOIN v_box_spread b ON b.run_id = r.run_id\n  JOIN cell_box raw ON raw.box_id = b.box_id\n  WHERE COALESCE(b.packed_at, raw.opened_at) >= $__timeFrom()\n    AND COALESCE(b.packed_at, raw.opened_at) < $__timeTo()\n  ORDER BY COALESCE(b.packed_at, raw.opened_at) DESC, b.box_id\n  LIMIT 200\n)\nSELECT b.box_id AS \"Kit ID\", b.grade AS \"특성군\", b.status AS \"DB 상태\", b.packed_at AS \"완료 시각\",\n       b.cells AS \"구성 셀\",\n       max(c.cell_id) FILTER (WHERE c.box_slot = 1) AS \"슬롯 1\",\n       max(c.cell_id) FILTER (WHERE c.box_slot = 2) AS \"슬롯 2\",\n       max(c.cell_id) FILTER (WHERE c.box_slot = 3) AS \"슬롯 3\",\n       max(c.cell_id) FILTER (WHERE c.box_slot = 4) AS \"슬롯 4\",\n       CASE WHEN b.status = 'filling' THEN '적재 중'\n            WHEN b.cells = 4 AND b.packed_at IS NOT NULL\n                 AND count(DISTINCT c.box_slot) = 4\n                 AND bool_and(c.grade IS NOT DISTINCT FROM b.grade AND c.run_id IS NOT DISTINCT FROM b.run_id)\n              THEN '동일 특성군 4셀'\n            ELSE '구성 확인 필요' END AS \"구성 확인\",\n       (b.spread_mv / 1000.0)::double precision AS \"OCV 편차 (V)\",\n       h.status AS \"최신 인계 상태\", h.requested_at AS \"인계 요청\",\n       h.released_at AS \"출구 통과\", h.confirmed_at AS \"수신 확인\"\nFROM boxes b\nLEFT JOIN cell c ON c.box_id = b.box_id\nLEFT JOIN LATERAL (\n  SELECT sh.status, sh.requested_at, sh.released_at, sh.confirmed_at\n  FROM supply_handoff sh WHERE sh.box_id = b.box_id\n  ORDER BY sh.requested_at DESC, sh.request_id DESC LIMIT 1\n) h ON true\nGROUP BY b.box_id, b.grade, b.status, b.run_id, b.packed_at, b.cells, b.spread_mv,\n         h.status, h.requested_at, h.released_at, h.confirmed_at\nORDER BY b.packed_at DESC NULLS LAST, b.box_id"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Cell ID / Kit ID 추적",
+      "description": "상단에 전체 ID를 입력합니다. 두 ID를 넣으면 양쪽의 이력을 함께 보여 줍니다. 최신 300건이며 화면 시간 범위는 적용하지 않습니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 71,
+        "w": 24,
+        "h": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\ninput AS (\n  SELECT NULLIF(btrim(${cell_id:sqlstring}), '') AS cell_id,\n         NULLIF(btrim(${kit_id:sqlstring}), '') AS kit_id\n), hits AS (\n  SELECT c.cell_id, c.box_id, c.box_slot, c.grade, c.status, c.lot_code, c.created_at\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  CROSS JOIN input p\n  WHERE c.cell_id = p.cell_id OR c.box_id = p.kit_id\n), hit_boxes AS (\n  SELECT b.box_id, b.grade, b.status, b.opened_at, b.packed_at\n  FROM selected_run r JOIN cell_box b ON b.run_id = r.run_id\n  CROSS JOIN input p\n  WHERE b.box_id = p.kit_id OR EXISTS (SELECT 1 FROM hits c WHERE c.box_id = b.box_id)\n), history AS (\n  SELECT c.created_at AS stamp, NULL::bigint AS event_order, c.cell_id AS ref,\n         '셀 등록'::text AS event, c.cell_id, c.box_id AS kit_id, NULL::text AS station,\n         concat_ws(' · ', '현재 ' || c.status, 'LOT ' || c.lot_code,\n                   '특성군 ' || c.grade, '슬롯 ' || c.box_slot) AS detail\n  FROM hits c\n  UNION ALL\n  SELECT i.measured_at, i.id, i.id::text, i.kind, c.cell_id, c.box_id, i.station_code,\n         concat_ws(' · ', '시도 ' || i.attempt,\n           CASE WHEN i.result_code IN (0,1,2,3) THEN 'PASS'\n                WHEN i.result_code = 9 THEN 'FAIL'\n                WHEN i.result_code = 5 AND i.kind = 'electrical' THEN '대기'\n                WHEN i.result_code = 5 THEN '미판독' END,\n           '사유 ' || i.reason_code, round(i.ocv_mv / 1000.0, 3)::text || ' V',\n           i.ir_mohm::text || ' mΩ')\n  FROM hits c JOIN cell_inspection i ON i.cell_id = c.cell_id\n  UNION ALL\n  SELECT e.occurred_at, NULL, e.event_id::text, e.event_type,\n         c.cell_id, COALESCE(b.box_id, c.box_id), e.station_code, '공정 이벤트 원장'\n  FROM selected_run r JOIN event_log e ON e.run_id = r.run_id AND e.source = '2A'\n  LEFT JOIN hits c ON c.cell_id = e.entity_id\n  LEFT JOIN hit_boxes b ON b.box_id = e.entity_id\n  WHERE c.cell_id IS NOT NULL OR b.box_id IS NOT NULL\n  UNION ALL\n  SELECT COALESCE(b.packed_at, b.opened_at), NULL, b.box_id, 'Kit 기록',\n         NULL, b.box_id, NULL, '특성군 ' || b.grade || ' · 현재 상태 ' || b.status\n  FROM hit_boxes b\n  UNION ALL\n  SELECT h.stamp, NULL, sh.request_id, h.event, NULL, b.box_id, NULL,\n         '요청 라인 ' || sh.requested_by || ' · 현재 상태 ' || sh.status\n  FROM hit_boxes b JOIN supply_handoff sh ON sh.box_id = b.box_id\n  CROSS JOIN LATERAL (VALUES ('인계 요청', sh.requested_at), ('출구 통과', sh.released_at),\n                            ('수신 확인', sh.confirmed_at)) h(event, stamp)\n  WHERE h.stamp IS NOT NULL\n)\nSELECT stamp AS \"발생 시각\", event AS \"이벤트\", ref AS \"원본 ID\", cell_id AS \"Cell ID\",\n       kit_id AS \"Kit ID\", station AS \"스테이션\", detail AS \"상세\"\nFROM history ORDER BY stamp DESC, event_order DESC NULLS LAST, ref DESC LIMIT 300"
+        }
+      ]
+    }
+  ],
+  "style": "dark"
+}

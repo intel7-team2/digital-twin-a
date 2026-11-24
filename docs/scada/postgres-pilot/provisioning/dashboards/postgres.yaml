@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Cellect PostgreSQL pilot
+    folder: Cellect PostgreSQL
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: $CELLECT_PG_DASHBOARDS

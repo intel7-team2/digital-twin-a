@@ -1,0 +1,286 @@
+{
+  "id": null,
+  "uid": "cellect-scada-postgres",
+  "title": "Cellect SCADA | 팀 PostgreSQL 파일럿",
+  "description": "최근 2A 실행을 읽기 전용으로 조회합니다. 수집 전에는 스테이션만 표시될 수 있습니다. 레인별 Buffer는 브리지 협의 항목입니다.",
+  "tags": [
+    "cellect",
+    "scada",
+    "postgres-pilot"
+  ],
+  "timezone": "Asia/Seoul",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "10s",
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m"
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "팀 DB 스테이션",
+      "description": "SSH 터널과 읽기 전용 계정 확인. 접속 검증의 기대값은 전체 라인 23행입니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 8
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cellect-scada-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cellect-scada-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT station_code AS \"스테이션\", name AS \"이름\"\nFROM station\nORDER BY sort_order, station_code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 2,
+      "title": "최근 2A 실행 수율",
+      "description": "가장 최근에 시작한 2A 실행의 팀 DB 수율입니다. 화면 시간 범위와 관계없이 조회합니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 10,
+        "y": 0,
+        "w": 14,
+        "h": 8
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cellect-scada-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cellect-scada-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT run_id, purpose, started_at, ended_at\n  FROM sim_run\n  WHERE line = '2A'\n  ORDER BY started_at DESC, run_id DESC\n  LIMIT 1\n)\nSELECT r.run_id AS \"실행 ID\", r.purpose AS \"목적\", r.started_at AS \"시작\",\n       y.cells_in AS \"투입\", y.appearance_ng AS \"외관 NG\", y.first_pass_ok AS \"1차 PASS\",\n       y.retested AS \"재검\", y.retest_recovered AS \"재검 합격\",\n       y.removed AS \"제거\", y.boxed AS \"포장 셀\"\nFROM selected_run r\nLEFT JOIN v_run_yield y ON y.run_id = r.run_id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "OCV 관측값",
+      "description": "최근 2A 실행에서 선택 기간의 검사 완료값. 원본 mV를 V로 변환합니다.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cellect-scada-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cellect-scada-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT run_id, purpose, started_at, ended_at\n  FROM sim_run\n  WHERE line = '2A'\n  ORDER BY started_at DESC, run_id DESC\n  LIMIT 1\n)\nSELECT i.measured_at AS \"time\", i.station_code, (i.ocv_mv / 1000.0)::double precision AS \"OCV\"\nFROM cell_inspection i\nJOIN cell c ON c.cell_id = i.cell_id\nJOIN selected_run r ON r.run_id = c.run_id\nWHERE i.kind = 'electrical' AND i.ocv_mv IS NOT NULL\n  AND i.measured_at >= $__timeFrom() AND i.measured_at < $__timeTo()\nORDER BY i.measured_at, i.id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "points",
+            "showPoints": "always",
+            "pointSize": 5,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "IR 관측값",
+      "description": "최근 2A 실행에서 선택 기간의 검사 완료값. 측정 누락은 표시하지 않습니다.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cellect-scada-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cellect-scada-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT run_id, purpose, started_at, ended_at\n  FROM sim_run\n  WHERE line = '2A'\n  ORDER BY started_at DESC, run_id DESC\n  LIMIT 1\n)\nSELECT i.measured_at AS \"time\", i.station_code, i.ir_mohm AS \"IR\"\nFROM cell_inspection i\nJOIN cell c ON c.cell_id = i.cell_id\nJOIN selected_run r ON r.run_id = c.run_id\nWHERE i.kind = 'electrical' AND i.ir_mohm IS NOT NULL\n  AND i.measured_at >= $__timeFrom() AND i.measured_at < $__timeTo()\nORDER BY i.measured_at, i.id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: mΩ",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "points",
+            "showPoints": "always",
+            "pointSize": 5,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "전기검사 이력",
+      "description": "최근 2A 실행과 선택 기간의 최신 검사 시도 200건입니다. 검사 ID로 동시 검사와 재검을 구분합니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cellect-scada-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cellect-scada-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT run_id, purpose, started_at, ended_at\n  FROM sim_run\n  WHERE line = '2A'\n  ORDER BY started_at DESC, run_id DESC\n  LIMIT 1\n)\nSELECT i.id::text AS \"검사 ID\", i.measured_at AS \"측정 시각\", i.cell_id AS \"Cell ID\",\n       i.station_code AS \"검사기\", i.attempt AS \"시도\",\n       (i.ocv_mv / 1000.0)::double precision AS \"OCV (V)\", i.ir_mohm AS \"IR (mΩ)\",\n       CASE WHEN i.result_code IN (1, 2, 3) THEN 'PASS'\n            WHEN i.result_code = 9 THEN 'FAIL'\n            WHEN i.result_code = 5 THEN 'PENDING' END AS \"시도 결과\",\n       CASE i.result_code WHEN 1 THEN 'A' WHEN 2 THEN 'B' WHEN 3 THEN 'C' END AS \"특성군\",\n       i.reason_code AS \"사유 코드\"\nFROM cell_inspection i\nJOIN cell c ON c.cell_id = i.cell_id\nJOIN selected_run r ON r.run_id = c.run_id\nWHERE i.kind = 'electrical'\n  AND i.measured_at >= $__timeFrom() AND i.measured_at < $__timeTo()\nORDER BY i.measured_at DESC, i.id DESC\nLIMIT 200"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 6,
+      "title": "완료 Kit",
+      "description": "최근 2A 실행에서 선택 기간 내 완료한 박스입니다. 현재 팀 DB의 셀 구성으로 4슬롯과 그룹 일치를 확인합니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cellect-scada-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cellect-scada-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT run_id, purpose, started_at, ended_at\n  FROM sim_run\n  WHERE line = '2A'\n  ORDER BY started_at DESC, run_id DESC\n  LIMIT 1\n)\nSELECT b.box_id AS \"Kit ID\", b.packed_at AS \"완료 시각\", b.grade AS \"특성군\",\n       b.status AS \"박스 상태\", b.cells AS \"셀 수\",\n       (b.spread_mv / 1000.0)::double precision AS \"OCV 편차 (V)\"\nFROM v_box_spread b\nJOIN selected_run r ON r.run_id = b.run_id\nWHERE b.status IN ('full', 'handed_over', 'consumed') AND b.cells = 4\n  AND b.packed_at >= $__timeFrom() AND b.packed_at < $__timeTo()\n  AND NOT EXISTS (\n    SELECT 1 FROM cell c\n    WHERE c.box_id = b.box_id\n      AND (c.grade IS DISTINCT FROM b.grade OR c.run_id IS DISTINCT FROM b.run_id)\n  )\nORDER BY b.packed_at DESC, b.box_id\nLIMIT 200"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    }
+  ]
+}

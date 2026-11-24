@@ -1,0 +1,174 @@
+{
+  "id": null,
+  "uid": "cellect-scada-demo",
+  "title": "Cellect SCADA | 모의 데이터",
+  "description": "DEMO-RUN-01 고정 스냅샷. 시간 범위는 표시된 수치에 영향을 주지 않습니다.",
+  "tags": [
+    "cellect",
+    "scada",
+    "demo"
+  ],
+  "timezone": "Asia/Seoul",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "",
+  "timepicker": {
+    "hidden": true
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "DEMO-RUN-01 공정 요약",
+      "type": "stat",
+      "description": "셀은 고유 Cell ID 기준입니다. 전기검사는 재검을 포함한 최종 결과입니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "cellect-scada-testdata"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "cellect-scada-testdata"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content",
+          "csvContent": "ID 부여,외관 PASS,전기검사 PASS,그룹 분류,완료 Kit\n16,15,13,13,3\n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 2,
+      "title": "특성군별 분류 및 포장",
+      "type": "table",
+      "description": "A/B/C는 전압·저항 유사 특성군입니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 6
+      },
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "cellect-scada-testdata"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "cellect-scada-testdata"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content",
+          "csvContent": "특성군,분류 셀,포장 셀,포장 대기 셀\nA,5,4,1\nB,4,4,0\nC,4,4,0\n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "완료 Kit",
+      "type": "table",
+      "description": "Kit 구성 셀의 편차는 최댓값−최솟값입니다.",
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 6
+      },
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "cellect-scada-testdata"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "cellect-scada-testdata"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content",
+          "csvContent": "Kit ID,특성군,셀 수,상태,OCV 편차 (V),IR 편차 (mΩ)\nDEMO-KIT-A,A,4,CLOSED,0.006,1.5\nDEMO-KIT-B,B,4,CLOSED,0.006,1.5\nDEMO-KIT-C,C,4,CLOSED,0.006,1.5\n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 4,
+      "title": "셀별 추적 | 외관부터 포장까지",
+      "type": "table",
+      "description": "재검 회복, 외관 FAIL, 최종 전기검사 FAIL, 검사 대기 및 포장 대기 사례를 포함합니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 14
+      },
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "cellect-scada-testdata"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "cellect-scada-testdata"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content",
+          "csvContent": "Cell ID,LOT,외관,최종 전기검사,최종 검사 위치,최종 시도,OCV (V),IR (mΩ),특성군,Kit ID,슬롯,현재 상태\nDEMO-C001,DEMO-LOT-01,PASS,PASS,2A-T1,1,3.680,18.0,A,DEMO-KIT-A,1,PACKED\nDEMO-C002,DEMO-LOT-01,PASS,PASS,2A-T2,1,3.682,18.5,A,DEMO-KIT-A,2,PACKED\nDEMO-C003,DEMO-LOT-01,PASS,PASS,2A-T3,1,3.684,19.0,A,DEMO-KIT-A,3,PACKED\nDEMO-C004,DEMO-LOT-01,PASS,PASS,2A-T4,1,3.686,19.5,A,DEMO-KIT-A,4,PACKED\nDEMO-C005,DEMO-LOT-01,PASS,PASS,2A-T1,1,3.750,23.0,B,DEMO-KIT-B,1,PACKED\nDEMO-C006,DEMO-LOT-01,PASS,PASS,2A-T2,1,3.752,23.5,B,DEMO-KIT-B,2,PACKED\nDEMO-C007,DEMO-LOT-01,PASS,PASS,2A-T3,1,3.754,24.0,B,DEMO-KIT-B,3,PACKED\nDEMO-C008,DEMO-LOT-01,PASS,PASS,2A-RT,2,3.756,24.5,B,DEMO-KIT-B,4,PACKED\nDEMO-C009,DEMO-LOT-01,PASS,PASS,2A-T1,1,3.830,21.0,C,DEMO-KIT-C,1,PACKED\nDEMO-C010,DEMO-LOT-01,PASS,PASS,2A-T2,1,3.832,21.5,C,DEMO-KIT-C,2,PACKED\nDEMO-C011,DEMO-LOT-01,PASS,PASS,2A-T3,1,3.834,22.0,C,DEMO-KIT-C,3,PACKED\nDEMO-C012,DEMO-LOT-01,PASS,PASS,2A-T4,1,3.836,22.5,C,DEMO-KIT-C,4,PACKED\nDEMO-C013,DEMO-LOT-01,FAIL,,,,,,,,,APPEARANCE_REJECTED\nDEMO-C014,DEMO-LOT-01,PASS,FAIL,2A-RT,2,3.49,41.0,,,,ELECTRICAL_REJECTED\nDEMO-C015,DEMO-LOT-01,PASS,PENDING,2A-T3,,,,,,,AWAITING_TEST_RESULT\nDEMO-C016,DEMO-LOT-01,PASS,PASS,2A-T4,1,3.685,19.0,A,,,AWAITING_PACKING\n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    }
+  ]
+}

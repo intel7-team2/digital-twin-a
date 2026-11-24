@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Cellect SCADA demo
+    folder: Cellect SCADA
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: $SCADA_GRAFANA_DASHBOARDS

@@ -1,0 +1,683 @@
+{
+  "id": null,
+  "uid": "cellect-scada-live",
+  "title": "Cellect SCADA | 라이브 시뮬레이션",
+  "description": "현재 실행의 셀·Kit 이벤트에서 집계한 모의 공정. 조회 구간을 바꿔도 누적 수치는 실행 시작 기준입니다.",
+  "tags": [
+    "cellect",
+    "scada",
+    "simulation"
+  ],
+  "timezone": "Asia/Seoul",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "refresh": "5s",
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m"
+    ]
+  },
+  "links": [
+    {
+      "title": "Cell / Kit 이력 조회",
+      "type": "link",
+      "url": "http://127.0.0.1:8766/trace",
+      "targetBlank": true
+    },
+    {
+      "title": "고정 모의 대시보드",
+      "type": "link",
+      "url": "/d/cellect-scada-demo",
+      "targetBlank": false
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "공정 누계",
+      "description": "선택 구간 끝의 시점까지 각 단계에서 처리한 현재 실행 누계입니다.",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.production.cells",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "B",
+          "target": "cellect.sim.vision.pass",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "C",
+          "target": "cellect.sim.vision.fail",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "D",
+          "target": "cellect.sim.electrical.pass",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "E",
+          "target": "cellect.sim.electrical.fail",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "F",
+          "target": "cellect.sim.kits.total",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.production.cells"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ID 부여"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.vision.pass"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "외관 PASS"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.vision.fail"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "외관 FAIL"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.electrical.pass"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "전기검사 PASS"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.electrical.fail"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "전기검사 FAIL"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.kits.total"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "완료 Kit"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 2,
+      "title": "생산량과 검사 분기",
+      "description": "ID 부여, 외관 PASS/FAIL, 전기검사 PASS/FAIL을 이벤트별로 누적합니다.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.production.cells",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "B",
+          "target": "cellect.sim.vision.pass",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "C",
+          "target": "cellect.sim.vision.fail",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "D",
+          "target": "cellect.sim.electrical.pass",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "E",
+          "target": "cellect.sim.electrical.fail",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineInterpolation": "stepAfter",
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.production.cells"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ID 부여"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.vision.pass"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "외관 PASS"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.vision.fail"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "외관 FAIL"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.electrical.pass"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "전기검사 PASS"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.electrical.fail"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "전기검사 FAIL"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "특성군별 Buffer",
+      "description": "실제로 분류된 셀 누계에서 해당 그룹으로 포장한 셀을 뺀 수량입니다.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.buffer.A",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "B",
+          "target": "cellect.sim.buffer.B",
+          "textEditor": true
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "C",
+          "target": "cellect.sim.buffer.C",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineInterpolation": "stepAfter",
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.buffer.A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "A 대기"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.buffer.B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "B 대기"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.buffer.C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "C 대기"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "OCV 검사값",
+      "description": "셀의 실제 시뮬레이션 전기검사 이벤트에서 읽은 OCV입니다. FAIL 포함.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.electrical.ocv_v",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "links": [
+            {
+              "title": "검사 셀 이력",
+              "url": "http://127.0.0.1:8766/trace?test_at=${__value.time}",
+              "targetBlank": true
+            }
+          ],
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "points",
+            "showPoints": "always",
+            "pointSize": 5,
+            "spanNulls": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.electrical.ocv_v"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "OCV"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "IR 검사값",
+      "description": "셀의 실제 시뮬레이션 전기검사 이벤트에서 읽은 IR입니다. FAIL 포함.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.electrical.ir_mohm",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: mΩ",
+          "links": [
+            {
+              "title": "검사 셀 이력",
+              "url": "http://127.0.0.1:8766/trace?test_at=${__value.time}",
+              "targetBlank": true
+            }
+          ],
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "points",
+            "showPoints": "always",
+            "pointSize": 5,
+            "spanNulls": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.electrical.ir_mohm"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "IR"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "완료 Kit",
+      "description": "동일 특성군 4셀의 포장 이벤트가 확정된 Kit만 누적합니다.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 7
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.kits.total",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineInterpolation": "stepAfter",
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.kits.total"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "완료 Kit"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    }
+  ]
+}
