@@ -52,3 +52,17 @@ flowchart LR
 5. Kit 완료 조회에 필요한 4슬롯과 완료 상태의 일관성을 제공한다. `PACKED` 여러 건이 순차 도착하면 완료 이벤트와 함께 트랜잭션으로 확정하거나, 4셀 대조까지 완료 상태 공개를 보류하는 방법을 DB 담당자와 합의한다.
 
 승인 받을 항목은 기존 브리지 지원 프로토콜, 메일박스와 데이터 코드표, PLC·Vision·검사기 간 키 전달, 시계 동기화, 대기열·재처리 정책, 쓰기 계정과 접속 경로다. 실제 태그 주소표는 [PLC 태그맵](../../../plc/tagmap.md)을 기준으로 관리한다.
+
+## 로컬 수집 대기열 검증
+
+[`collector/spool.py`](../collector/spool.py)는 위 이벤트 봉투의 로컬 초안 버전 1을 JSONL로 받아 SQLite에 저장한다. 기본 파일은 Git에서 제외되는 `docs/scada/.local/collector-spool.sqlite3`이다. 이벤트 봉투 예시는 [테스트의 `sample()`](../collector/test_spool.py)에 있다.
+
+```powershell
+python -X utf8 -B .\docs\scada\collector\spool.py enqueue .\qa-events.jsonl
+python -X utf8 -B .\docs\scada\collector\spool.py pending --limit 10
+python -B -m unittest discover -s docs/scada/collector -v
+```
+
+`enqueue`는 파일 전체를 한 트랜잭션으로 저장한다. 같은 `event_key`와 동일한 이벤트를 재전송하면 최초 수신 시각을 유지하고 중복으로 계산한다. 내용이 달라졌거나 동일한 실행·생산자·소스 세션·순번에 다른 키가 들어오면 배치 전체가 롤백된다. `pending`은 도착 순서로 아직 전송 확인되지 않은 이벤트를 출력한다.
+
+브리지는 로컬 커밋 이후 ACK 가능 여부를 판단해야 한다. 연속 순번의 ACK 기준과 누락 처리, 운영 DB 이벤트 ID 생성·매핑, 전송·재시도는 연동 단계에서 확정한다. `mark_delivered()`는 향후 단일 전송기가 대상 DB 커밋 확인 뒤 호출할 메서드다. 현재 CLI는 로컬 파일 입출력만 수행한다.

@@ -6,6 +6,8 @@ Grafana OSS 13.3.1 / Windows에서 시작용 대시보드를 실행한다. SCADA
 
 ## 팀 공용 DB 연동 준비
 
+- [운영 SCADA Overview v2](http://127.0.0.1:3300/d/cellect-2a-scada-overview-v2?theme=dark&kiosk)
+- [실데이터 연동 검증 결과와 Factory I/O 통합 절차](db-integration/integration-test.md)
 - [팀 PostgreSQL 읽기 전용 파일럿 실행과 확인 항목](postgres-pilot/README.md)
 - [현재 이벤트 구조와 패널 필드·단위·갱신 주기](db-integration/current-data-flow.md)
 - [DB 조회 인터페이스와 SQLite/PostgreSQL 전환 설계](db-integration/read-interface.md)
@@ -32,6 +34,14 @@ Grafana OSS 13.3.1이 설치된 PC에서 저장소 루트를 열고 실행한다
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\docs\scada\Start-Grafana.ps1
 ```
+
+다른 PowerShell에서 `python -X utf8 -B .\docs\scada\check_environment.py`를 실행하면 `3300`의 응답, Overview v2 등록과 갱신 설정, PostgreSQL 데이터 소스 UID, 로컬 `5433` 연결, 선택 사항인 모의 서버 `8766`을 확인한다. 기본 개발 인스턴스의 로컬 등록 메타데이터만 읽는다. `5433` TCP 연결 성공은 실제 PostgreSQL 로그인·SELECT 및 화면 표시 결과와 별개다.
+
+발표 전 검증은 다음 순서로 진행한다.
+
+1. **화면 검증.** 팀 DB 터널과 `3300`을 연 뒤, PostgreSQL 조회와 Overview v2의 KPI·Canvas·검사 상태·차트·추적을 1920×1080에서 확인한다. 근거 데이터가 없을 때 `미수집`이 표시되는지 확인하고, 조회 오류와 구분한다.
+2. **수집 경로 검증.** [수집 인터페이스](db-integration/collector-interface.md)의 키·순번·ACK 규칙을 DB·PLC 담당자와 합의한다. 승인된 스테이징 회차에서 검사·포장 이벤트와 화면 집계를 대조한다.
+3. **발표 리허설.** 회차 선택 → OCV·IR 확인 → Cell ID·Kit ID 추적 순으로 시연한다. 연결이 끊기면 [라이브 모의 대시보드](http://127.0.0.1:3300/d/cellect-scada-live)를 별도 모의 화면으로 시연한다.
 
 1. 콘솔에서 `HTTP Server Listen` 로그를 확인한 뒤 [Cellect SCADA 모의 대시보드](http://127.0.0.1:3300/d/cellect-scada-demo)를 연다. 새 개발 인스턴스의 초기 로그인은 `admin` / `admin`이며 첫 로그인에서 비밀번호를 변경한다.
 2. `Cellect SCADA` 폴더와 `Cellect SCADA TestData` 데이터 소스는 자동 등록된다. 패널 수정은 [`dashboards/cellect-scada-demo.json`](dashboards/cellect-scada-demo.json)에 반영한다. 실행 중인 인스턴스가 약 30초 간격으로 변경 사항을 읽는다.

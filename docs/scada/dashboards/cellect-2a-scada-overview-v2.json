@@ -12,7 +12,7 @@
   ],
   "timezone": "Asia/Seoul",
   "schemaVersion": 41,
-  "version": 3,
+  "version": 4,
   "editable": false,
   "time": {
     "from": "now-1h",
@@ -941,12 +941,86 @@
       }
     },
     {
+      "id": 1,
+      "type": "table",
+      "title": "선택 회차 · 최근 데이터 수신",
+      "description": "최근 수신 30초 기준은 이벤트 지연 참고값입니다. 유휴 상태도 표시될 수 있습니다. 수집 통신 장애는 열린 COMM_LOST 알람으로만 표시합니다. Grafana 조회 실패는 패널 오류로 표시됩니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nstation_state AS (\n  SELECT s.station_code, s.name, s.kind, s.sort_order, e.state, e.started_at, e.ended_at, t.seconds\n  FROM station s\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN LATERAL (\n    SELECT es.state, es.started_at, es.ended_at\n    FROM equipment_state es\n    WHERE es.station_code = s.station_code AND es.run_id = r.run_id\n    ORDER BY es.started_at DESC, es.id DESC\n    LIMIT 1\n  ) e ON true\n  LEFT JOIN v_equipment_time t\n    ON t.station_code = s.station_code AND t.run_id = r.run_id AND t.state = e.state\n  WHERE s.line = '2A'\n), run_lots AS (\n  SELECT c.lot_code, count(*) AS cells\n  FROM cell c JOIN selected_run r ON r.run_id = c.run_id\n  GROUP BY c.lot_code\n), visible_alarms AS (\n  SELECT a.id, a.station_code, a.code, a.severity, a.raised_at, a.acked_at, a.message\n  FROM v_alarm_open a\n  LEFT JOIN station s ON s.station_code = a.station_code\n  LEFT JOIN selected_run r ON true\n  WHERE a.run_id = r.run_id OR (a.run_id IS NULL AND s.line = '2A')\n), latest_event AS (\n  SELECT e.occurred_at, e.received_at, e.station_code, e.event_type\n  FROM selected_run r JOIN event_log e ON e.run_id = r.run_id\n  WHERE e.source = '2A'\n  ORDER BY e.received_at DESC, e.event_id DESC LIMIT 1\n), recent_events AS (\n  SELECT e.event_id, e.occurred_at, e.received_at, e.station_code, e.event_type, e.entity_id\n  FROM selected_run r JOIN event_log e ON e.run_id = r.run_id\n  WHERE e.source = '2A'\n    AND e.occurred_at >= $__timeFrom() AND e.occurred_at < $__timeTo()\n  ORDER BY e.occurred_at DESC, e.event_id DESC LIMIT 100\n), state_history AS (\n  SELECT e.id, e.station_code, e.state, e.started_at, e.ended_at\n  FROM selected_run r JOIN equipment_state e ON e.run_id = r.run_id\n  JOIN station s ON s.station_code = e.station_code AND s.line = '2A'\n  WHERE e.started_at < $__timeTo()\n    AND COALESCE(e.ended_at, CURRENT_TIMESTAMP) > $__timeFrom()\n  ORDER BY e.started_at DESC, e.id DESC LIMIT 100\n), rows AS (\n  SELECT 'overview' AS section, -1 AS position, '선택 실행'::text AS item,\n         COALESCE(r.run_id::text, '미수집 / 회차 없음') AS state,\n         r.started_at AS started, r.ended_at AS ended,\n         NULL::numeric AS amount, r.purpose AS detail\n  FROM (VALUES (1)) AS anchor(n) LEFT JOIN selected_run r ON true\n  UNION ALL\n  SELECT 'overview', s.sort_order, s.station_code || ' · ' || s.name,\n         CASE WHEN s.state IS NULL THEN '미수집'\n              WHEN s.ended_at IS NOT NULL THEN s.state || ' · 종료'\n              ELSE s.state END,\n         s.started_at, s.ended_at, s.seconds, s.kind\n  FROM station_state s\n  UNION ALL\n  SELECT 'lot', 0, l.lot_code, CASE WHEN l.is_held THEN '보류' ELSE '보류 아님' END,\n         l.last_held_at, NULL, x.cells,\n         format('공용 DB 셀 %s · 최신 전기 NG %s', l.cells, l.confirmed_ng)\n  FROM v_lot_status l LEFT JOIN run_lots x USING (lot_code)\n  UNION ALL\n  SELECT 'alarm', -a.severity, COALESCE(a.station_code, '회차 공통') || ' · ' || a.code,\n         CASE WHEN a.acked_at IS NULL THEN '미확인' ELSE '확인됨' END,\n         a.raised_at, a.acked_at, a.severity,\n         '#' || a.id::text || COALESCE(' · ' || a.message, '')\n  FROM visible_alarms a\n  UNION ALL\n  SELECT 'freshness', 0, COALESCE('회차 ' || r.run_id::text, '선택 실행 없음'),\n         CASE WHEN r.run_id IS NULL THEN '미수집 · 회차 없음'\n              WHEN r.ended_at IS NOT NULL THEN '회차 종료'\n              WHEN EXISTS (SELECT 1 FROM visible_alarms a WHERE a.code = 'COMM_LOST')\n                THEN '수집 통신 장애 · 열린 알람'\n              WHEN e.received_at IS NULL THEN '미수집 · 이벤트 없음'\n              WHEN e.received_at > CURRENT_TIMESTAMP OR e.occurred_at > e.received_at\n                THEN '시계 확인 필요'\n              WHEN CURRENT_TIMESTAMP - e.received_at > interval '30 seconds'\n                THEN '이벤트 유입 지연 · 연결 미확인'\n              ELSE '최근 수신 있음' END,\n         e.received_at, e.occurred_at,\n         CASE WHEN r.ended_at IS NULL AND e.received_at <= CURRENT_TIMESTAMP\n              THEN floor(extract(epoch FROM CURRENT_TIMESTAMP - e.received_at)) END,\n         CASE WHEN e.received_at IS NOT NULL THEN\n           concat_ws(' · ', e.station_code, e.event_type,\n             CASE WHEN e.occurred_at <= e.received_at\n                  THEN '발생→DB ' || round(extract(epoch FROM e.received_at - e.occurred_at), 1)::text || '초' END)\n         END\n  FROM (VALUES (1)) AS anchor(n)\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN latest_event e ON true\n  UNION ALL\n  SELECT 'events', 0, e.station_code, e.event_type, e.occurred_at, e.received_at,\n         CASE WHEN e.occurred_at <= e.received_at\n              THEN round(extract(epoch FROM e.received_at - e.occurred_at), 1) END,\n         concat_ws(' · ', e.entity_id, e.event_id::text)\n  FROM recent_events e\n  UNION ALL\n  SELECT 'state_history', 0, e.station_code, e.state, e.started_at, e.ended_at,\n         floor(extract(epoch FROM COALESCE(e.ended_at, CURRENT_TIMESTAMP) - e.started_at)),\n         e.id::text\n  FROM state_history e\n)\nSELECT section AS \"영역\", item AS \"항목\", state AS \"상태\", started AS \"시각\",\n       ended AS \"종료·확인 시각\", amount AS \"값\", detail AS \"상세\"\nFROM rows\nORDER BY section, position, CASE WHEN section IN ('alarm','events','state_history') THEN started END DESC NULLS LAST, item, detail"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "freshness"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "항목": "선택 회차",
+              "시각": "마지막 DB 수신",
+              "종료·확인 시각": "공정 발생",
+              "값": "수신 후 (초)",
+              "상세": "마지막 이벤트 / 기록 지연"
+            }
+          }
+        }
+      ]
+    },
+    {
       "id": 20,
       "type": "canvas",
       "title": "2A 공정 흐름",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 8,
         "w": 15,
         "h": 9
       },
@@ -1387,7 +1461,7 @@
       "title": "검사기 상태 · 실적",
       "gridPos": {
         "x": 15,
-        "y": 4,
+        "y": 8,
         "w": 9,
         "h": 9
       },
@@ -1554,7 +1628,7 @@
       "title": "OCV 검사 추이",
       "gridPos": {
         "x": 0,
-        "y": 13,
+        "y": 17,
         "w": 12,
         "h": 8
       },
@@ -1573,7 +1647,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nobservations AS (\n  SELECT i.id, i.measured_at, i.cell_id, i.station_code, i.attempt, i.ocv_mv, i.ir_mohm,\n         i.result_code, i.reason_code\n  FROM selected_run r\n  JOIN cell c ON c.run_id = r.run_id\n  JOIN cell_inspection i ON i.cell_id = c.cell_id\n  WHERE i.kind = 'electrical'\n    AND i.measured_at >= $__timeFrom() AND i.measured_at < $__timeTo()\n    AND (NULLIF(btrim(${cell_id:sqlstring}), '') IS NULL OR c.cell_id = btrim(${cell_id:sqlstring}))\n  ORDER BY i.measured_at DESC, i.id DESC\n  LIMIT 500\n)\nSELECT measured_at AS \"time\", id::text AS \"검사 ID\", cell_id AS \"Cell ID\",\n       station_code AS \"검사기\", attempt AS \"시도\",\n       (ocv_mv / 1000.0)::double precision AS \"OCV (V)\", ir_mohm AS \"IR (mΩ)\",\n       CASE WHEN result_code IN (1,2,3) THEN 'PASS' WHEN result_code = 5 THEN '대기'\n            WHEN result_code = 9 THEN 'FAIL' END AS \"시도 결과\",\n       reason_code AS \"사유 코드\"\nFROM observations\nORDER BY measured_at, id"
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nobservations AS (\n  SELECT i.id, i.measured_at, i.cell_id, i.station_code, i.attempt, i.ocv_mv, i.ir_mohm,\n         i.result_code, i.reason_code\n  FROM selected_run r\n  JOIN cell c ON c.run_id = r.run_id\n  JOIN cell_inspection i ON i.cell_id = c.cell_id\n  WHERE i.kind = 'electrical'\n    AND i.measured_at >= $__timeFrom() AND i.measured_at < $__timeTo()\n    AND (NULLIF(btrim(${cell_id:sqlstring}), '') IS NULL OR c.cell_id = btrim(${cell_id:sqlstring}))\n  ORDER BY i.measured_at DESC, i.id DESC\n  LIMIT 500\n)\nSELECT measured_at AS \"time\", id::text AS \"검사 ID\", cell_id AS \"Cell ID\",\n       station_code AS \"검사기\", attempt AS \"시도\",\n       (ocv_mv / 1000.0)::double precision AS \"OCV (V)\", ir_mohm AS \"IR (mΩ)\",\n       CASE WHEN result_code IN (1,2,3) THEN 'PASS' WHEN result_code = 5 THEN '대기'\n            WHEN result_code = 9 THEN 'FAIL' END AS \"시도 결과\",\n       reason_code AS \"사유 코드\",\n       CASE result_code WHEN 1 THEN 'A' WHEN 2 THEN 'B' WHEN 3 THEN 'C' END AS \"전기 특성군\"\nFROM observations\nORDER BY measured_at, id"
         }
       ],
       "transformations": [
@@ -1624,7 +1698,7 @@
       "title": "IR 검사 추이",
       "gridPos": {
         "x": 12,
-        "y": 13,
+        "y": 17,
         "w": 12,
         "h": 8
       },
@@ -1692,7 +1766,7 @@
       "title": "A/B/C 특성군별 셀 · Kit 수량",
       "gridPos": {
         "x": 0,
-        "y": 21,
+        "y": 25,
         "w": 12,
         "h": 8
       },
@@ -1851,7 +1925,7 @@
       "title": "OCV 평균 편차 · 투입 순서와 실제 Kit",
       "gridPos": {
         "x": 12,
-        "y": 21,
+        "y": 25,
         "w": 12,
         "h": 8
       },
@@ -2005,13 +2079,13 @@
       }
     },
     {
-      "id": 1,
+      "id": 28,
       "title": "열린 알람 이력",
       "description": "선택 회차 알람과 2A 스테이션의 회차 미지정 알람입니다. 표에 행이 없으면 등록된 열린 알람 기록이 없는 상태입니다.",
       "type": "table",
       "gridPos": {
         "x": 0,
-        "y": 29,
+        "y": 33,
         "w": 12,
         "h": 8
       },
@@ -2025,20 +2099,18 @@
         "showHeader": true
       },
       "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "bg551q8i4v6rkb"
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
       },
       "targets": [
         {
           "refId": "A",
           "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "bg551q8i4v6rkb"
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nstation_state AS (\n  SELECT s.station_code, s.name, s.kind, s.sort_order, e.state, e.started_at, e.ended_at, t.seconds\n  FROM station s\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN LATERAL (\n    SELECT es.state, es.started_at, es.ended_at\n    FROM equipment_state es\n    WHERE es.station_code = s.station_code AND es.run_id = r.run_id\n    ORDER BY es.started_at DESC, es.id DESC\n    LIMIT 1\n  ) e ON true\n  LEFT JOIN v_equipment_time t\n    ON t.station_code = s.station_code AND t.run_id = r.run_id AND t.state = e.state\n  WHERE s.line = '2A'\n), run_lots AS (\n  SELECT c.lot_code, count(*) AS cells\n  FROM cell c JOIN selected_run r ON r.run_id = c.run_id\n  GROUP BY c.lot_code\n), visible_alarms AS (\n  SELECT a.id, a.station_code, a.code, a.severity, a.raised_at, a.acked_at, a.message\n  FROM v_alarm_open a\n  LEFT JOIN station s ON s.station_code = a.station_code\n  LEFT JOIN selected_run r ON true\n  WHERE a.run_id = r.run_id OR (a.run_id IS NULL AND s.line = '2A')\n), rows AS (\n  SELECT 'overview' AS section, -1 AS position, '선택 실행'::text AS item,\n         COALESCE(r.run_id::text, '미수집 / 회차 없음') AS state,\n         r.started_at AS started, r.ended_at AS ended,\n         NULL::numeric AS amount, r.purpose AS detail\n  FROM (VALUES (1)) AS anchor(n) LEFT JOIN selected_run r ON true\n  UNION ALL\n  SELECT 'overview', s.sort_order, s.station_code || ' · ' || s.name,\n         CASE WHEN s.state IS NULL THEN '미수집'\n              WHEN s.ended_at IS NOT NULL THEN s.state || ' · 종료'\n              ELSE s.state END,\n         s.started_at, s.ended_at, s.seconds, s.kind\n  FROM station_state s\n  UNION ALL\n  SELECT 'lot', 0, l.lot_code, CASE WHEN l.is_held THEN '보류' ELSE '보류 아님' END,\n         l.last_held_at, NULL, x.cells,\n         format('공용 DB 셀 %s · 최신 전기 NG %s', l.cells, l.confirmed_ng)\n  FROM v_lot_status l LEFT JOIN run_lots x USING (lot_code)\n  UNION ALL\n  SELECT 'alarm', -a.severity, COALESCE(a.station_code, '회차 공통') || ' · ' || a.code,\n         CASE WHEN a.acked_at IS NULL THEN '미확인' ELSE '확인됨' END,\n         a.raised_at, a.acked_at, a.severity,\n         '#' || a.id::text || COALESCE(' · ' || a.message, '')\n  FROM visible_alarms a\n)\nSELECT section AS \"영역\", item AS \"항목\", state AS \"상태\", started AS \"시각\",\n       ended AS \"종료·확인 시각\", amount AS \"값\", detail AS \"상세\"\nFROM rows\nORDER BY section, position, CASE WHEN section = 'alarm' THEN started END DESC, item"
+          "panelId": 1,
+          "withTransforms": false
         }
       ],
       "transformations": [
@@ -2084,7 +2156,7 @@
       "type": "table",
       "gridPos": {
         "x": 12,
-        "y": 29,
+        "y": 33,
         "w": 12,
         "h": 8
       },
@@ -2154,7 +2226,7 @@
       "title": "1차 전기 PASS · 재검 실적",
       "gridPos": {
         "x": 0,
-        "y": 37,
+        "y": 41,
         "w": 12,
         "h": 8
       },
@@ -2243,7 +2315,7 @@
       "title": "특성군별 4셀 Kit 평균 OCV 편차",
       "gridPos": {
         "x": 12,
-        "y": 37,
+        "y": 41,
         "w": 12,
         "h": 8
       },
@@ -2339,7 +2411,7 @@
       "type": "table",
       "gridPos": {
         "x": 0,
-        "y": 45,
+        "y": 49,
         "w": 13,
         "h": 8
       },
@@ -2410,7 +2482,7 @@
       "title": "OCV 편차 비교 상세",
       "gridPos": {
         "x": 13,
-        "y": 45,
+        "y": 49,
         "w": 11,
         "h": 8
       },
@@ -2493,7 +2565,7 @@
       "type": "table",
       "gridPos": {
         "x": 0,
-        "y": 53,
+        "y": 57,
         "w": 24,
         "h": 9
       },
@@ -2535,7 +2607,7 @@
       "type": "table",
       "gridPos": {
         "x": 0,
-        "y": 62,
+        "y": 66,
         "w": 24,
         "h": 9
       },
@@ -2573,7 +2645,7 @@
       "type": "table",
       "gridPos": {
         "x": 0,
-        "y": 71,
+        "y": 75,
         "w": 24,
         "h": 10
       },
@@ -2601,6 +2673,164 @@
           "format": "table",
           "rawQuery": true,
           "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\ninput AS (\n  SELECT NULLIF(btrim(${cell_id:sqlstring}), '') AS cell_id,\n         NULLIF(btrim(${kit_id:sqlstring}), '') AS kit_id\n), hits AS (\n  SELECT c.cell_id, c.box_id, c.box_slot, c.grade, c.status, c.lot_code, c.created_at\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  CROSS JOIN input p\n  WHERE c.cell_id = p.cell_id OR c.box_id = p.kit_id\n), hit_boxes AS (\n  SELECT b.box_id, b.grade, b.status, b.opened_at, b.packed_at\n  FROM selected_run r JOIN cell_box b ON b.run_id = r.run_id\n  CROSS JOIN input p\n  WHERE b.box_id = p.kit_id OR EXISTS (SELECT 1 FROM hits c WHERE c.box_id = b.box_id)\n), history AS (\n  SELECT c.created_at AS stamp, NULL::bigint AS event_order, c.cell_id AS ref,\n         '셀 등록'::text AS event, c.cell_id, c.box_id AS kit_id, NULL::text AS station,\n         concat_ws(' · ', '현재 ' || c.status, 'LOT ' || c.lot_code,\n                   '특성군 ' || c.grade, '슬롯 ' || c.box_slot) AS detail\n  FROM hits c\n  UNION ALL\n  SELECT i.measured_at, i.id, i.id::text, i.kind, c.cell_id, c.box_id, i.station_code,\n         concat_ws(' · ', '시도 ' || i.attempt,\n           CASE WHEN i.result_code IN (0,1,2,3) THEN 'PASS'\n                WHEN i.result_code = 9 THEN 'FAIL'\n                WHEN i.result_code = 5 AND i.kind = 'electrical' THEN '대기'\n                WHEN i.result_code = 5 THEN '미판독' END,\n           '사유 ' || i.reason_code, round(i.ocv_mv / 1000.0, 3)::text || ' V',\n           i.ir_mohm::text || ' mΩ')\n  FROM hits c JOIN cell_inspection i ON i.cell_id = c.cell_id\n  UNION ALL\n  SELECT e.occurred_at, NULL, e.event_id::text, e.event_type,\n         c.cell_id, COALESCE(b.box_id, c.box_id), e.station_code, '공정 이벤트 원장'\n  FROM selected_run r JOIN event_log e ON e.run_id = r.run_id AND e.source = '2A'\n  LEFT JOIN hits c ON c.cell_id = e.entity_id\n  LEFT JOIN hit_boxes b ON b.box_id = e.entity_id\n  WHERE c.cell_id IS NOT NULL OR b.box_id IS NOT NULL\n  UNION ALL\n  SELECT COALESCE(b.packed_at, b.opened_at), NULL, b.box_id, 'Kit 기록',\n         NULL, b.box_id, NULL, '특성군 ' || b.grade || ' · 현재 상태 ' || b.status\n  FROM hit_boxes b\n  UNION ALL\n  SELECT h.stamp, NULL, sh.request_id, h.event, NULL, b.box_id, NULL,\n         '요청 라인 ' || sh.requested_by || ' · 현재 상태 ' || sh.status\n  FROM hit_boxes b JOIN supply_handoff sh ON sh.box_id = b.box_id\n  CROSS JOIN LATERAL (VALUES ('인계 요청', sh.requested_at), ('출구 통과', sh.released_at),\n                            ('수신 확인', sh.confirmed_at)) h(event, stamp)\n  WHERE h.stamp IS NOT NULL\n)\nSELECT stamp AS \"발생 시각\", event AS \"이벤트\", ref AS \"원본 ID\", cell_id AS \"Cell ID\",\n       kit_id AS \"Kit ID\", station AS \"스테이션\", detail AS \"상세\"\nFROM history ORDER BY stamp DESC, event_order DESC NULLS LAST, ref DESC LIMIT 300"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "type": "table",
+      "title": "최근 공정 이벤트",
+      "description": "선택 회차와 공정 발생 시간 범위의 2A 이벤트 최근 100건입니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 85,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "events"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "항목": "스테이션",
+              "상태": "이벤트",
+              "시각": "발생",
+              "종료·확인 시각": "DB 수신",
+              "값": "기록 지연 (초)",
+              "상세": "대상 / 이벤트 ID"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "table",
+      "title": "설비 상태 변경 이력",
+      "description": "선택 구간과 겹치는 상태 전이 최근 100건입니다. 종료가 미수집이면 열린 상태 구간입니다.",
+      "gridPos": {
+        "x": 12,
+        "y": 85,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "상태 종료"
+            },
+            "properties": [
+              {
+                "id": "noValue",
+                "value": "열린 구간"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "state_history"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "항목": "스테이션",
+              "시각": "상태 시작",
+              "종료·확인 시각": "상태 종료",
+              "값": "상태 지속 (초)",
+              "상세": "상태 기록 ID"
+            }
+          }
         }
       ]
     }
