@@ -148,6 +148,18 @@ def read_jsonl(path):
                     raise ValueError(f"Invalid JSON on line {number}") from error
 
 
+def read_stream(path, run_id, source_id, source_session_id):
+    """Read the retained stream, including rows already confirmed by a sender."""
+    uri = Path(path).resolve().as_uri() + "?mode=ro"
+    with closing(sqlite3.connect(uri, uri=True, timeout=5)) as db:
+        rows = db.execute("""
+            SELECT body FROM spool
+            WHERE run_id = ? AND source_id = ? AND source_session_id = ?
+            ORDER BY source_sequence
+        """, (run_id, source_id, source_session_id))
+        return [json.loads(body) for body, in rows]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=DEFAULT_PATH)

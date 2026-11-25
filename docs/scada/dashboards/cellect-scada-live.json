@@ -10,7 +10,7 @@
   ],
   "timezone": "Asia/Seoul",
   "schemaVersion": 41,
-  "version": 1,
+  "version": 4,
   "editable": false,
   "time": {
     "from": "now-5m",
@@ -52,7 +52,7 @@
         "x": 0,
         "y": 0,
         "w": 24,
-        "h": 5
+        "h": 4
       },
       "datasource": {
         "type": "graphite",
@@ -130,6 +130,13 @@
               {
                 "id": "displayName",
                 "value": "ID 부여"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#66D8EE"
+                }
               }
             ]
           },
@@ -142,6 +149,13 @@
               {
                 "id": "displayName",
                 "value": "외관 PASS"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8DE0B4"
+                }
               }
             ]
           },
@@ -154,6 +168,13 @@
               {
                 "id": "displayName",
                 "value": "외관 FAIL"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#FF8C97"
+                }
               }
             ]
           },
@@ -166,6 +187,13 @@
               {
                 "id": "displayName",
                 "value": "전기검사 PASS"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8DE0B4"
+                }
               }
             ]
           },
@@ -178,6 +206,13 @@
               {
                 "id": "displayName",
                 "value": "전기검사 FAIL"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#FF8C97"
+                }
               }
             ]
           },
@@ -190,6 +225,13 @@
               {
                 "id": "displayName",
                 "value": "완료 Kit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#66D8EE"
+                }
               }
             ]
           }
@@ -203,10 +245,2176 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "none",
+        "colorMode": "value",
         "graphMode": "none",
         "textMode": "value_and_name",
-        "orientation": "horizontal"
+        "orientation": "vertical",
+        "wideLayout": false,
+        "justifyMode": "center",
+        "text": {
+          "titleSize": 13,
+          "valueSize": 34
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "canvas",
+      "title": "라이브 시뮬레이션 · 공정 평면도",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 6
+      },
+      "description": "로컬 시뮬레이터가 구현한 흐름입니다. 셀별 검사·Kit 이력과 특성군별 Buffer 집계는 SQLite 이벤트를 사용합니다.",
+      "options": {
+        "inlineEditing": false,
+        "showAdvancedTypes": false,
+        "root": {
+          "name": "root",
+          "type": "frame",
+          "elements": [
+            {
+              "name": "simulation-main-belt",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 18.0,
+                "right": 41.2,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "electrical-reject-link",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 36.2,
+                "right": 63.24,
+                "top": 72,
+                "height": 47,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#492C37"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "simulation-source-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.8,
+                "right": 2.0,
+                "top": 126,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "모의 공정 · SQLite 이벤트  |  Buffer 실집계는 아래 그래프"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "inspection-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 45.2,
+                "right": 53.4,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "electrical-reject-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 32.5,
+                "right": 59.8,
+                "top": 132,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "전기검사 NG"
+                },
+                "color": {
+                  "fixed": "#FF8C97"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "simulation-sort-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 49.7,
+                "right": 42.5,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "특성군 분류"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "simulation-sorter",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 50.8,
+                "right": 43.4,
+                "top": 60,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "SORT"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "simulation-test-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 29.4,
+                "right": 56.4,
+                "top": 36,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "전기검사"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "simulation-test",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 30.8,
+                "right": 57.8,
+                "top": 60,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "OCV / IR"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#17334A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#507C9D"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-distributor",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.519999999999996,
+                "right": 40.92,
+                "top": 35,
+                "height": 74,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "group-collector",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 75.62,
+                "right": 23.82,
+                "top": 35,
+                "height": 74,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-A",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.8,
+                "right": 24.1,
+                "top": 33,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#223C51"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-A-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 64.4,
+                "right": 35.41,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 66.0,
+                "right": 33.81,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 67.6,
+                "right": 32.21,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 69.2,
+                "right": 30.61,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-5",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 70.8,
+                "right": 29.01,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-6",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 72.4,
+                "right": 27.41,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-7",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.0,
+                "right": 25.81,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.8,
+                "right": 24.1,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#223C51"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-B-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 64.4,
+                "right": 35.41,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 66.0,
+                "right": 33.81,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 67.6,
+                "right": 32.21,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 69.2,
+                "right": 30.61,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-5",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 70.8,
+                "right": 29.01,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-6",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 72.4,
+                "right": 27.41,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-7",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.0,
+                "right": 25.81,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.8,
+                "right": 24.1,
+                "top": 101,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#223C51"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-C-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 64.4,
+                "right": 35.41,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 66.0,
+                "right": 33.81,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 67.6,
+                "right": 32.21,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 69.2,
+                "right": 30.61,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-5",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 70.8,
+                "right": 29.01,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-6",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 72.4,
+                "right": 27.41,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-7",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.0,
+                "right": 25.81,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "pack-to-out",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 75.9,
+                "right": 2.0,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "appearance-reject",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 10.8,
+                "right": 84.0,
+                "top": 114,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#492C37"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "appearance-drop",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 15.72,
+                "right": 83.72,
+                "top": 72,
+                "height": 47,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#492C37"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "infeed",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 2.4,
+                "right": 93.6,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "IN"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "vision-id",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.8,
+                "right": 87.8,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "VIS1"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "vision-appearance",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 13.3,
+                "right": 81.4,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "VIS2"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "infeed-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 2.0,
+                "right": 93.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "셀 투입"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "vision-id-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.2,
+                "right": 87.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "ID 부여"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "vision-appearance-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 12.8,
+                "right": 80.9,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "외관검사"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "lane-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 59.4,
+                "right": 24.6,
+                "top": 9,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "A/B/C 전기적 특성군"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "group-A",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.6,
+                "right": 36.4,
+                "top": 26.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "A"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20384F"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#547891"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-arrow-A",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.8,
+                "right": 23.8,
+                "top": 28,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "group-B",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.6,
+                "right": 36.4,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "B"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20384F"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#547891"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-arrow-B",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.8,
+                "right": 23.8,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "group-C",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.6,
+                "right": 36.4,
+                "top": 94.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "C"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20384F"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#547891"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-arrow-C",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.8,
+                "right": 23.8,
+                "top": 96,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "box-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 77.4,
+                "right": 12.0,
+                "top": 32,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "BOX · 동일군 4셀"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "box-tray",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 79.2,
+                "right": 13.9,
+                "top": 56,
+                "height": 32,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#15283A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#50728E"
+                },
+                "width": 1,
+                "radius": 5
+              }
+            },
+            {
+              "name": "box-slot-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 79.9,
+                "right": 18.9,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "1"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "box-slot-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 81.35,
+                "right": 17.45,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "2"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "box-slot-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 82.8,
+                "right": 16.0,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "3"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "box-slot-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 84.25,
+                "right": 14.55,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "4"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "outfeed",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 91.5,
+                "right": 2.1,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "완료"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "outfeed-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 90.2,
+                "right": 1.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "완료 Kit"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "feed-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 6.4,
+                "right": 92.2,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "vision-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 18.6,
+                "right": 80.0,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "sort-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 57.3,
+                "right": 41.3,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "pack-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 87.8,
+                "right": 10.8,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "appearance-reject-bin",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.2,
+                "right": 88.5,
+                "top": 108.0,
+                "height": 22,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "FAIL"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#321F2B"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "appearance-reject-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.0,
+                "right": 83.8,
+                "top": 133,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "외관 NG"
+                },
+                "color": {
+                  "fixed": "#FF8C97"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "electrical-reject",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 32.9,
+                "right": 60.2,
+                "top": 108,
+                "height": 22,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "FAIL 배출"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 11
+              },
+              "background": {
+                "color": {
+                  "fixed": "#321F2B"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            }
+          ],
+          "background": {
+            "color": {
+              "fixed": "#0B1421"
+            }
+          }
+        }
       }
     },
     {
@@ -216,8 +2424,8 @@
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 5,
-        "w": 12,
+        "y": 10,
+        "w": 8,
         "h": 8
       },
       "datasource": {
@@ -365,9 +2573,9 @@
       "description": "실제로 분류된 셀 누계에서 해당 그룹으로 포장한 셀을 뺀 수량입니다.",
       "type": "timeseries",
       "gridPos": {
-        "x": 12,
-        "y": 5,
-        "w": 12,
+        "x": 8,
+        "y": 10,
+        "w": 8,
         "h": 8
       },
       "datasource": {
@@ -426,6 +2634,13 @@
               {
                 "id": "displayName",
                 "value": "A 대기"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#66D8EE"
+                }
               }
             ]
           },
@@ -438,6 +2653,13 @@
               {
                 "id": "displayName",
                 "value": "B 대기"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#C8ADFF"
+                }
               }
             ]
           },
@@ -450,6 +2672,79 @@
               {
                 "id": "displayName",
                 "value": "C 대기"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#80A9E8"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "완료 Kit",
+      "description": "동일 특성군 4셀의 포장 이벤트가 확정된 Kit만 누적합니다.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 16,
+        "y": 10,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "graphite",
+        "uid": "cellect-scada-simulation"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "cellect-scada-simulation"
+          },
+          "refId": "A",
+          "target": "cellect.sim.kits.total",
+          "textEditor": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineInterpolation": "stepAfter",
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cellect.sim.kits.total"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "완료 Kit"
               }
             ]
           }
@@ -474,7 +2769,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 13,
+        "y": 18,
         "w": 12,
         "h": 8
       },
@@ -547,7 +2842,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 12,
-        "y": 13,
+        "y": 18,
         "w": 12,
         "h": 8
       },
@@ -596,72 +2891,6 @@
               {
                 "id": "displayName",
                 "value": "IR"
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      }
-    },
-    {
-      "id": 6,
-      "title": "완료 Kit",
-      "description": "동일 특성군 4셀의 포장 이벤트가 확정된 Kit만 누적합니다.",
-      "type": "timeseries",
-      "gridPos": {
-        "x": 0,
-        "y": 21,
-        "w": 24,
-        "h": 7
-      },
-      "datasource": {
-        "type": "graphite",
-        "uid": "cellect-scada-simulation"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "graphite",
-            "uid": "cellect-scada-simulation"
-          },
-          "refId": "A",
-          "target": "cellect.sim.kits.total",
-          "textEditor": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "decimals": 0,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "lineInterpolation": "stepAfter",
-            "showPoints": "never"
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "cellect.sim.kits.total"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "완료 Kit"
               }
             ]
           }

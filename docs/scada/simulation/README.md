@@ -12,7 +12,7 @@ python -B .\docs\scada\simulation\server.py
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\docs\scada\Start-Grafana.ps1
 ```
 
-- [라이브 대시보드](http://127.0.0.1:3300/d/cellect-scada-live)에서 5초마다 갱신되는 생산·검사 누계, 그룹별 Buffer, OCV·IR 검사값, 완료 Kit 수를 확인한다.
+- [라이브 대시보드](http://127.0.0.1:3300/d/cellect-scada-live)에서 모의 공정의 컨베이어 평면도와 5초마다 갱신되는 생산·검사 누계, 그룹별 Buffer, OCV·IR 검사값, 완료 Kit 수를 확인한다. 평면도는 외관 및 전기검사 실패 시의 배출과 A/B/C 분류·포장을 표시한다.
 - 대시보드 상단의 **Cell / Kit 이력 조회** 또는 [이력 화면](http://127.0.0.1:8766/trace)에서 ID를 클릭하거나 검색한다. OCV·IR 그래프의 점에서 **검사 셀 이력**을 열면 해당 검사값을 남긴 셀의 이력을 조회한다. 그래프는 한국 시각, 이력 표는 UTC로 표시한다.
 - 기본 간격은 2초며 첫 Kit는 기본 실행에서 약 30초 후 생성된다. 빠른 검증에는 시뮬레이터 명령 뒤에 `--interval 1`을 붙인다. `--seed`는 측정값 편차를 재현할 때 사용한다.
 - 각 콘솔에서 `Ctrl+C`로 종료한다. 시뮬레이터를 다시 시작하면 새 실행 ID로 공정이 시작된다. 이전 셀·Kit ID를 검색하면 `.local/simulation.sqlite3`에 남은 이력을 조회할 수 있다. 실행 종료 시점에 진행 중이던 셀은 그 상태까지 기록된다.
@@ -41,7 +41,7 @@ powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\docs\scada\Start
 | 라이브 모의 공정 | `cellect-scada-simulation` / Grafana 내장 Graphite → `127.0.0.1:8766`의 읽기 전용 로컬 어댑터 → 모의 SQLite 이벤트 |
 | 실제 DB | 향후 별도 PostgreSQL 데이터 소스 UID와 읽기 전용 접속으로 설정. 조회 정의는 [DB 요청 문서](../db-data-requirements.md) 기준으로 협의 |
 
-Graphite 어댑터는 대시보드에 필요한 정확한 메트릭 경로, 시간 범위와 JSON 응답을 제공한다. 별도 Graphite 서버 설치는 필요 없다. 이력은 `GET /api/history?cell_id=...` 또는 `GET /api/history?kit_id=...`로도 읽을 수 있다. [Grafana Graphite 데이터 소스](https://grafana.com/docs/grafana/latest/datasources/graphite/) · [Graphite Render API](https://graphite.readthedocs.io/en/latest/render_api.html)
+Graphite 어댑터는 대시보드에 필요한 정확한 메트릭 경로와 Grafana가 쿼리 식별자를 붙이는 `aliasSub` 형식을 지원한다. 별도 Graphite 서버 설치는 필요 없다. 이력은 `GET /api/history?cell_id=...` 또는 `GET /api/history?kit_id=...`로도 읽을 수 있다. LAN에서 Grafana를 열 때 모의 그래프는 볼 수 있으며, 이력 페이지는 시뮬레이터 PC의 localhost에서 열린다. [Grafana Graphite 데이터 소스](https://grafana.com/docs/grafana/latest/datasources/graphite/) · [Graphite Render API](https://graphite.readthedocs.io/en/latest/render_api.html)
 
 ## 검증 명령
 

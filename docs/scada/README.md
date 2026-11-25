@@ -4,15 +4,43 @@ Grafana OSS 13.3.1 / Windows에서 시작용 대시보드를 실행한다. SCADA
 
 시간에 따라 진행되는 공정과 개별 셀 이력을 확인하려면 [라이브 시뮬레이션 실행 안내](simulation/README.md)를 참고한다. 아래의 고정 TestData 화면도 같은 개발 인스턴스에서 열 수 있다.
 
-## 팀 공용 DB 연동 준비
+## 업무별 SCADA
+
+Grafana 3300의 [01 메인 · 회차 총괄](http://127.0.0.1:3300/d/cellect-2a-main)에서 시작한다. 상단 메뉴를 사용하면 선택 회차·기간과 입력한 조회 필터가 이어진다. 팀 LAN에서 접속할 때는 로컬 주소 대신 Grafana가 열려 있는 개발 PC의 LAN 주소를 사용한다.
+
+| 화면 | 용도 |
+| --- | --- |
+| [01 메인 · 회차 총괄](http://127.0.0.1:3300/d/cellect-2a-main) | 회차·출처·수신 상태, 생산 KPI 4개, 비교 표본과 편차 감소율, 최근 열린 알람 |
+| [02 공정 관제](http://127.0.0.1:3300/d/cellect-2a-process) | 컨베이어 평면도, T1~T4·RT, 기록 기반 Cell 단계 추적과 열린 알람 |
+| [03 생산·인계](http://127.0.0.1:3300/d/cellect-2a-production-flow) | 회차 누계, 선택 기간 분당 생산량, 특성군별 셀·Kit 수와 인계 현황 |
+| [04 품질·설비 분석](http://127.0.0.1:3300/d/cellect-2a-quality-equipment) | 외관·전기 NG율, 재검 회복률, OCV·IR, 편차 비교와 관측된 장애 지속시간 |
+| [05 DB 이력·추적](http://127.0.0.1:3300/d/cellect-2a-trace) | Cell ID·Kit ID·LOT 검색, 검사 원본과 구성 슬롯, 공정·설비 이벤트 |
+
+메인·공정·생산은 10초 자동 갱신한다. 품질·DB 이력은 범위를 바꿀 때와 수동 새로고침 시 조회한다. 합격률과 최종 전기 NG율은 최종 판정이 확정된 셀 기준이다. 외관 NG율은 최신 외관 판정이 확정된 셀, 재검 회복률은 재검을 받은 고유 셀 기준이다. 공정 관제는 DB 기록을 표시하며, Factory I/O·Buffer 실시간 수집과 수리 완료 기반 MTTR은 미연동이다.
+
+업무별 JSON은 현재 발표용 JSON의 검증된 패널에서 생성한다. 공유 패널 정의나 업무별 배치를 변경한 뒤 아래 명령을 실행한다.
+
+```powershell
+python -X utf8 -B .\docs\scada\build_role_dashboards.py
+```
+
+## 기존 검증·발표 화면과 연동 자료
 
 - [운영 SCADA Overview v2](http://127.0.0.1:3300/d/cellect-2a-scada-overview-v2?theme=dark&kiosk)
+- [SCADA 관제 · 발표용](http://127.0.0.1:3300/d/cellect-2a-scada-presentation?theme=dark&kiosk)
 - [실데이터 연동 검증 결과와 Factory I/O 통합 절차](db-integration/integration-test.md)
 - [팀 PostgreSQL 읽기 전용 파일럿 실행과 확인 항목](postgres-pilot/README.md)
 - [현재 이벤트 구조와 패널 필드·단위·갱신 주기](db-integration/current-data-flow.md)
 - [DB 조회 인터페이스와 SQLite/PostgreSQL 전환 설계](db-integration/read-interface.md)
 - [Factory I/O·PLC 이벤트 수집 인터페이스](db-integration/collector-interface.md)
+- [02 공정 관제 셀 위치 연동 뼈대와 로컬 테스트](db-integration/cell-position-adapter.md)
 - [DB 담당자에게 전달할 협의사항과 인수 기준](db-integration/db-handoff.md)
+
+발표용 화면은 기존 Overview v2와 같은 PostgreSQL 데이터 소스를 사용한다. 상단에 회차와 마지막 DB 수신을, 중앙에 컨베이어 평면도와 검사기·알람을 배치했다. 평면도에는 T1~T4 병렬 검사, RT 재검 복귀, 외관·최종 NG 배출, A/B/C 레인과 4셀 트레이가 표시된다. 트레이 숫자는 슬롯 번호이고 실시간 셀 위치와 Buffer 점유량은 미수집으로 표시한다.
+
+- **편차 비교**는 선택 회차에서 완료 상태, 동일 특성군 4슬롯, 유효한 최종 OCV 4개를 확인한 Kit를 대상으로 한다. 두 방식에 동일한 셀을 사용한다. 2 Kit 미만은 표본 부족으로, 기준 편차가 0이면 감소율을 비교 불가로 표시한다. 50%는 [설계 메모의 잠정 목표](../design-notes.md#편차-비교-방법)다.
+- **인계**는 출구와 수신 기록이 없는 요청 접수, 출구 통과, 수신 확인을 해당 기록이 있는 고유 Kit로 집계한다. 출구 통과와 수신 확인 집계에는 같은 Kit가 포함될 수 있다.
+- **셀 이력**은 Cell ID와 단계 번호를 선택하면 공정 평면도에 해당 기록 지점을 표시한다. 단계 번호를 비우면 마지막 기록을 표시한다. 단계 표는 기록 시각 순이며, 포장 시각이 전기검사 시각보다 이르면 포장 기록에 확인 메시지를 표시한다. 추이 그래프나 Kit 상세를 시연할 때는 검사·포장 시각이 포함되는 시간 범위를 선택한다.
 
 ## 저장소 분석과 작업 순서
 

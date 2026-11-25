@@ -1,0 +1,4923 @@
+{
+  "timezone": "Asia/Seoul",
+  "schemaVersion": 41,
+  "version": 7,
+  "editable": false,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "10s",
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m"
+    ]
+  },
+  "style": "dark",
+  "id": null,
+  "uid": "cellect-2a-process",
+  "title": "Cellect 2A · 02 공정 관제",
+  "description": "02 공정 관제 · 팀 공용 PostgreSQL 읽기 전용",
+  "tags": [
+    "cellect",
+    "2a",
+    "scada",
+    "업무별 관제"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "run_id",
+        "label": "시연 회차",
+        "description": "비워 두면 가장 최근에 시작한 2A 실행을 사용합니다.",
+        "type": "textbox",
+        "hide": 0,
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      },
+      {
+        "name": "cell_id",
+        "label": "Cell ID",
+        "description": "전기검사 패널을 좁히고 ID 검색을 실행합니다.",
+        "type": "textbox",
+        "hide": 0,
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      },
+      {
+        "name": "kit_id",
+        "label": "Kit ID",
+        "description": "Kit ID로 구성 셀과 인계 이력을 검색합니다.",
+        "type": "textbox",
+        "hide": 2,
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      },
+      {
+        "name": "trace_step",
+        "label": "이력 단계",
+        "type": "textbox",
+        "hide": 0,
+        "description": "선택 Cell의 시간순 단계 번호. 비워 두면 마지막 기록이 표시됩니다.",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "skipUrlSync": false
+      },
+      {
+        "name": "lot_code",
+        "label": "LOT",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [],
+        "skipUrlSync": false,
+        "hide": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "선택 회차",
+      "description": "최근 수신 30초 기준은 이벤트 지연 참고값입니다. 유휴 상태도 표시될 수 있습니다. 수집 통신 장애는 열린 COMM_LOST 알람으로만 표시합니다. Grafana 조회 실패는 패널 오류로 표시됩니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 5,
+        "h": 3
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\nstation_state AS (\n  SELECT s.station_code, s.name, s.kind, s.sort_order, e.state, e.started_at, e.ended_at, t.seconds\n  FROM station s\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN LATERAL (\n    SELECT es.state, es.started_at, es.ended_at\n    FROM equipment_state es\n    WHERE es.station_code = s.station_code AND es.run_id = r.run_id\n    ORDER BY es.started_at DESC, es.id DESC\n    LIMIT 1\n  ) e ON true\n  LEFT JOIN v_equipment_time t\n    ON t.station_code = s.station_code AND t.run_id = r.run_id AND t.state = e.state\n  WHERE s.line = '2A'\n), run_lots AS (\n  SELECT c.lot_code, count(*) AS cells\n  FROM cell c JOIN selected_run r ON r.run_id = c.run_id\n  GROUP BY c.lot_code\n), visible_alarms AS (\n  SELECT a.id, a.station_code, a.code, a.severity, a.raised_at, a.acked_at, a.message\n  FROM v_alarm_open a\n  LEFT JOIN station s ON s.station_code = a.station_code\n  LEFT JOIN selected_run r ON true\n  WHERE a.run_id = r.run_id OR (a.run_id IS NULL AND s.line = '2A')\n), latest_event AS (\n  SELECT e.occurred_at, e.received_at, e.station_code, e.event_type\n  FROM selected_run r JOIN event_log e ON e.run_id = r.run_id\n  WHERE e.source = '2A'\n  ORDER BY e.received_at DESC, e.event_id DESC LIMIT 1\n), recent_events AS (\n  SELECT e.event_id, e.occurred_at, e.received_at, e.station_code, e.event_type, e.entity_id\n  FROM selected_run r JOIN event_log e ON e.run_id = r.run_id\n  WHERE e.source = '2A'\n    AND e.occurred_at >= $__timeFrom() AND e.occurred_at < $__timeTo()\n  ORDER BY e.occurred_at DESC, e.event_id DESC LIMIT 100\n), state_history AS (\n  SELECT e.id, e.station_code, e.state, e.started_at, e.ended_at\n  FROM selected_run r JOIN equipment_state e ON e.run_id = r.run_id\n  JOIN station s ON s.station_code = e.station_code AND s.line = '2A'\n  WHERE e.started_at < $__timeTo()\n    AND COALESCE(e.ended_at, CURRENT_TIMESTAMP) > $__timeFrom()\n  ORDER BY e.started_at DESC, e.id DESC LIMIT 100\n), rows AS (\n  SELECT 'overview' AS section, -1 AS position, '선택 실행'::text AS item,\n         COALESCE(r.run_id::text, '미수집 / 회차 없음') AS state,\n         r.started_at AS started, r.ended_at AS ended,\n         NULL::numeric AS amount, r.purpose AS detail\n  FROM (VALUES (1)) AS anchor(n) LEFT JOIN selected_run r ON true\n  UNION ALL\n  SELECT 'overview', s.sort_order, s.station_code || ' · ' || s.name,\n         CASE WHEN s.state IS NULL THEN '미수집'\n              WHEN s.ended_at IS NOT NULL THEN s.state || ' · 종료'\n              ELSE s.state END,\n         s.started_at, s.ended_at, s.seconds, s.kind\n  FROM station_state s\n  UNION ALL\n  SELECT 'lot', 0, l.lot_code, CASE WHEN l.is_held THEN '보류' ELSE '보류 아님' END,\n         l.last_held_at, NULL, x.cells,\n         format('공용 DB 셀 %s · 최신 전기 NG %s', l.cells, l.confirmed_ng)\n  FROM v_lot_status l LEFT JOIN run_lots x USING (lot_code)\n  UNION ALL\n  SELECT 'alarm', -a.severity, COALESCE(a.station_code, '회차 공통') || ' · ' || a.code,\n         CASE WHEN a.acked_at IS NULL THEN '미확인' ELSE '확인됨' END,\n         a.raised_at, a.acked_at, a.severity,\n         '#' || a.id::text || COALESCE(' · ' || a.message, '')\n  FROM visible_alarms a\n  UNION ALL\n  SELECT 'freshness', 0, COALESCE('회차 ' || r.run_id::text, '선택 실행 없음'),\n         CASE WHEN r.run_id IS NULL THEN '미수집 · 회차 없음'\n              WHEN r.ended_at IS NOT NULL THEN '회차 종료'\n              WHEN EXISTS (SELECT 1 FROM visible_alarms a WHERE a.code = 'COMM_LOST')\n                THEN '수집 통신 장애 · 열린 알람'\n              WHEN e.received_at IS NULL THEN '미수집 · 이벤트 없음'\n              WHEN e.received_at > CURRENT_TIMESTAMP OR e.occurred_at > e.received_at\n                THEN '시계 확인 필요'\n              WHEN CURRENT_TIMESTAMP - e.received_at > interval '30 seconds'\n                THEN '이벤트 유입 지연 · 연결 미확인'\n              ELSE '최근 수신 있음' END,\n         e.received_at, e.occurred_at,\n         CASE WHEN r.ended_at IS NULL AND e.received_at <= CURRENT_TIMESTAMP\n              THEN floor(extract(epoch FROM CURRENT_TIMESTAMP - e.received_at)) END,\n         CASE WHEN e.received_at IS NOT NULL THEN\n           concat_ws(' · ', e.station_code, e.event_type,\n             CASE WHEN e.occurred_at <= e.received_at\n                  THEN '발생→DB ' || round(extract(epoch FROM e.received_at - e.occurred_at), 1)::text || '초' END)\n         END\n  FROM (VALUES (1)) AS anchor(n)\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN latest_event e ON true\n  UNION ALL\n  SELECT 'events', 0, e.station_code, e.event_type, e.occurred_at, e.received_at,\n         CASE WHEN e.occurred_at <= e.received_at\n              THEN round(extract(epoch FROM e.received_at - e.occurred_at), 1) END,\n         concat_ws(' · ', e.entity_id, e.event_id::text)\n  FROM recent_events e\n  UNION ALL\n  SELECT 'state_history', 0, e.station_code, e.state, e.started_at, e.ended_at,\n         floor(extract(epoch FROM COALESCE(e.ended_at, CURRENT_TIMESTAMP) - e.started_at)),\n         e.id::text\n  FROM state_history e\n)\nSELECT section AS \"영역\", item AS \"항목\", state AS \"상태\", started AS \"시각\",\n       ended AS \"종료·확인 시각\", amount AS \"값\", detail AS \"상세\"\nFROM rows\nORDER BY section, position, CASE WHEN section IN ('alarm','events','state_history') THEN started END DESC NULLS LAST, item, detail"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#EFF5FF"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true,
+          "limit": 1
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "justifyMode": "center",
+        "colorMode": "value",
+        "graphMode": "none",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 21
+        }
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "freshness"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true,
+              "종료·확인 시각": true,
+              "값": true,
+              "상세": true
+            },
+            "indexByName": {
+              "항목": 0,
+              "상태": 1,
+              "시각": 2
+            },
+            "renameByName": {
+              "항목": "선택 회차",
+              "상태": "수신 상태",
+              "시각": "마지막 DB 수신"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "선택 회차"
+              ]
+            }
+          }
+        }
+      ],
+      "transparent": false
+    },
+    {
+      "id": 48,
+      "type": "stat",
+      "title": "수신 상태",
+      "description": "최근 수신 30초 기준은 이벤트 지연 참고값입니다. 유휴 상태도 표시될 수 있습니다. 수집 통신 장애는 열린 COMM_LOST 알람으로만 표시합니다. Grafana 조회 실패는 패널 오류로 표시됩니다.",
+      "gridPos": {
+        "x": 5,
+        "y": 0,
+        "w": 10,
+        "h": 3
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#EFF5FF"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "수신 상태"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "최근 수신 있음": {
+                        "text": "최근 수신 있음",
+                        "color": "#8DE0B4"
+                      },
+                      "이벤트 유입 지연 · 연결 미확인": {
+                        "text": "이벤트 유입 지연 · 연결 미확인",
+                        "color": "#F7C875"
+                      },
+                      "수집 통신 장애 · 열린 알람": {
+                        "text": "수집 통신 장애 · 열린 알람",
+                        "color": "#C8ADFF"
+                      },
+                      "시계 확인 필요": {
+                        "text": "시계 확인 필요",
+                        "color": "#F7C875"
+                      },
+                      "회차 종료": {
+                        "text": "회차 종료",
+                        "color": "#A6B7CE"
+                      },
+                      "미수집 · 회차 없음": {
+                        "text": "미수집 · 회차 없음",
+                        "color": "#A6B7CE"
+                      },
+                      "미수집 · 이벤트 없음": {
+                        "text": "미수집 · 이벤트 없음",
+                        "color": "#A6B7CE"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true,
+          "limit": 1
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "justifyMode": "center",
+        "colorMode": "value",
+        "graphMode": "none",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 21
+        }
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "freshness"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true,
+              "종료·확인 시각": true,
+              "값": true,
+              "상세": true
+            },
+            "indexByName": {
+              "항목": 0,
+              "상태": 1,
+              "시각": 2
+            },
+            "renameByName": {
+              "항목": "선택 회차",
+              "상태": "수신 상태",
+              "시각": "마지막 DB 수신"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수신 상태"
+              ]
+            }
+          }
+        }
+      ],
+      "transparent": false
+    },
+    {
+      "id": 49,
+      "type": "stat",
+      "title": "마지막 DB 수신 · KST",
+      "description": "최근 수신 30초 기준은 이벤트 지연 참고값입니다. 유휴 상태도 표시될 수 있습니다. 수집 통신 장애는 열린 COMM_LOST 알람으로만 표시합니다. Grafana 조회 실패는 패널 오류로 표시됩니다.",
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 9,
+        "h": 3
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#EFF5FF"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "마지막 DB 수신"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:YYYY-MM-DD HH:mm:ss"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true,
+          "limit": 1
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "justifyMode": "center",
+        "colorMode": "value",
+        "graphMode": "none",
+        "wideLayout": false,
+        "text": {
+          "valueSize": 21
+        }
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "freshness"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true,
+              "종료·확인 시각": true,
+              "값": true,
+              "상세": true
+            },
+            "indexByName": {
+              "항목": 0,
+              "상태": 1,
+              "시각": 2
+            },
+            "renameByName": {
+              "항목": "선택 회차",
+              "상태": "수신 상태",
+              "시각": "마지막 DB 수신"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "마지막 DB 수신"
+              ]
+            }
+          }
+        }
+      ],
+      "transparent": false
+    },
+    {
+      "id": 20,
+      "type": "canvas",
+      "title": "2A 공정 평면도 · 기록 기반",
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 9
+      },
+      "description": "병렬 검사기, 합류선, 재검 복귀선, 동일 특성군 4셀 포장과 인계의 공정 경로입니다. 트레이의 숫자는 슬롯 번호입니다. 설비 관측과 검사 실적은 아래 표를 확인하세요. Cell ID와 이력 단계 번호를 선택하면 해당 기록 지점만 표시합니다.",
+      "options": {
+        "inlineEditing": false,
+        "showAdvancedTypes": false,
+        "root": {
+          "name": "root",
+          "type": "frame",
+          "elements": [
+            {
+              "name": "feed",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 2.4,
+                "right": 79.6,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-distributor",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 20.119999999999997,
+                "right": 79.32,
+                "top": 32,
+                "height": 91,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-collector",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 39.82,
+                "right": 59.62,
+                "top": 32,
+                "height": 113,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-track-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 20.4,
+                "right": 59.9,
+                "top": 30,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-1-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 21.8,
+                "right": 78.07,
+                "top": 31,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-1-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 23.0,
+                "right": 76.87,
+                "top": 31,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-1-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 36.8,
+                "right": 63.07,
+                "top": 31,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-1-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 38.0,
+                "right": 61.87,
+                "top": 31,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-track-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 20.4,
+                "right": 59.9,
+                "top": 57,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-2-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 21.8,
+                "right": 78.07,
+                "top": 58,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-2-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 23.0,
+                "right": 76.87,
+                "top": 58,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-2-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 36.8,
+                "right": 63.07,
+                "top": 58,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-2-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 38.0,
+                "right": 61.87,
+                "top": 58,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-track-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 20.4,
+                "right": 59.9,
+                "top": 84,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-3-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 21.8,
+                "right": 78.07,
+                "top": 85,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-3-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 23.0,
+                "right": 76.87,
+                "top": 85,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-3-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 36.8,
+                "right": 63.07,
+                "top": 85,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-3-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 38.0,
+                "right": 61.87,
+                "top": 85,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-track-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 20.4,
+                "right": 59.9,
+                "top": 111,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "tester-4-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 21.8,
+                "right": 78.07,
+                "top": 112,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-4-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 23.0,
+                "right": 76.87,
+                "top": 112,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-4-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 36.8,
+                "right": 63.07,
+                "top": 112,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "tester-4-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 38.0,
+                "right": 61.87,
+                "top": 112,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "collector-to-sort",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 40.1,
+                "right": 41.2,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "group-distributor",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.519999999999996,
+                "right": 40.92,
+                "top": 35,
+                "height": 74,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "group-collector",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 75.62,
+                "right": 23.82,
+                "top": 35,
+                "height": 74,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-A",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.8,
+                "right": 24.1,
+                "top": 33,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#223C51"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-A-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 64.4,
+                "right": 35.41,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 66.0,
+                "right": 33.81,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 67.6,
+                "right": 32.21,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 69.2,
+                "right": 30.61,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-5",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 70.8,
+                "right": 29.01,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-6",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 72.4,
+                "right": 27.41,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-A-roller-7",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.0,
+                "right": 25.81,
+                "top": 34,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.8,
+                "right": 24.1,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#223C51"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-B-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 64.4,
+                "right": 35.41,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 66.0,
+                "right": 33.81,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 67.6,
+                "right": 32.21,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 69.2,
+                "right": 30.61,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-5",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 70.8,
+                "right": 29.01,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-6",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 72.4,
+                "right": 27.41,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-B-roller-7",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.0,
+                "right": 25.81,
+                "top": 68,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 58.8,
+                "right": 24.1,
+                "top": 101,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#223C51"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "lane-C-roller-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 64.4,
+                "right": 35.41,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 66.0,
+                "right": 33.81,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 67.6,
+                "right": 32.21,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 69.2,
+                "right": 30.61,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-5",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 70.8,
+                "right": 29.01,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-6",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 72.4,
+                "right": 27.41,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "lane-C-roller-7",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.0,
+                "right": 25.81,
+                "top": 102,
+                "height": 8,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#47647C"
+                }
+              }
+            },
+            {
+              "name": "pack-to-out",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 75.9,
+                "right": 2.0,
+                "top": 67,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#21384D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#47647C"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "appearance-reject",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 10.8,
+                "right": 84.0,
+                "top": 114,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#492C37"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "appearance-drop",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 15.72,
+                "right": 83.72,
+                "top": 72,
+                "height": 47,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#492C37"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "sorting-to-retest",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 56.32,
+                "right": 43.12,
+                "top": 72,
+                "height": 69,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#3D362A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#806643"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "retest-return",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 40.1,
+                "right": 43.4,
+                "top": 136,
+                "height": 10,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#3D362A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#806643"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "retest-drop",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 47.72,
+                "right": 51.72,
+                "top": 141,
+                "height": 22,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#492C37"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "infeed",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 2.4,
+                "right": 93.6,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "IN"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "vision-id",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.8,
+                "right": 87.8,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "VIS1"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "vision-appearance",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 13.3,
+                "right": 81.4,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "VIS2"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "infeed-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 2.0,
+                "right": 93.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "셀 투입"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "vision-id-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.2,
+                "right": 87.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "ID 부여"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "vision-appearance-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 12.8,
+                "right": 80.9,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "외관검사"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "testers-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 23.4,
+                "right": 63.5,
+                "top": 5,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "OCV / IR 병렬 검사"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "tester-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 25,
+                "right": 64.4,
+                "top": 23.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "T1"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#17334A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#507C9D"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "tester-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 25,
+                "right": 64.4,
+                "top": 50.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "T2"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#17334A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#507C9D"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "tester-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 25,
+                "right": 64.4,
+                "top": 77.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "T3"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#17334A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#507C9D"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "tester-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 25,
+                "right": 64.4,
+                "top": 104.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "T4"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#17334A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#507C9D"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "id-check",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 42.7,
+                "right": 51.8,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "IDC"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "id-check-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 42.1,
+                "right": 51.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "ID 재확인"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "sorter",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 51.0,
+                "right": 43.4,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "SORT"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "sort-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 50.3,
+                "right": 42.8,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "특성군 분류"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "lane-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 59.4,
+                "right": 24.6,
+                "top": 9,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "A/B/C 전기적 특성군"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "group-A",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.6,
+                "right": 36.4,
+                "top": 26.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "A"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20384F"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#547891"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-arrow-A",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.8,
+                "right": 23.8,
+                "top": 28,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "group-B",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.6,
+                "right": 36.4,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "B"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20384F"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#547891"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-arrow-B",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.8,
+                "right": 23.8,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "group-C",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.6,
+                "right": 36.4,
+                "top": 94.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "C"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20384F"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#547891"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "group-arrow-C",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 74.8,
+                "right": 23.8,
+                "top": 96,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "box-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 77.4,
+                "right": 12.0,
+                "top": 32,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "BOX · 동일군 4셀"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "box-tray",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 79.2,
+                "right": 13.9,
+                "top": 56,
+                "height": 32,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": ""
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#15283A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#50728E"
+                },
+                "width": 1,
+                "radius": 5
+              }
+            },
+            {
+              "name": "box-slot-1",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 79.9,
+                "right": 18.9,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "1"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "box-slot-2",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 81.35,
+                "right": 17.45,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "2"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "box-slot-3",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 82.8,
+                "right": 16.0,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "3"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "box-slot-4",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 84.25,
+                "right": 14.55,
+                "top": 62,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "4"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 10
+              },
+              "background": {
+                "color": {
+                  "fixed": "#20354A"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#57748D"
+                },
+                "width": 1,
+                "radius": 2
+              }
+            },
+            {
+              "name": "outfeed",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 91.5,
+                "right": 2.1,
+                "top": 60.0,
+                "height": 24,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "OUT"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#14293D"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#496981"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "outfeed-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 90.2,
+                "right": 1.2,
+                "top": 38,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "팩 라인 인계"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "feed-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 6.4,
+                "right": 92.2,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "vision-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 18.6,
+                "right": 80.0,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "collect-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 40.7,
+                "right": 57.9,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "sort-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 57.3,
+                "right": 41.3,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "pack-arrow",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 87.8,
+                "right": 10.8,
+                "top": 62,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "›"
+                },
+                "color": {
+                  "fixed": "#66D8EE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 18
+              }
+            },
+            {
+              "name": "appearance-reject-bin",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.2,
+                "right": 88.5,
+                "top": 108.0,
+                "height": 22,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "RJ1"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#321F2B"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "appearance-reject-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 7.0,
+                "right": 83.8,
+                "top": 133,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "외관 NG"
+                },
+                "color": {
+                  "fixed": "#FF8C97"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "retest-module",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 51.0,
+                "right": 43.4,
+                "top": 130.0,
+                "height": 22,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "RT"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              },
+              "background": {
+                "color": {
+                  "fixed": "#3A2E22"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#806643"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "retest-return-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 41.1,
+                "right": 49.6,
+                "top": 117,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "‹  PASS · 합류선 복귀"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "retest-entry-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 56.9,
+                "right": 36.4,
+                "top": 112,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "↓ 재검 대상"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "final-reject-bin",
+              "type": "rectangle",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 45.8,
+                "right": 49.8,
+                "top": 152.5,
+                "height": 19,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "RJ2"
+                },
+                "color": {
+                  "fixed": "#EFF5FF"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 11
+              },
+              "background": {
+                "color": {
+                  "fixed": "#321F2B"
+                }
+              },
+              "border": {
+                "color": {
+                  "fixed": "#86505A"
+                },
+                "width": 1,
+                "radius": 4
+              }
+            },
+            {
+              "name": "final-reject-caption",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 50.0,
+                "right": 44.4,
+                "top": 152,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "최종 NG"
+                },
+                "color": {
+                  "fixed": "#FF8C97"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 12
+              }
+            },
+            {
+              "name": "legend",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 60.8,
+                "right": 2.0,
+                "top": 148,
+                "height": 18,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "fixed": "컨베이어 배치도  ·  셀 위치 및 Buffer 점유량 미수집"
+                },
+                "color": {
+                  "fixed": "#A6B7CE"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-infeed",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 5.15,
+                "right": 93.6,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-IN",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-vision-id",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 10.95,
+                "right": 87.8,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-VIS1",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-vision-appearance",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 17.35,
+                "right": 81.4,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-VIS2",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-tester-1",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 34.35,
+                "right": 64.4,
+                "top": 23,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-T1",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-tester-2",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 34.35,
+                "right": 64.4,
+                "top": 50,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-T2",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-tester-3",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 34.35,
+                "right": 64.4,
+                "top": 77,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-T3",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-tester-4",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 34.35,
+                "right": 64.4,
+                "top": 104,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-T4",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-retest-module",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 55.35,
+                "right": 43.4,
+                "top": 130,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-RT",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-id-check",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 46.95,
+                "right": 51.8,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-IDC",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-box-tray",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 84.85,
+                "right": 13.9,
+                "top": 56,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-BOX",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-outfeed",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 96.65,
+                "right": 2.1,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-OUT",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-group-A",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 62.35,
+                "right": 36.4,
+                "top": 26,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 그룹 A",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-group-B",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 62.35,
+                "right": 36.4,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 그룹 B",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-group-C",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 62.35,
+                "right": 36.4,
+                "top": 94,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 그룹 C",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "selected-history-event",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 2,
+                "right": 2,
+                "top": 181,
+                "height": 29,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "상세",
+                  "fixed": "Cell ID를 입력하면 기록된 지점을 볼 수 있습니다.",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "left",
+                "valign": "middle",
+                "size": 15
+              }
+            },
+            {
+              "name": "record-marker-sorter",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 55.6,
+                "right": 43.4,
+                "top": 60,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-SORT",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-appearance-reject-bin",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 10.5,
+                "right": 88.5,
+                "top": 108,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-RJ1",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-final-reject-bin",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 49.2,
+                "right": 49.8,
+                "top": 152,
+                "height": 16,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 2A-RJ2",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-box-slot-1",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 80.1,
+                "right": 18.9,
+                "top": 53,
+                "height": 11,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 slot 1",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-box-slot-2",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 81.55,
+                "right": 17.45,
+                "top": 53,
+                "height": 11,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 slot 2",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-box-slot-3",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 83.0,
+                "right": 16.0,
+                "top": 53,
+                "height": 11,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 slot 3",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            },
+            {
+              "name": "record-marker-box-slot-4",
+              "type": "text",
+              "constraint": {
+                "horizontal": "scale",
+                "vertical": "top"
+              },
+              "placement": {
+                "left": 84.45,
+                "right": 14.55,
+                "top": 53,
+                "height": 11,
+                "rotation": 0
+              },
+              "config": {
+                "text": {
+                  "field": "이력 slot 4",
+                  "fixed": " ",
+                  "mode": "field"
+                },
+                "color": {
+                  "fixed": "#F7C875"
+                },
+                "align": "center",
+                "valign": "middle",
+                "size": 13
+              }
+            }
+          ],
+          "background": {
+            "color": {
+              "fixed": "#0B1421"
+            }
+          }
+        }
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "cursor"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "상세",
+                "이력 2A-IN",
+                "이력 2A-VIS1",
+                "이력 2A-VIS2",
+                "이력 2A-T1",
+                "이력 2A-T2",
+                "이력 2A-T3",
+                "이력 2A-T4",
+                "이력 2A-RT",
+                "이력 2A-IDC",
+                "이력 2A-BOX",
+                "이력 2A-OUT",
+                "이력 그룹 A",
+                "이력 그룹 B",
+                "이력 그룹 C",
+                "이력 2A-SORT",
+                "이력 2A-RJ1",
+                "이력 2A-RJ2",
+                "이력 slot 1",
+                "이력 slot 2",
+                "이력 slot 3",
+                "이력 slot 4"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "검사기 상태 · T1–T4 / RT",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 14,
+        "h": 7
+      },
+      "description": "선택 회차의 마지막 상태 전이와 전기검사 실적입니다. 끝난 구간은 종료로 표시합니다.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bg551q8i4v6rkb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bg551q8i4v6rkb"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\ncore AS (\nWITH selected_run AS (\n  SELECT r.run_id, r.purpose, r.started_at, r.ended_at\n  FROM sim_run r\n  WHERE r.line = '2A'\n    AND (NULLIF(btrim(${run_id:sqlstring}), '') IS NULL OR r.run_id::text = btrim(${run_id:sqlstring}))\n  ORDER BY r.started_at DESC, r.run_id DESC\n  LIMIT 1\n),\ntotals AS (\n  SELECT count(*) FILTER (WHERE e.result_code IN (1, 2, 3) AND c.status <> 'retest') AS final_pass,\n         count(*) FILTER (WHERE e.result_code = 9 AND c.status IN ('rejected','scrapped')) AS final_ng,\n         count(*) FILTER (WHERE c.status = 'retest') AS retest_pending,\n         count(*) FILTER (WHERE c.grade = 'A' AND e.result_code = 1 AND c.status <> 'retest') AS group_a,\n         count(*) FILTER (WHERE c.grade = 'B' AND e.result_code = 2 AND c.status <> 'retest') AS group_b,\n         count(*) FILTER (WHERE c.grade = 'C' AND e.result_code = 3 AND c.status <> 'retest') AS group_c\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  LEFT JOIN v_cell_electrical_latest e USING (cell_id)\n  GROUP BY r.run_id\n), retest_attempts AS (\n  SELECT c.run_id, count(i.id) AS attempts\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  LEFT JOIN cell_inspection i ON i.cell_id = c.cell_id AND i.kind = 'electrical' AND i.attempt > 1\n  GROUP BY c.run_id\n), rows AS (\n  SELECT m.section, m.position, m.item, m.value, m.unit, m.detail\n  FROM (VALUES (1)) AS anchor(n)\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_run_yield y ON y.run_id = r.run_id\n  LEFT JOIN totals t ON true\n  LEFT JOIN retest_attempts a ON a.run_id = r.run_id\n  CROSS JOIN LATERAL (VALUES\n    ('production', 1, '셀 투입', y.cells_in::numeric, '셀', '등록 셀 기준'),\n    ('production', 2, '외관 NG', y.appearance_ng, '셀', '외관 결과 코드 9'),\n    ('production', 3, '1차 전기 PASS', y.first_pass_ok, '셀', '시도 1, 결과 코드 1/2/3'),\n    ('production', 4, '최종 전기 PASS', t.final_pass, '셀', '최대 시도, 재검 대기 제외'),\n    ('production', 5, '최종 전기 NG', t.final_ng, '셀', '최대 시도 NG, 최종 제거 상태'),\n    ('group', 1, 'A', t.group_a, '셀', '셀 특성군·전기 결과 일치'),\n    ('group', 2, 'B', t.group_b, '셀', '셀 특성군·전기 결과 일치'),\n    ('group', 3, 'C', t.group_c, '셀', '셀 특성군·전기 결과 일치'),\n    ('retest', 1, '재검 검사 건수', a.attempts, '건', 'attempt > 1'),\n    ('retest', 2, '재검한 셀', y.retested, '셀', '중복 셀 제외'),\n    ('retest', 3, '재검 합격', y.retest_recovered, '셀', '팀 실행 수율 정의'),\n    ('retest', 4, '재검 대기', t.retest_pending, '셀', '셀 상태 retest'),\n    ('retest', 5, '최종 전기 NG', t.final_ng, '셀', '외관 NG 및 재검 대기 제외')\n  ) AS m(section, position, item, value, unit, detail)\n  UNION ALL\n  SELECT 'tester', v.position, v.station_code, s.tests, '건',\n         CASE WHEN s.station_code IS NOT NULL THEN\n           format('NG %s · 평균 검사 %s', coalesce(s.ng_pct::text || '%', '미수집'),\n             coalesce(s.avg_test_s::text || '초', '미수집')) END\n  FROM (VALUES (1,'2A-T1'),(2,'2A-T2'),(3,'2A-T3'),(4,'2A-T4'),(5,'2A-RT')) v(position,station_code)\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_tester_stats s ON s.run_id = r.run_id AND s.station_code = v.station_code\n)\nSELECT section AS \"영역\", item AS \"항목\", value AS \"수량\", unit AS \"단위\", detail AS \"상세\"\nFROM rows ORDER BY section, position\n), inspections AS (\n  SELECT count(*) FILTER (WHERE i.kind = 'appearance') AS appearances,\n         count(DISTINCT i.cell_id) FILTER (WHERE i.kind = 'appearance' AND i.result_code = 0) AS appearance_pass,\n         count(*) FILTER (WHERE i.kind = 'electrical') AS electrical\n  FROM selected_run r JOIN cell c ON c.run_id = r.run_id\n  JOIN cell_inspection i ON i.cell_id = c.cell_id AND i.kind IN ('appearance','electrical')\n), kit_state AS (\n  SELECT b.box_id, b.grade, b.spread_mv,\n         b.status IN ('full','handed_over','consumed') AND b.packed_at IS NOT NULL\n         AND b.cells = 4 AND count(DISTINCT c.box_slot) = 4\n         AND bool_and(c.grade IS NOT DISTINCT FROM b.grade AND c.run_id IS NOT DISTINCT FROM b.run_id) AS complete\n  FROM selected_run r JOIN v_box_spread b ON b.run_id = r.run_id\n  LEFT JOIN cell c ON c.box_id = b.box_id\n  GROUP BY b.box_id, b.grade, b.spread_mv, b.status, b.packed_at, b.cells\n), alarm_state AS (\n  SELECT CASE WHEN count(a.id) > 0\n              THEN count(a.id) FILTER (WHERE open_alarm.id IS NOT NULL)\n         END AS open_count\n  FROM alarm a LEFT JOIN station s ON s.station_code = a.station_code\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_alarm_open open_alarm ON open_alarm.id = a.id\n  WHERE a.run_id = r.run_id OR (a.run_id IS NULL AND s.line = '2A')\n), tester_state AS (\n  SELECT v.station_code, v.position, m.\"수량\", m.\"상세\", stats.ng_pct, stats.avg_test_s,\n         CASE WHEN e.state IS NULL THEN '미수집'\n              WHEN e.ended_at IS NOT NULL THEN '종료: ' || e.state\n              ELSE e.state END AS state\n  FROM (VALUES (1,'2A-T1'),(2,'2A-T2'),(3,'2A-T3'),(4,'2A-T4'),(5,'2A-RT')) v(position, station_code)\n  LEFT JOIN core m ON m.\"영역\" = 'tester' AND m.\"항목\" = v.station_code\n  LEFT JOIN selected_run r ON true\n  LEFT JOIN v_tester_stats stats ON stats.run_id = r.run_id AND stats.station_code = v.station_code\n  LEFT JOIN LATERAL (\n    SELECT e.state, e.ended_at\n    FROM equipment_state e\n    WHERE e.run_id = r.run_id AND e.station_code = v.station_code\n    ORDER BY e.started_at DESC, e.id DESC LIMIT 1\n  ) e ON true\n), comparison_cells AS (\n  SELECT b.box_id, c.cell_id, c.plc_no, e.ocv_mv\n  FROM kit_state b JOIN cell c USING (box_id)\n  JOIN v_cell_electrical_latest e USING (cell_id)\n  WHERE b.complete AND c.plc_no IS NOT NULL AND e.ocv_mv IS NOT NULL\n    AND e.result_code = CASE b.grade WHEN 'A' THEN 1 WHEN 'B' THEN 2 WHEN 'C' THEN 3 END\n), comparison_kits AS (\n  SELECT box_id, max(ocv_mv) - min(ocv_mv) AS spread_mv\n  FROM comparison_cells\n  GROUP BY box_id HAVING count(*) = 4\n), sequence_cells AS (\n  SELECT c.ocv_mv, (row_number() OVER (ORDER BY c.plc_no, c.cell_id) - 1) / 4 AS set_no\n  FROM comparison_cells c JOIN comparison_kits b USING (box_id)\n), sequence_kits AS (\n  SELECT max(ocv_mv) - min(ocv_mv) AS spread_mv\n  FROM sequence_cells GROUP BY set_no\n), comparison AS (\n  SELECT count(*) AS sets, avg(spread_mv) AS kit_avg,\n         (SELECT avg(spread_mv) FROM sequence_kits) AS sequence_avg\n  FROM comparison_kits\n), handoff_per_kit AS (\n  SELECT b.box_id, count(h.request_id) > 0 AS has_history,\n         bool_or(h.status = 'requested' AND h.released_at IS NULL AND h.confirmed_at IS NULL) AS open_request,\n         bool_or(h.released_at IS NOT NULL) AS released,\n         bool_or(h.confirmed_at IS NOT NULL) AS confirmed\n  FROM kit_state b LEFT JOIN supply_handoff h USING (box_id)\n  WHERE b.complete\n  GROUP BY b.box_id\n), handoff_counts AS (\n  SELECT CASE WHEN bool_or(has_history) THEN count(*) FILTER (\n           WHERE open_request AND NOT released AND NOT confirmed) END AS waiting,\n         CASE WHEN bool_or(has_history) THEN count(*) FILTER (WHERE released) END AS released,\n         CASE WHEN bool_or(has_history) THEN count(*) FILTER (WHERE confirmed) END AS confirmed\n  FROM handoff_per_kit\n), trace_cell AS (\n  SELECT c.cell_id, c.created_at, c.grade, c.box_id, c.box_slot\n  FROM selected_run r JOIN cell c USING (run_id)\n  WHERE c.cell_id = NULLIF(btrim(${cell_id:sqlstring}), '')\n), trace_events AS (\n  SELECT c.created_at AS stamp, 0::bigint AS sort_id, '2A-IN'::text AS node,\n         '셀 등록'::text AS title, c.cell_id AS detail, NULL::text AS group_name, NULL::smallint AS slot_no\n  FROM trace_cell c\n  UNION ALL\n  SELECT i.measured_at, i.id, i.station_code,\n         CASE i.kind WHEN 'id_read' THEN 'ID 판독' WHEN 'appearance' THEN '외관검사'\n                     ELSE '전기검사 · 시도 ' || i.attempt END,\n         concat_ws(' · ',\n           CASE WHEN i.result_code IN (0,1,2,3) THEN 'PASS'\n                WHEN i.result_code = 9 THEN 'FAIL'\n                WHEN i.result_code = 5 THEN '미판독/대기' END,\n           CASE WHEN i.kind = 'electrical' THEN\n             concat_ws(' / ', COALESCE(round(i.ocv_mv / 1000.0, 3)::text || ' V', 'OCV 미수집'),\n                              COALESCE(i.ir_mohm::text || ' mΩ', 'IR 미수집')) END,\n           '검사 #' || i.id), NULL, NULL\n  FROM trace_cell c JOIN cell_inspection i USING (cell_id)\n  UNION ALL\n  SELECT b.packed_at, 0, '2A-BOX', 'Kit 포장',\n         concat_ws(' · ', c.box_id, '특성군 ' || c.grade, '슬롯 ' || c.box_slot,\n                   CASE WHEN EXISTS (SELECT 1 FROM cell_inspection i WHERE i.cell_id = c.cell_id\n                          AND i.kind = 'electrical' AND i.measured_at > b.packed_at)\n                        THEN '포장·검사 시각 순서 확인 필요' END), c.grade, c.box_slot\n  FROM trace_cell c JOIN cell_box b USING (box_id)\n  JOIN selected_run r ON r.run_id = b.run_id\n  WHERE b.packed_at IS NOT NULL\n  UNION ALL\n  SELECT h.stamp, 0, '2A-OUT', h.title, sh.request_id, NULL, NULL\n  FROM trace_cell c JOIN supply_handoff sh USING (box_id)\n  JOIN cell_box b ON b.box_id = c.box_id\n  JOIN selected_run r ON r.run_id = b.run_id\n  CROSS JOIN LATERAL (VALUES ('인계 요청', sh.requested_at),\n                             ('출구 통과', sh.released_at), ('수신 확인', sh.confirmed_at)) h(title, stamp)\n  WHERE h.stamp IS NOT NULL\n  UNION ALL\n  SELECT e.occurred_at, 0, e.station_code, e.event_type, e.event_id::text, NULL, NULL\n  FROM trace_cell c JOIN event_log e ON e.entity_id = c.cell_id AND e.source = '2A'\n  JOIN selected_run r ON r.run_id = e.run_id\n  WHERE e.station_code IN ('2A-IDC', '2A-SORT', '2A-LA', '2A-LB', '2A-LC', '2A-RJ1', '2A-RJ2')\n), trace_steps AS (\n  SELECT *, row_number() OVER (ORDER BY stamp, sort_id, node, title, detail) AS step_no\n  FROM trace_events\n), trace_cursor AS (\n  SELECT * FROM trace_steps\n  WHERE NULLIF(btrim(${trace_step:sqlstring}), '') IS NULL OR step_no::text = btrim(${trace_step:sqlstring})\n  ORDER BY step_no DESC LIMIT 1\n), v2_rows AS (\n  SELECT \"영역\" AS area, \"항목\" AS label,\n         CASE WHEN i.electrical = 0 AND (\"영역\" = 'retest' OR \"항목\" = '1차 전기 PASS')\n              THEN NULL ELSE \"수량\" END AS amount,\n         \"단위\" AS unit, \"상세\" AS detail,\n         NULL::text AS state, NULL::numeric AS ng_pct, NULL::numeric AS average_s,\n         NULL::bigint AS kit_count, NULL::double precision AS spread_v\n  FROM core CROSS JOIN inspections i\n  UNION ALL\n  SELECT 'kpi', x.label, x.amount, x.unit, NULL, NULL, NULL, NULL, NULL, NULL\n  FROM inspections i CROSS JOIN alarm_state a\n  CROSS JOIN LATERAL (VALUES\n    ('총 투입 셀', (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '셀 투입'), '셀'),\n    ('외관 PASS', CASE WHEN i.appearances > 0 THEN i.appearance_pass END, '셀'),\n    ('외관 NG', CASE WHEN i.appearances > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '외관 NG') END, '셀'),\n    ('최종 전기 PASS', CASE WHEN i.electrical > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '최종 전기 PASS') END, '셀'),\n    ('최종 전기 NG', CASE WHEN i.electrical > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'production' AND \"항목\" = '최종 전기 NG') END, '셀'),\n    ('재검 대기', CASE WHEN i.electrical > 0 THEN (SELECT \"수량\" FROM core WHERE \"영역\" = 'retest' AND \"항목\" = '재검 대기') END, '셀'),\n    ('완료 Kit', (SELECT CASE WHEN count(*) > 0 THEN count(*) FILTER (WHERE complete) END FROM kit_state), 'Kit'),\n    ('열린 알람', a.open_count, '건')\n  ) x(label, amount, unit)\n  UNION ALL\n  SELECT 'testers_v2', station_code, \"수량\", '건', \"상세\", state, ng_pct, avg_test_s, NULL, NULL\n  FROM tester_state\n  UNION ALL\n  SELECT 'groups_v2', c.\"항목\",\n         CASE WHEN i.electrical > 0 THEN c.\"수량\" END, '셀', NULL, NULL, NULL, NULL,\n         CASE WHEN EXISTS (SELECT 1 FROM kit_state) THEN\n             (SELECT count(*) FROM kit_state b WHERE b.complete AND b.grade = c.\"항목\") END,\n         (SELECT (avg(b.spread_mv) / 1000.0)::double precision\n          FROM kit_state b WHERE b.complete AND b.grade = c.\"항목\")\n  FROM core c CROSS JOIN inspections i WHERE c.\"영역\" = 'group'\n\n  UNION ALL\n  SELECT 'paired_spread', x.label, x.amount, x.unit, NULL, x.state, NULL, NULL, NULL, NULL\n  FROM comparison c\n  CROSS JOIN LATERAL (VALUES\n    ('비교 대상 세트', CASE WHEN EXISTS (SELECT 1 FROM selected_run) THEN c.sets END, 'Kit', NULL),\n    ('투입 순서 평균 편차', CASE WHEN c.sets >= 2 THEN c.sequence_avg END, 'mV', NULL),\n    ('실제 Kit 평균 편차', CASE WHEN c.sets >= 2 THEN c.kit_avg END, 'mV', NULL),\n    ('평균 편차 감소율', CASE WHEN c.sets >= 2 THEN\n             100 * (c.sequence_avg - c.kit_avg) / NULLIF(c.sequence_avg, 0) END, '%', NULL),\n    ('비교 상태', NULL, NULL,\n            CASE WHEN NOT EXISTS (SELECT 1 FROM selected_run) THEN '미수집 · 회차 없음'\n                 WHEN c.sets < 2 THEN '비교 불가 · 표본 부족'\n                 WHEN c.sequence_avg = 0 THEN '비교 불가 · 기준 편차 0'\n                 ELSE '비교 가능' END)\n  ) x(label, amount, unit, state)\n  UNION ALL\n  SELECT 'handoff', x.label, x.amount, 'Kit', NULL, NULL, NULL, NULL, NULL, NULL\n  FROM handoff_counts h\n  CROSS JOIN LATERAL (VALUES ('인계 대기 · 요청 접수', h.waiting),\n                             ('출구 통과 Kit', h.released), ('팩 라인 수신 확인 Kit', h.confirmed)) x(label, amount)\n  UNION ALL\n  SELECT 'trace', title, step_no, NULL, detail, node, NULL, NULL, NULL, NULL FROM trace_steps\n  UNION ALL\n  SELECT 'cursor', t.group_name, NULL, NULL,\n         CASE WHEN t.step_no IS NOT NULL THEN\n           concat_ws('  ·  ', '단계 ' || t.step_no, to_char(t.stamp AT TIME ZONE 'Asia/Seoul', 'HH24:MI:SS'),\n                     t.node, t.title, t.detail)\n         WHEN btrim(${cell_id:sqlstring}) = '' THEN\n           'Cell ID를 입력하면 기록된 지점을 볼 수 있습니다. 단계 번호를 비우면 마지막 기록을 표시합니다.'\n         WHEN EXISTS (SELECT 1 FROM trace_cell) THEN '미수집 · 해당 단계 기록 없음'\n         ELSE '미수집 · 선택 회차에 해당 Cell ID 없음' END,\n         t.node, NULL, NULL, t.slot_no, NULL\n  FROM (VALUES (1)) a(n) LEFT JOIN trace_cursor t ON true\n)\nSELECT area AS \"영역\", label AS \"항목\", amount AS \"수량\", unit AS \"단위\", v.detail AS \"상세\",\n       state AS \"상태\", ng_pct AS \"NG율 (%)\", average_s AS \"평균 검사 (초)\",\n       kit_count AS \"Kit 수\", spread_v AS \"평균 Kit 편차 (V)\", ts.stamp AS \"기록 시각\",\n       CASE WHEN area = 'cursor' AND state = '2A-IN' THEN '●' ELSE ' ' END AS \"이력 2A-IN\",\n       CASE WHEN area = 'cursor' AND state = '2A-VIS1' THEN '●' ELSE ' ' END AS \"이력 2A-VIS1\",\n       CASE WHEN area = 'cursor' AND state = '2A-VIS2' THEN '●' ELSE ' ' END AS \"이력 2A-VIS2\",\n       CASE WHEN area = 'cursor' AND state = '2A-T1' THEN '●' ELSE ' ' END AS \"이력 2A-T1\",\n       CASE WHEN area = 'cursor' AND state = '2A-T2' THEN '●' ELSE ' ' END AS \"이력 2A-T2\",\n       CASE WHEN area = 'cursor' AND state = '2A-T3' THEN '●' ELSE ' ' END AS \"이력 2A-T3\",\n       CASE WHEN area = 'cursor' AND state = '2A-T4' THEN '●' ELSE ' ' END AS \"이력 2A-T4\",\n       CASE WHEN area = 'cursor' AND state = '2A-RT' THEN '●' ELSE ' ' END AS \"이력 2A-RT\",\n       CASE WHEN area = 'cursor' AND state = '2A-IDC' THEN '●' ELSE ' ' END AS \"이력 2A-IDC\",\n       CASE WHEN area = 'cursor' AND state = '2A-BOX' THEN '●' ELSE ' ' END AS \"이력 2A-BOX\",\n       CASE WHEN area = 'cursor' AND state = '2A-OUT' THEN '●' ELSE ' ' END AS \"이력 2A-OUT\",\n       CASE WHEN area = 'cursor' AND ((state = '2A-BOX' AND label = 'A') OR state = '2A-LA') THEN '●' ELSE ' ' END AS \"이력 그룹 A\",\n       CASE WHEN area = 'cursor' AND ((state = '2A-BOX' AND label = 'B') OR state = '2A-LB') THEN '●' ELSE ' ' END AS \"이력 그룹 B\",\n       CASE WHEN area = 'cursor' AND ((state = '2A-BOX' AND label = 'C') OR state = '2A-LC') THEN '●' ELSE ' ' END AS \"이력 그룹 C\",\n       CASE WHEN area = 'cursor' AND state = '2A-SORT' THEN '●' ELSE ' ' END AS \"이력 2A-SORT\",\n       CASE WHEN area = 'cursor' AND state = '2A-RJ1' THEN '●' ELSE ' ' END AS \"이력 2A-RJ1\",\n       CASE WHEN area = 'cursor' AND state = '2A-RJ2' THEN '●' ELSE ' ' END AS \"이력 2A-RJ2\",\n       CASE WHEN area = 'cursor' AND state = '2A-BOX' AND kit_count = 1 THEN '●' ELSE ' ' END AS \"이력 slot 1\",\n       CASE WHEN area = 'cursor' AND state = '2A-BOX' AND kit_count = 2 THEN '●' ELSE ' ' END AS \"이력 slot 2\",\n       CASE WHEN area = 'cursor' AND state = '2A-BOX' AND kit_count = 3 THEN '●' ELSE ' ' END AS \"이력 slot 3\",\n       CASE WHEN area = 'cursor' AND state = '2A-BOX' AND kit_count = 4 THEN '●' ELSE ' ' END AS \"이력 slot 4\"\nFROM v2_rows v LEFT JOIN trace_steps ts ON v.area = 'trace' AND ts.step_no = v.amount\nORDER BY area, CASE WHEN area = 'trace' THEN amount END,\n         CASE label WHEN '2A-RT' THEN 2 ELSE 1 END, label\n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "상태"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "idle": {
+                        "text": "정상 대기",
+                        "color": "#8DE0B4"
+                      },
+                      "busy": {
+                        "text": "운전 중",
+                        "color": "#66D8EE"
+                      },
+                      "blocked": {
+                        "text": "후단 대기",
+                        "color": "#F7C875"
+                      },
+                      "starved": {
+                        "text": "공급 대기",
+                        "color": "#F7C875"
+                      },
+                      "fault": {
+                        "text": "설비 이상",
+                        "color": "#FF8C97"
+                      },
+                      "stopped": {
+                        "text": "정지",
+                        "color": "#A6B7CE"
+                      },
+                      "미수집": {
+                        "text": "미수집",
+                        "color": "#A6B7CE"
+                      },
+                      "종료: idle": {
+                        "text": "정상 대기 · 종료",
+                        "color": "#A6B7CE"
+                      },
+                      "종료: busy": {
+                        "text": "운전 중 · 종료",
+                        "color": "#A6B7CE"
+                      },
+                      "종료: blocked": {
+                        "text": "후단 대기 · 종료",
+                        "color": "#A6B7CE"
+                      },
+                      "종료: starved": {
+                        "text": "공급 대기 · 종료",
+                        "color": "#A6B7CE"
+                      },
+                      "종료: fault": {
+                        "text": "설비 이상 · 종료",
+                        "color": "#A6B7CE"
+                      },
+                      "종료: stopped": {
+                        "text": "정지 · 종료",
+                        "color": "#A6B7CE"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "NG율 (%)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "평균 (초)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "testers_v2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "항목",
+                "상태",
+                "수량",
+                "NG율 (%)",
+                "평균 검사 (초)"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "항목": 0,
+              "상태": 1,
+              "수량": 2,
+              "NG율 (%)": 3,
+              "평균 검사 (초)": 4
+            },
+            "renameByName": {
+              "항목": "검사기",
+              "수량": "검사 건수",
+              "평균 검사 (초)": "평균 (초)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "title": "열린 알람 이력",
+      "description": "선택 회차 알람과 2A 스테이션의 회차 미지정 알람입니다. 표에 행이 없으면 등록된 열린 알람 기록이 없는 상태입니다.",
+      "type": "table",
+      "gridPos": {
+        "x": 14,
+        "y": 12,
+        "w": 10,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "스테이션 / 코드"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 205
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "심각도"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 83
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "상태"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 96
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "발생"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 177
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "alarm"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "영역": true
+            },
+            "indexByName": {
+              "항목": 0,
+              "값": 1,
+              "상태": 2,
+              "시각": 3,
+              "종료·확인 시각": 4,
+              "상세": 5
+            },
+            "renameByName": {
+              "항목": "스테이션 / 코드",
+              "시각": "발생",
+              "종료·확인 시각": "확인",
+              "값": "심각도"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "type": "table",
+      "title": "선택 Cell · 이력 단계",
+      "description": "단계 번호를 클릭하거나 화면 상단에서 번호를 선택하면 공정 평면도에서 해당 기록을 확인할 수 있습니다. 기록 시각 순서이며 검사 시각·포장 시각이 역전되면 포장 행에 표시합니다.",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "미수집"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "단계"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "평면도에서 단계 보기",
+                    "url": "/d/cellect-2a-process?${run_id:queryparam}&${cell_id:queryparam}&${kit_id:queryparam}&var-trace_step=${__value.raw}&from=${__from}&to=${__to}&theme=dark&kiosk",
+                    "oneClick": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "datasource": {
+        "type": "dashboard",
+        "uid": "-- Dashboard --"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "dashboard",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "withTransforms": false
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "영역",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "trace"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "수량",
+                "기록 시각",
+                "상태",
+                "항목",
+                "상세"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "수량": 0,
+              "기록 시각": 1,
+              "상태": 2,
+              "항목": 3,
+              "상세": 4
+            },
+            "renameByName": {
+              "수량": "단계",
+              "상태": "스테이션",
+              "항목": "기록"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "type": "link",
+      "title": "01 메인 · 회차 총괄",
+      "url": "/d/cellect-2a-main",
+      "keepTime": true,
+      "includeVars": true,
+      "targetBlank": false
+    },
+    {
+      "type": "link",
+      "title": "03 생산·인계",
+      "url": "/d/cellect-2a-production-flow",
+      "keepTime": true,
+      "includeVars": true,
+      "targetBlank": false
+    },
+    {
+      "type": "link",
+      "title": "04 품질·설비 분석",
+      "url": "/d/cellect-2a-quality-equipment",
+      "keepTime": true,
+      "includeVars": true,
+      "targetBlank": false
+    },
+    {
+      "type": "link",
+      "title": "05 DB 이력·추적",
+      "url": "/d/cellect-2a-trace",
+      "keepTime": true,
+      "includeVars": true,
+      "targetBlank": false
+    }
+  ]
+}

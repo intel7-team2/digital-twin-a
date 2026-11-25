@@ -172,16 +172,17 @@ class OperationView:
         view = self.snapshot
         self.status_fields["line"].configure(text=view.display_state(), fg=self.state_color())
         self.status_fields["quality"].configure(text=view.quality.value, fg=QUALITY_COLORS[view.quality])
-        run_text = view.run_id or "회차 없음"
-        if view.last_state():
+        run_text = view.run_id or "미수집"
+        if view.run_id and view.quality is not Quality.GOOD:
             run_text += " · 마지막"
         self.status_fields["run"].configure(text=run_text)
         observed = view.observed_at.strftime("%H:%M:%S") if view.observed_at else "미수집"
         self.status_fields["observed"].configure(text=observed)
+        unavailable = "미수집" if view.quality is Quality.GOOD else view.quality.value
         for i, field in enumerate(self.metric_fields):
             value = view.display_count(i)
-            field.configure(text=value if value != "—" else "— 미수집", fg=TEXT if value != "—" else MUTED)
-        self.handoff_label.configure(text=f"인계 · {view.handoff or '미수집'}    /    이력 DB·API · 미연동")
+            field.configure(text=value if value != "—" else f"— {unavailable}", fg=TEXT if value != "—" else MUTED)
+        self.handoff_label.configure(text=f"인계 · {view.handoff or unavailable}    /    이력 DB·API · 미연동")
         self.select_station(view.fault_station or self.selected)
 
     def state_color(self, station=None):

@@ -19,6 +19,17 @@ class SimulationTest(unittest.TestCase):
         with connect(self.path) as db:
             self.events = db.execute("SELECT * FROM events ORDER BY event_id").fetchall()
 
+    def test_grafana_graphite_ref_id_alias_preserves_values_and_query_identity(self):
+        metric = f"{PREFIX}production.cells"
+        plain = render(self.path, self.simulation.run_id, [metric], self.first, self.last)
+        queries = [rf'aliasSub({metric}, "(^.*$)", "\1 {ref}")' for ref in ("A", "B")]
+        wrapped = render(self.path, self.simulation.run_id, queries, self.first, self.last)
+        self.assertEqual(wrapped, [
+            {"target": f"{metric} {ref}", "datapoints": plain[0]["datapoints"]} for ref in ("A", "B")
+        ])
+        with self.assertRaisesRegex(ValueError, "exact cellect.sim metric"):
+            render(self.path, self.simulation.run_id, [f"sumSeries({metric})"], self.first, self.last)
+
     def test_cell_progression_and_kit_composition(self):
         cells = {}
         kits = {}

@@ -1,6 +1,7 @@
 import argparse
 import fnmatch
 import json
+import re
 import time
 from html import escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -19,6 +20,7 @@ COUNTS = (
 )
 MEASUREMENTS = ("electrical.ocv_v", "electrical.ir_mohm")
 METRICS = (*COUNTS, *MEASUREMENTS)
+GRAFANA_ALIAS = re.compile(r'aliasSub\(([\w.]+), "\(\^\.\*\$\)", "\\1 ([A-Z][A-Z0-9]*)"\)')
 
 
 def count_event(counts, kind, result, group, amount=1):
@@ -33,7 +35,16 @@ def count_event(counts, kind, result, group, amount=1):
 
 
 def render(path, run_id, targets, start, end):
-    series = {target: [] for target in targets}
+    series = {}
+    for target in targets:
+        # Grafana tags Graphite series with their query ref IDs before matching the response.
+        alias = GRAFANA_ALIAS.fullmatch(target)
+        metric_path = alias[1] if alias else target
+        metric = metric_path.removeprefix(PREFIX)
+        if not metric_path.startswith(PREFIX) or metric not in METRICS:
+            raise ValueError("Use an exact cellect.sim metric path")
+        label = f"{metric_path} {alias[2]}" if alias else metric_path
+        series[label] = (metric, [])
     counts = dict.fromkeys(COUNTS, 0)
     with connect(path) as db:
         db.execute("BEGIN")
@@ -54,12 +65,11 @@ def render(path, run_id, targets, start, end):
                 if event["kind"] == "ELECTRICAL":
                     measurements["electrical.ocv_v"] = event["ocv_v"]
                     measurements["electrical.ir_mohm"] = event["ir_mohm"]
-            for target, points in series.items():
-                metric = target.removeprefix(PREFIX)
+            for metric, points in series.values():
                 value = counts.get(metric, measurements.get(metric))
                 points.append([value, stamp])
 
-    return [{"target": target, "datapoints": points} for target, points in series.items()]
+    return [{"target": target, "datapoints": points} for target, (_, points) in series.items()]
 
 
 def find_metrics(pattern):
@@ -164,10 +174,6 @@ class Handler(BaseHTTPRequestHandler):
         simulation = self.server.simulation
         if route == "/render":
             targets = params.get("target", [])
-            if any(not target.startswith(PREFIX) or target.removeprefix(PREFIX) not in METRICS
-                   for target in targets):
-                self.send_error(400, "Use an exact cellect.sim metric path")
-                return
             now = int(time.time())
             try:
                 start = int(param("from", now - 600))
@@ -177,7 +183,12 @@ class Handler(BaseHTTPRequestHandler):
             except ValueError:
                 self.send_error(400, "Expected a valid range in UNIX seconds")
                 return
-            self.json_response(render(simulation.path, simulation.run_id, targets, start, end))
+            try:
+                series = render(simulation.path, simulation.run_id, targets, start, end)
+            except ValueError as error:
+                self.send_error(400, str(error))
+                return
+            self.json_response(series)
         elif route == "/metrics/find":
             self.json_response(find_metrics(param("query", "*")))
         elif route == "/health":
