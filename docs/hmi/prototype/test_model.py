@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from model import (
     CONTROL_ACTIONS, KST, SAMPLE_MAX_AGE, SCENARIOS, STATIONS,
-    BridgeObservation, Quality, State, project_observation, sample, sample_observation,
+    BridgeObservation, OperationPractice, Quality, State, project_observation, sample, sample_observation,
 )
 
 
@@ -70,6 +70,29 @@ class SnapshotTest(unittest.TestCase):
             for action in CONTROL_ACTIONS:
                 with self.subTest(scenario=key, action=action):
                     self.assertFalse(sample(key, self.now).control_enabled(action))
+
+    def test_practice_start_repeat_stop_and_reset_while_running(self):
+        practice = OperationPractice("practice")
+        self.assertIs(practice.snapshot(self.now).line_state, State.IDLE)
+        self.assertTrue(practice.command("START").applied)
+        self.assertIs(practice.snapshot(self.now).line_state, State.BUSY)
+        self.assertEqual(practice.command("START").reason, "이미 운전 중")
+        self.assertFalse(practice.command("RESET").applied)
+        self.assertIs(practice.snapshot(self.now).line_state, State.BUSY)
+        self.assertTrue(practice.command("STOP").applied)
+        self.assertIs(practice.snapshot(self.now).line_state, State.STOPPED)
+        self.assertEqual(practice.snapshot(self.now).display_count(0), "0")
+
+    def test_practice_reset_clears_training_fault_but_keeps_lot_hold(self):
+        practice = OperationPractice("practice_hold")
+        self.assertIs(practice.snapshot(self.now).state_at("T3"), State.FAULT)
+        self.assertFalse(practice.command("START").applied)
+        self.assertEqual(practice.result.reason, "LOT 보류")
+        self.assertTrue(practice.command("RESET").applied)
+        self.assertTrue(practice.lot_hold)
+        self.assertIs(practice.snapshot(self.now).state_at("T3"), State.STOPPED)
+        self.assertFalse(practice.command("START").applied)
+        self.assertTrue(practice.command("STOP").applied)
 
 
 if __name__ == "__main__":

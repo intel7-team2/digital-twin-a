@@ -3,7 +3,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-from model import CONTROL_ACTIONS, CONTROL_REASON, METRICS, SCENARIOS, STATIONS, Quality, State, sample
+from model import (
+    CONTROL_ACTIONS, CONTROL_REASON, METRICS, PRACTICE_SCENARIOS, SCENARIOS, STATIONS,
+    OperationPractice, Quality, State, sample,
+)
 
 
 BG = "#0b1421"
@@ -30,6 +33,8 @@ NODES = {
 }
 EDGES = ((105, 128, 128, 128), (224, 128, 246, 128), (592, 128, 616, 128), (948, 128, 964, 128))
 TESTERS = ("T1", "T2", "T3", "T4")
+INSPECTION_STATIONS = (*TESTERS, "RT")
+VIEW_SCENARIOS = {**SCENARIOS, **PRACTICE_SCENARIOS}
 LANES = ("LA", "LB", "LC")
 
 
@@ -51,12 +56,14 @@ class OperationView:
         self.root.geometry("1440x840")
         self.root.minsize(1040, 710)
         self.snapshot = sample("missing")
+        self.practice = None
         self.selected = "T1"
         self.configure_styles()
         self.build_header()
         self.build_status()
         self.build_operation()
         self.build_metrics()
+        self.build_tester_page()
         self.show_scenario("missing")
 
     def configure_styles(self):
@@ -86,7 +93,7 @@ class OperationView:
         scenario_row = tk.Frame(chooser, bg=BG)
         scenario_row.pack(anchor="e")
         label(scenario_row, "시나리오", color=MUTED).pack(side="left", padx=(0, 9))
-        self.scenario_input = ttk.Combobox(scenario_row, values=tuple(SCENARIOS.values()), state="readonly",
+        self.scenario_input = ttk.Combobox(scenario_row, values=tuple(VIEW_SCENARIOS.values()), state="readonly",
                                            width=22, style="Hmi.TCombobox")
         self.scenario_input.pack(side="left")
         self.scenario_input.bind("<<ComboboxSelected>>", self.on_scenario)
@@ -110,6 +117,7 @@ class OperationView:
     def build_operation(self):
         row = tk.Frame(self.root, bg=BG)
         row.pack(fill="both", expand=True, padx=22)
+        self.operation_row = row
         row.columnconfigure(0, weight=1)
         row.rowconfigure(0, weight=1)
         process = card(row)
@@ -127,10 +135,12 @@ class OperationView:
         control_row = tk.Frame(side, bg=PANEL)
         control_row.pack(fill="x", padx=12, pady=(0, 8))
         for action in CONTROL_ACTIONS:
-            button = ttk.Button(control_row, text=action, width=7, style="Locked.TButton", state="disabled")
+            button = ttk.Button(control_row, text=action, width=7, style="Locked.TButton", state="disabled",
+                                command=lambda selected=action: self.on_control(selected))
             button.pack(side="left", padx=2)
             self.control_buttons[action] = button
-        label(side, CONTROL_REASON, size=9, color=AMBER).pack(fill="x", padx=14)
+        self.control_status = label(side, size=9, color=AMBER, wraplength=230)
+        self.control_status.pack(fill="x", padx=14)
         label(side, "비상정지 관측: 미수집", color=MUTED).pack(fill="x", padx=14, pady=(3, 8))
         tk.Frame(side, bg=BORDER, height=1).pack(fill="x", padx=14, pady=(0, 8))
         label(side, "선택 공정", size=12, bold=True).pack(fill="x", padx=14)
@@ -142,9 +152,12 @@ class OperationView:
         self.station_state.pack(fill="x", padx=14)
         self.station_detail = label(side, size=9, color=MUTED, wraplength=230)
         self.station_detail.pack(fill="x", padx=14, pady=(4, 9))
+        self.tester_button = ttk.Button(side, text="검사기 상세 열기", command=self.show_tester_page)
+        self.tester_button.pack(fill="x", padx=14, pady=(0, 10))
 
     def build_metrics(self):
         metrics = card(self.root)
+        self.metrics = metrics
         metrics.pack(fill="x", padx=22, pady=(12, 16))
         self.metric_fields = []
         for i, (title, unit) in enumerate(METRICS):
@@ -158,17 +171,51 @@ class OperationView:
         self.handoff_label = label(metrics, color=MUTED, size=9)
         self.handoff_label.grid(row=1, column=0, columnspan=5, sticky="ew", padx=12, pady=(1, 9))
 
+    def build_tester_page(self):
+        self.tester_page = card(self.root)
+        nav = tk.Frame(self.tester_page, bg=PANEL)
+        nav.pack(fill="x", padx=16, pady=12)
+        ttk.Button(nav, text="← 메인 운전", command=self.show_operation_page).pack(side="left", padx=(0, 10))
+        for code in INSPECTION_STATIONS:
+            ttk.Button(nav, text=code, command=lambda selected=code: self.select_station(selected)).pack(side="left", padx=2)
+        self.tester_title = label(self.tester_page, size=21, bold=True)
+        self.tester_title.pack(fill="x", padx=16, pady=(6, 4))
+        self.tester_state = label(self.tester_page, size=14, bold=True)
+        self.tester_state.pack(fill="x", padx=16, pady=(0, 6))
+        self.tester_note = label(self.tester_page, color=MUTED)
+        self.tester_note.pack(fill="x", padx=16, pady=(0, 8))
+        label(self.tester_page, "Cell ID —    OCV — V    IR — mΩ    판정 미수집", color=MUTED).pack(fill="x", padx=16)
+
+    def show_tester_page(self):
+        if self.selected in INSPECTION_STATIONS:
+            self.operation_row.pack_forget()
+            self.tester_page.pack(fill="both", expand=True, padx=22, before=self.metrics)
+
+    def show_operation_page(self):
+        self.tester_page.pack_forget()
+        self.operation_row.pack(fill="both", expand=True, padx=22, before=self.metrics)
+
     def on_scenario(self, _event):
         index = self.scenario_input.current()
         if index >= 0:
-            self.show_scenario(tuple(SCENARIOS)[index])
+            self.show_scenario(tuple(VIEW_SCENARIOS)[index])
 
     def on_station(self, _event):
         self.select_station(self.station_input.get().removeprefix("2A-"))
 
     def show_scenario(self, key):
-        self.snapshot = sample(key)
-        self.scenario_input.set(SCENARIOS[key])
+        self.practice = OperationPractice(key) if key in PRACTICE_SCENARIOS else None
+        self.snapshot = self.practice.snapshot() if self.practice else sample(key)
+        self.scenario_input.set(VIEW_SCENARIOS[key])
+        self.render(select_fault=True)
+
+    def on_control(self, action):
+        if self.practice:
+            self.practice.command(action)
+            self.snapshot = self.practice.snapshot()
+            self.render()
+
+    def render(self, select_fault=False):
         view = self.snapshot
         self.status_fields["line"].configure(text=view.display_state(), fg=self.state_color())
         self.status_fields["quality"].configure(text=view.quality.value, fg=QUALITY_COLORS[view.quality])
@@ -183,7 +230,18 @@ class OperationView:
             value = view.display_count(i)
             field.configure(text=value if value != "—" else f"— {unavailable}", fg=TEXT if value != "—" else MUTED)
         self.handoff_label.configure(text=f"인계 · {view.handoff or unavailable}    /    이력 DB·API · 미연동")
-        self.select_station(view.fault_station or self.selected)
+        for button in self.control_buttons.values():
+            button.configure(state="normal" if self.practice else "disabled")
+        status = CONTROL_REASON
+        if self.practice:
+            hold = "LOT 보류" if self.practice.lot_hold else "LOT 보류 없음"
+            status = f"로컬 조작 연습 · {hold}"
+            result = self.practice.result
+            if result:
+                outcome = "확인" if result.applied else "거절"
+                status += f"\n{result.action} 요청 · {outcome}\n{result.reason}"
+        self.control_status.configure(text=status)
+        self.select_station((view.fault_station if select_fault else None) or self.selected)
 
     def state_color(self, station=None):
         if self.snapshot.quality is not Quality.GOOD:
@@ -203,7 +261,15 @@ class OperationView:
         if view.fault_station == code:
             detail.append(view.fault_detail)
         self.station_detail.configure(text="\n".join(detail))
+        self.tester_button.configure(state="normal" if code in INSPECTION_STATIONS else "disabled")
+        self.tester_title.configure(text=f"2A-{code} · {STATIONS[code]}")
+        self.tester_state.configure(text=view.display_state(code), fg=self.state_color(code))
+        self.tester_note.configure(text="\n".join(detail))
         self.draw_map()
+
+    def on_map_station(self, code):
+        self.select_station(code)
+        self.show_tester_page()
 
     def draw_map(self):
         canvas = self.map
@@ -252,7 +318,7 @@ class OperationView:
                                font=("Segoe UI", max(8, round(13 * scale)), "bold"), tags=(tag,))
             canvas.create_text(*scaled((x, y + 9)), text=self.snapshot.display_state(code), fill=accent,
                                font=("Malgun Gothic", max(7, round(10 * scale))), tags=(tag,))
-            canvas.tag_bind(tag, "<Button-1>", lambda _, station=code: self.select_station(station))
+            canvas.tag_bind(tag, "<Button-1>", lambda _, station=code: self.on_map_station(station))
 
 
 def main():
