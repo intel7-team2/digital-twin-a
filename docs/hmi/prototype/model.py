@@ -1,4 +1,4 @@
-"""Read-only projection from offline bridge fixtures to the operation screen."""
+"""Projection from offline bridge fixtures and an isolated operator practice model."""
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -38,6 +38,10 @@ SCENARIOS = {
 }
 CONTROL_ACTIONS = ("START", "STOP", "RESET")
 CONTROL_REASON = "브리지 명령 미연동 · 테스트 입력 전용"
+PRACTICE_SCENARIOS = {
+    "practice": "조작 연습 · 정상 대기",
+    "practice_hold": "조작 연습 · LOT 보류 및 T3 이상",
+}
 
 
 @dataclass(frozen=True)
@@ -140,3 +144,63 @@ def sample_observation(key, now):
 def sample(key, now=None):
     now = now or datetime.now(KST)
     return project_observation(key, sample_observation(key, now), now)
+
+
+@dataclass(frozen=True)
+class PracticeResult:
+    action: str
+    applied: bool
+    reason: str
+
+
+class OperationPractice:
+    """In-memory command loop for touch practice. No transport or live addresses."""
+
+    def __init__(self, scenario):
+        if scenario not in PRACTICE_SCENARIOS:
+            raise ValueError(f"Unknown practice scenario: {scenario}")
+        self.scenario = scenario
+        self.lot_hold = scenario == "practice_hold"
+        self.fault = self.lot_hold
+        self.running = False
+        self.engaged = False
+        self.result = None
+
+    def command(self, action):
+        if action not in CONTROL_ACTIONS:
+            raise ValueError(f"Unknown control action: {action}")
+        if action == "START" and (self.lot_hold or self.fault):
+            result = PracticeResult(action, False, "LOT 보류" if self.lot_hold else "T3 설비 이상")
+        elif action == "START":
+            result = PracticeResult(action, True, "이미 운전 중" if self.running else "운전 시작 확인")
+            self.running = self.engaged = True
+        elif action == "STOP":
+            result = PracticeResult(action, True, "정지 확인")
+            self.running = False
+            self.engaged = True
+        elif self.running:
+            result = PracticeResult(action, False, "운전 중 · 먼저 정지하세요")
+        else:
+            self.fault = False
+            self.engaged = True
+            result = PracticeResult(action, True, "설비 이상 리셋 · LOT 보류 유지" if self.lot_hold else "리셋 확인")
+        self.result = result
+        return result
+
+    def snapshot(self, now=None):
+        now = now or datetime.now(KST)
+        if self.running:
+            state = State.BUSY
+            stations = sample_observation("running", now).stations
+        else:
+            station_state = State.STOPPED if self.engaged or self.fault else State.IDLE
+            stations = dict.fromkeys(STATIONS, station_state)
+            state = State.FAULT if self.fault else station_state
+            if self.fault:
+                stations["T3"] = State.FAULT
+        # Practice changes operation state only. No cells or kits are generated.
+        observation = BridgeObservation(
+            True, now, "TRAINING-2A", state, stations, (0, 0, 0, 0, int(self.fault)), "인계 요청 없음",
+            "T3" if self.fault else None, "연습용 계측 이상" if self.fault else None,
+        )
+        return project_observation(self.scenario, observation, now)

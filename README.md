@@ -28,6 +28,9 @@ docs/                 방향·결정 문서, 계획서
   plan_v0.x.hwp       계획서 (가장 높은 번호가 최신, v0.17부터 hwp만)
   design-notes.md     계획서에서 뺀 상세 규칙 (구현 참고용)
   interface.md        PLC 디바이스 배정, Python 브리지 신호 규약 (초안)
+  open-decisions.md   사람이 정해 줘야 하는 것 + 제안, 일정 제안
+  abnormal-cases.md   비정상 상황 시험 8건 (재현·기대 동작·복구)
+  analysis/           PLC 없이 돌리는 분석 (세트 편차 비교 시뮬 등)
   assets/cellect-*    팀 로고 (워드마크, 흰색 워드마크, 프사용 512px)
   assets/hwp/         계획서 그림 (html 원본과 png)
   tools/hwp/          계획서 hwp 생성 도구
