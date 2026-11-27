@@ -1,6 +1,8 @@
-"""Figures for the mid-progress report (docs/report): system structure, process v2 flow, Factory I/O scene screenshot.
+"""Figures for the mid-progress report (docs/report): system structure, process v2 flow, Factory I/O scene screenshot,
+kit deviation comparison (from docs/analysis/kit-deviation/sim.py).
 
-Usage: python make_report_figures.py <out dir> <scene screenshot (webp/png)>  (needs Pillow, Windows Malgun Gothic)
+Usage: python make_report_figures.py <out dir> [scene screenshot (webp/png)]  (needs Pillow, Windows Malgun Gothic)
+Without the screenshot the existing scene.png in <out dir> is kept.
 """
 import sys
 from pathlib import Path
@@ -8,7 +10,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 OUT = Path(sys.argv[1])
-SCENE = Path(sys.argv[2])
+SCENE = Path(sys.argv[2]) if len(sys.argv) > 2 else None
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "analysis" / "kit-deviation"))
 OUT.mkdir(parents=True, exist_ok=True)
 F = "C:/Windows/Fonts/malgun.ttf"
 FB = "C:/Windows/Fonts/malgunbd.ttf"
@@ -111,11 +114,57 @@ def process():
 
 
 def scene():
+    if SCENE is None:
+        return
     im = Image.open(SCENE).convert("RGB")
     im.save(OUT / "scene.png")
+
+
+def deviation():
+    """Mean in-kit voltage range, in-order vs A/B/C-binned, for the four scenarios the report talks about."""
+    import sim
+    keep = {"기준 가정": "지금 경계값 (3650/3750)", "LOT 안 편차 작음 (sd 20)": "셀이 고를 때 (sd 20)",
+            "LOT 안 편차 큼 (sd 60)": "셀 편차 클 때 (sd 60)"}
+    rows = []
+    for sc in sim.scenarios():
+        name = keep.get(sc.name)
+        if name is None and sc.name.startswith("경계 1/3씩"):
+            name = "경계 1/3씩 " + sc.name[sc.name.index("("):]
+        if name:
+            rows.append((name, sim.summarize(sc)))
+    order = ["지금", "경계 1/3씩", "셀이 고를", "셀 편차 클"]
+    rows.sort(key=lambda r: next(i for i, k in enumerate(order) if r[0].startswith(k)))
+
+    W, left, top, bar, gap = 1800, 520, 150, 46, 60
+    H = top + len(rows) * (2 * bar + gap) + 90
+    im = Image.new("RGB", (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    d.text((40, 36), "세트 안 전압 편차 (최대 - 최소) 평균", font=font(40, True), fill=NAVY)
+    for i, (txt, col) in enumerate((("순서대로 4개", LINE), ("구간별 4개", GREEN))):
+        x = W - 560 + i * 280
+        d.rectangle([x, 50, x + 32, 82], fill=col)
+        d.text((x + 44, 48), txt, font=font(28), fill=INK)
+    scale = (W - left - 300) / max(r["order_mv"] for _, r in rows)
+    y = top
+    for name, r in rows:
+        tw = d.textlength(name, font=font(30, True))
+        d.text((left - 30 - tw, y + bar - 18), name, font=font(30, True), fill=INK)
+        for k, (key, col) in enumerate((("order_mv", LINE), ("bin_mv", GREEN))):
+            yy = y + k * bar
+            bw = r[key] * scale
+            d.rectangle([left, yy + 4, left + bw, yy + bar - 4], fill=col)
+            d.text((left + bw + 14, yy + 4), f"{r[key]:.0f} mV", font=font(28), fill=INK)
+        red = f"-{r['reduction']:.0f}%"
+        col = GREEN if r["reduction"] >= 50 else AMBER
+        d.text((W - 40 - d.textlength(red, font=font(40, True)), y + bar - 24), red, font=font(40, True), fill=col)
+        y += 2 * bar + gap
+    d.text((left, H - 70), "가정 분포 (실측 아님), 100셀 회차 300번 평균. 목표 50% 이상은 초록, 미달은 주황",
+           font=font(26), fill=MUTED)
+    im.save(OUT / "deviation.png")
 
 
 system()
 process()
 scene()
+deviation()
 print("ok", sorted(p.name for p in OUT.iterdir()))

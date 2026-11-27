@@ -194,6 +194,14 @@ public class BuildReport {
         for (int i : idx) s.deleteParagraph(indexOf(s, P[i]));
     }
 
+    /** Insert a copy of ref right after it with new text (same paragraph and character style). */
+    static Paragraph after(Section s, Paragraph ref, String text) throws Exception {
+        Paragraph p = ref.clone();
+        s.insertParagraph(indexOf(s, ref) + 1, p);
+        set(p, text);
+        return p;
+    }
+
     static void deleteRange(Section s, Paragraph[] P, int from, int to) {
         for (int i = from; i <= to; i++) delete(s, P, i);
     }
@@ -280,7 +288,7 @@ public class BuildReport {
         fill(coverPara, new String[][]{
             {"교과목명", "공정설비 디지털트윈 모델링"},
             {"지도교수", "김 유 성"},
-            {"기    간", "2026. 11. 17 ~ (진행 중)"},
+            {"기    간", "2026. 11. 17 ~ 12. 8 무렵"},
             {"발표일시", "2026년 12월 2일"},
             {"팀  구분", "Cellect (2A)"},
             {"팀    장", "최예현"},
@@ -394,11 +402,11 @@ public class BuildReport {
         String[][] tasks = {
             {"주제 선정 및\n역할 분담", "실시 계획서 작성\n(v0.14 ~ v0.18)", "공정 v2 재설계\n(11/23 미팅)"},
             {"Factory I/O 씬\nv2 배치·센서·태그", "PLC 래더\n(GX Works2)", "DB·API·수집기,\nSCADA·HMI 설계"},
-            {"통합 시험\n(전체 연결)", "비정상 상황\n8건 시험", "중간보고서 작성 및\n발표 자료 제작, 발표"}};
+            {"통합 시험\n(전체 연결)", "편차 비교 시뮬,\n비정상 8건 시험표", "중간보고서 작성 및\n발표 자료 제작, 발표"}};
         int[][][] bars = {
             {{0, 0}, {0, 0}, {3, 3}},
             {{1, 6}, {1, 6}, {2, 5}},
-            {{5, 6}, {6, 6}, {4, 7}}};
+            {{5, 7}, {5, 5}, {4, 7}}};
         String[] status = {"종\n\n\n\n료", "진\n\n\n\n행", "예\n\n\n\n정"};
         for (int ph = 0; ph < 3; ph++) {
             int base = 4 + ph * 4;
@@ -467,10 +475,28 @@ public class BuildReport {
             + "오프라인 시제품까지, PLC 연결·조작은 아직 없음\n"
             + "[그림 필요: HMI 와이어프레임]", LH);
 
+        set(S2[35], "세트 편차 비교 · 비정상 시험 (11/27)");
+        set(S2[36], "세트 편차 비교 (시뮬레이션, 가정 분포, 회차 300번 평균)");
+        figure(S2[37], "deviation.png", 46000);
+        set(S2[38], "시뮬레이션에서 읽은 것");
+        box(S2[39],
+            "가정: LOT 3개 (평균 3640/3680/3720 mV, LOT 안 표준편차 40 mV), 규격 이탈 5%, 100셀. 실측값 아님\n"
+            + "구간별로 모으면 모든 조건에서 세트 편차 감소. 세트 수는 회차당 1개 안팎 적음 (끝에 레인에 남는 셀)\n"
+            + "지금 경계값 (A ≥ 3750, B ≥ 3650 mV): 87 → 49 mV, 43% 감소로 목표(50%) 미달. C 구간 150 mV, A 구간 50 mV로 폭이 고르지 않음\n"
+            + "합격 셀이 1/3씩 나뉘게 경계를 잡으면 (3656/3703) 87 → 42 mV, 52% 감소 → 실측 분포로 경계 재설정\n"
+            + "셀이 원래 고르면 (LOT 안 표준편차 20 mV) 25%에 그침 → 감소율과 함께 세트 편차 절댓값 목표 검토", LH);
+        set(S2[41], "비정상 상황 시험표 (8건, 재현·기대 동작·알람·복구)");
+        box(S2[42],
+            "대상: 센서 OFF 고착 · 센서 ON 고착 · 잼 · 비상정지 · 레인 만재 · LOT NG 3건 · 2B 미준비 · 통신 단절\n"
+            + "line_v0 래더와 대조: 비상정지, 통신 단절(1초 넘으면 출력 OFF), 센서 OFF 고착(분류 구간 20초 감시)은 있음\n"
+            + "없음: 센서 ON 고착 감시, 2B 준비·수신 확인 신호. 잼은 카운트만 하고 계속 운전\n"
+            + "조작반 Reset이 LOT 보류·NG 횟수까지 지움 → 설계(리셋으로 보류 이력을 지우지 않음)와 충돌, 이상 리셋과 보류 해제를 나눔\n"
+            + "통과 기준: 기대 동작·알람·복구 일치, 셀 유실과 NG·보류 셀 공급 유출 0", LH);
+
         // MANUX-only results in section 2 (pictures and demo references)
         delete(s2, S2, 7, 8, 9, 10, 11, 12);
         deleteRange(s2, S2, 18, 22);
-        deleteRange(s2, S2, 28, 42);
+        deleteRange(s2, S2, 28, 34);
 
         set(S2[45], "미비점 식별 및 검토 결과");
         set(S2[46], "실제 데이터 연결 전 단계");
@@ -480,6 +506,8 @@ public class BuildReport {
         set(S2[50], "결정과 확인이 필요한 것");
         set(S2[51], "데이터 쪽이 못 따라올 때 라인을 멈출지(누락 0) 계속 돌릴지(누락 감지만) 결정 필요, 멈추려면 래더 변경");
         set(S2[52], "v2 배치 위험 3건 반영 여부, 셀 전압 실측, 실습실 네트워크에서 서버 접속(SSH·Tailscale) " + GAP);
+        Paragraph more = after(s2, S2[52], "지금 경계값으로는 편차 감소 43%로 목표 미달, 판정 기준도 래더(3500~3800 mV, IR ≤ 60)와 SCADA 시뮬(3.55~3.92 V, IR 14~32)이 다름 → 실측 분포로 경계 재설정, 기준 하나로 통일");
+        after(s2, more, "래더에 2B 준비·수신 확인 신호와 센서 ON 고착 감시가 없고, Reset이 LOT 보류를 지움 → 12/4까지 래더 반영, v2 씬 진행 여부도 12/4에 결정");
 
         set(S2[55], "중간 총평 (초안)");
         set(S2[56], "11/23 공정을 v2로 다시 짜면서, 배치가 바뀌어도 DB·SCADA·HMI가 흔들리지 않도록 스테이션 코드와 이벤트를 먼저 맞췄다.");
