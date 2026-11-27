@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>역할① I/O 표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 작업대 옆에 붙여두는 참고표. 조용하고 또렷하게.
+   IDEA: 제어반 문 안쪽에 붙은 단자 배치표.
+   PICTURE: 측정기 4대 매트릭스(입력·출력·내부·기록)가 첫 화면의 중심.
+   COLOUR and TYPE: 흑백 + 민트 한 가지. Space Grotesk 주소, Noto Sans KR 본문.
+   LAYOUT: 상단 검색 + 구역 탭, 그 아래 구역별 표. 좁은 창(옆에 띄움) 기준. */
+:root{color-scheme:light dark;
+ --bg:light-dark(#ffffff,#0e0f0f);--ink:light-dark(#111,#eef1ef);--mute:light-dark(#5b605d,#9aa19d);
+ --line:light-dark(#e3e6e4,#272a29);--mint:light-dark(#b8f5d0,#1f4a35);--mintink:light-dark(#0b3d24,#b8f5d0);
+ --soft:light-dark(#f4f6f5,#171918);--warn:light-dark(#fff1cc,#3d3214);--warnink:light-dark(#6b4c00,#ffd77a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Noto Sans KR",Inter,system-ui,sans-serif;overflow-x:clip}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:14px max(3vw,14px) 10px}
+h1{font:700 22px/1.1 "Space Grotesk","Noto Sans KR",sans-serif;margin:0 0 2px}
+.sub{color:var(--mute);font-size:13px;margin:0 0 10px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=search]{flex:1 1 220px;font:16px "Noto Sans KR",sans-serif;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);min-height:44px}
+input:focus-visible,a:focus-visible{outline:2px solid var(--mintink);outline-offset:2px}
+nav{display:flex;gap:6px;overflow-x:auto;padding-top:8px}
+nav a{flex:none;text-decoration:none;color:var(--ink);font-size:13px;padding:6px 10px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+nav a:hover{background:var(--mint);color:var(--mintink)}
+main{padding:6px max(3vw,14px) 48px;max-width:1240px}
+section{margin-top:22px}
+h2{font:700 17px/1.2 "Space Grotesk","Noto Sans KR",sans-serif;margin:0 0 8px;display:flex;gap:8px;align-items:baseline}
+h2 small{font:400 12px "Noto Sans KR";color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;font-size:12px;color:var(--mute);border-bottom:1px solid var(--line);padding:6px 8px}
+td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:top}
+td.a{font:600 14px "Space Grotesk",Inter,sans-serif;white-space:nowrap;width:7.5em}
+td.n{color:var(--mute);font-size:13px}
+tr.off td{color:var(--mute)}tr.off td.a{text-decoration:line-through;text-decoration-color:var(--line)}
+tr.hit td{background:var(--mint);color:var(--mintink)}
+.matrix{background:var(--mint);color:var(--mintink);border-radius:12px;padding:14px}
+.matrix table{font-size:14px}.matrix th{color:var(--mintink);opacity:.75;border-color:rgba(0,0,0,.12)}
+.matrix td{border-color:rgba(0,0,0,.12)}.matrix td.a{white-space:normal;width:auto;font-weight:500;font-family:"Noto Sans KR"}
+.matrix td.m{font:600 14px "Space Grotesk",sans-serif;white-space:nowrap}
+.note{background:var(--soft);border-left:3px solid var(--mintink);padding:10px 12px;border-radius:6px;font-size:13.5px;margin-top:10px}
+.note b{font-weight:600}
+.warn{background:var(--warn);color:var(--warnink);border-left-color:var(--warnink)}
+.code{font:13px/1.6 ui-monospace,Consolas,monospace;white-space:pre;overflow-x:auto;background:var(--soft);padding:10px 12px;border-radius:8px;margin-top:8px}
+.scroll{overflow-x:auto}
+.empty{display:none;color:var(--mute);padding:20px 0}
+html{scroll-padding-top:150px}
+@media(max-width:600px){table{font-size:13px}.matrix{padding:10px}}
+</style>
+</head>
+<body>
+<header>
+ <h1>역할① I/O 표</h1>
+ <p class="sub">투입 · 1차 검사 · 측정기 4대 · 2026-11-27 기준 · X/Y는 16진수 (X1009 다음은 X100A)</p>
+ <div class="tools"><input id="q" type="search" placeholder="주소나 이름 검색 (예: Y1046, 저항, 분기2)" aria-label="검색"></div>
+ <nav id="nav"></nav>
+</header>
+<main id="main"></main>
+<p class="empty" id="empty">검색 결과가 없어요.</p>
+<script>
+{
+const S=[
+ {id:'panel',t:'조작반',s:'공통, ①이 관리',rows:[
+  ['X10E0','Start 버튼','누르는 동안 ON'],['X10E1','Stop 버튼','NC, 래더는 b접점'],['X10E2','Reset 버튼','정지 + 비트·기록 지우기 + 측정기 Reset'],['X10E3','비상정지','NC, 래더는 b접점'],
+  ['Y10E0','Start 램프',''],['Y10E1','Stop 램프',''],['Y10E2','Reset 램프',''],['Y10E3','경광등 초록','운전'],['Y10E4','경광등 노랑','대기·주의'],['Y10E5','경광등 빨강','이상']]},
+ {id:'input',t:'투입 · 비전',s:'X/Y 1000~',rows:[
+  ['X1000','투입 센서','투입 벨트에 셀 있음'],['X1001','비전 도착 센서','ID 부여 예정'],['Y1000','Emitter','측정기 4대 중 하나라도 비면 ON'],['Y1003','외관NG Remover','메인 벨트 끝'],['D2000','비전 값','파랑 1, 초록 4, 금속 7, 없음 0']]},
+ {id:'belt',t:'컨베이어',s:'Y1010~Y101C',rows:[
+  ['Y1010','메인벨트 0','6m'],['Y1011','메인벨트 1','6m'],['Y1012','메인벨트 2','6m'],['Y1013','메인벨트 3','6m'],['Y1014','메인벨트 4','6m'],
+  ['Y1015','분기벨트 1','2m → 측정기1'],['Y1016','분기벨트 2','2m → 측정기2'],['Y1017','분기벨트 3','2m → 측정기3'],['Y1018','분기벨트 4','2m → 측정기4'],
+  ['Y1019','출구벨트 1','4m, 측정기1 → ②'],['Y101A','출구벨트 2','4m'],['Y101B','출구벨트 3','4m'],['Y101C','출구벨트 4','4m']]},
+ {id:'div',t:'분배 (Pivot Arm)',s:'X/Y 1020~',matrix:{head:['','분기1','분기2','분기3','분기4'],rows:[
+  ['센서',['X1021','X1024','X1027','X102A']],['팔 Turn',['Y1022','Y1023','Y1024','Y1025']],['팔 Belt(+)',['Y1026','Y1027','Y1028','Y1029']],
+  ['팔돌림 M',['M2101','M2111','M2121','M2131']],['센서통과 M (예비)',['M2102','M2112','M2122','M2132']],['팔 유지 타이머',['T201','T202','T203','T204']]]},
+  note:'<b>동작</b> 센서 ON + 측정기 비어 있음 → SET 팔돌림 → 사용 중 SET + 타이머(K15) → 끝나면 RST 팔돌림. 미사용: X1020·22·23·25·26·28·29·2B·2C, Y1020·21, Belt(−)'},
+ {id:'mc',t:'측정기 4대',s:'머시닝 센터 0~3 = 측정기 1~4',matrix:{head:['','측정기1','측정기2','측정기3','측정기4'],rows:[
+  ['Is Busy (가공 중)',['X1042','X1052','X1062','X1072']],['Has Error',['X1043','X1053','X1063','X1073']],
+  ['Start',['Y1042','Y1052','Y1062','Y1072']],['Stop',['Y1043','Y1053','Y1063','Y1073']],['Reset (에러 풀기)',['Y1044','Y1054','Y1064','Y1074']],
+  ['Lids (ON 뚜껑 = 재측정)',['Y1046','Y1056','Y1066','Y1076']],['사용 중',['M2400','M2410','M2420','M2430']],['측정 완료',['M2402','M2412','M2422','M2432']],['재측정 대상',['M2407','M2417','M2427','M2437']]]},
+  note:'<b>공통</b> M2440 측정기 Start (Start 버튼 SET), M2441 측정기 Stop (Stop·비상정지 SET). 서로 RST하는 인터록.<br><b>사용 중</b> 팔 돌릴 때 SET → Is Busy ↓ 때 RST. <b>재측정 대상</b> 팔 돌릴 때 정함 → Is Busy ↓ 때 RST. <b>Lids</b> M24n7 → (Y10n6)'},
+ {id:'rec',t:'측정기 기록 (D)',s:'측정기 n = D2400 + 10×(n−1)',matrix:{head:['','측정기1','측정기2','측정기3','측정기4'],rows:[
+  ['+0 셀 ID (예정)',['D2400','D2410','D2420','D2430']],['+1 LOT (예정)',['D2401','D2411','D2421','D2431']],['+2 전압 (349~381)',['D2402','D2412','D2422','D2432']],
+  ['+3 저항 (mΩ, 0 = 재측정)',['D2403','D2413','D2423','D2433']],['+4 전압 × 저항',['D2404','D2414','D2424','D2434']],['+5 등급 코드',['D2405','D2415','D2425','D2435']]]},
+  note:'<b>등급 코드</b> 1 A · 2 B · 3 C · 5 재측정 · 9 NG. 다음 셀이 같은 측정기로 가면 덮어써짐.'},
+ {id:'gen',t:'값 만들기 · 판정',s:'측정기 1 기준, 2~4는 번호만 +10',rows:[
+  ['D2310','전압 스톱워치','매 스캔 +1, 0~32 반복'],['D2311','저항 스톱워치','매 스캔 +1, 0~46 반복'],['D2312','V×R 계산용','32비트, D2313은 상위(안 씀)']],
+  code:'① 팔 돌 때 (M2400 ↑)\n   D2311 < 1 이면 SET M2407        → 재측정 대상 (약 2%), Lids ON\n\n② 측정 시작 (X1042 ↑)\n   전압 D2402 = D2310 + 349        → 349~381\n   저항 D2403 = D2311 + 15         → 15~61\n   M2407 이면 저항 = 0\n   V×R  D2404 = 전압 × 저항        (D2312에서 계산 후 MOV)\n\n   등급 D2405 (범위가 안 겹쳐서 순서 상관없음)\n     V×R < 11000                → 1 (A)\n     11000 ≤ V×R < 16500        → 2 (B)\n     V×R ≥ 16500                → 3 (C)\n   그다음 덮어쓰기 (뒤에 있어서 우선)\n     전압 < 350, 전압 > 380, 저항 > 60  → 9 (NG)\n     저항 = 0                          → 5 (재측정)\n\n③ 측정 끝 (X1042 ↓)\n   RST M2400, RST M2407             → Lids OFF',
+  note:'<b>비율</b> A 29% · B 30% · C 31% · NG 8% · 재측정 2%'},
+ {id:'set',t:'판정 설정값',s:'D2200~, HMI가 씀 (지금은 래더에 K 숫자)',rows:[
+  ['D2200','전압 하한','350 (3.50 V)'],['D2201','전압 상한','380 (3.80 V)'],['D2202','저항 상한','60 mΩ'],['D2203','A / B 경계','11000'],['D2204','B / C 경계','16500'],['D2205','LOT NG 한도','3'],['D2207','외관 NG 비율','5%, 팀 확인 필요']]},
+ {id:'m',t:'기타 M · D',s:'',rows:[
+  ['M2000','운전 중','Start SET, Stop·비상정지·Reset RST'],['M2100','비전 통과',''],['D2100','다음 셀 ID','예정'],['D2101','비전 위치 셀 ID','예정'],['D2102','비전 위치 LOT','D2000 복사'],
+  ['M2900~03','측정기1~4 출구 도착','① → ②, 협의 필요'],['M2910~13','측정기1~4 합류 허가','② → ①, 협의 필요'],['D2700~99','DB 메일박스','비워 둠']]},
+ {id:'reset',t:'Reset 버튼이 지우는 것',s:'X10E2',rows:[
+  ['M2400~','BKRST M2400 K40','측정기 비트'],['M2101~','BKRST M2101 K33','분기 팔 (M2101~M2133)'],['D2400~','FMOV K0 D2400 K40','측정기 기록, Lids도 꺼짐'],['Y1044~','Y1044·54·64·74','측정기 에러 해제']]}
+];
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tbl=r=>`<div class="scroll"><table><thead><tr><th>주소</th><th>이름</th><th>메모</th></tr></thead><tbody>${r.map(x=>`<tr${/미사용/.test(x[1])?' class="off"':''}><td class="a">${esc(x[0])}</td><td>${esc(x[1])}</td><td class="n">${esc(x[2])}</td></tr>`).join('')}</tbody></table></div>`;
+const mtx=m=>`<div class="matrix scroll"><table><thead><tr>${m.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${m.rows.map(r=>`<tr><td class="a">${esc(r[0])}</td>${r[1].map(c=>`<td class="m">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+document.getElementById('nav').innerHTML=S.map(s=>`<a href="#${s.id}">${esc(s.t)}</a>`).join('');
+document.getElementById('main').innerHTML=S.map(s=>`<section id="${s.id}"><h2>${esc(s.t)}${s.s?`<small>${esc(s.s)}</small>`:''}</h2>${s.matrix?mtx(s.matrix):''}${s.rows?tbl(s.rows):''}${s.code?`<div class="code">${esc(s.code)}</div>`:''}${s.note?`<div class="note">${s.note}</div>`:''}</section>`).join('');
+const q=document.getElementById('q'),empty=document.getElementById('empty');
+q.addEventListener('input',()=>{
+ const v=q.value.trim().toLowerCase();let any=false;
+ document.querySelectorAll('section').forEach(sec=>{
+  let shown=0;
+  sec.querySelectorAll('tbody tr').forEach(tr=>{
+   const hit=!v||tr.textContent.toLowerCase().includes(v);
+   tr.style.display=hit?'':'none';tr.classList.toggle('hit',!!v&&hit&&!tr.closest('.matrix'));if(hit)shown++;
+   if(v&&tr.closest('.matrix'))tr.querySelectorAll('td').forEach(td=>td.style.outline=td.textContent.toLowerCase().includes(v)?'2px solid currentColor':'');
+   else tr.querySelectorAll('td').forEach(td=>td.style.outline='');
+  });
+  const title=sec.querySelector('h2').textContent.toLowerCase().includes(v);
+  if(v&&title){sec.querySelectorAll('tbody tr').forEach(tr=>tr.style.display='');shown=1}
+  sec.style.display=shown?'':'none';if(shown)any=true;
+ });
+ empty.style.display=any?'none':'block';
+});
+}
+</script>
+</body>
+</html>
