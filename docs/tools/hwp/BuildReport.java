@@ -9,6 +9,8 @@ import kr.dogfoot.hwplib.object.bodytext.control.gso.ControlRectangle;
 import kr.dogfoot.hwplib.object.bodytext.control.table.Cell;
 import kr.dogfoot.hwplib.object.bodytext.control.table.Row;
 import kr.dogfoot.hwplib.object.bodytext.paragraph.Paragraph;
+import kr.dogfoot.hwplib.object.bodytext.paragraph.text.HWPChar;
+import kr.dogfoot.hwplib.object.bodytext.paragraph.text.HWPCharType;
 import kr.dogfoot.hwplib.object.docinfo.BinData;
 import kr.dogfoot.hwplib.reader.HWPReader;
 import kr.dogfoot.hwplib.writer.HWPWriter;
@@ -43,19 +45,36 @@ public class BuildReport {
 
     // ---------- helpers (as in BuildPlan) ----------
 
+    /**
+     * Replace a paragraph's text. Extended control characters (section/column definition, page control,
+     * tables, pictures...) stay at the front, because each one pairs with an entry in the control list;
+     * dropping the character but not the control gives a file Hangul tolerates and Polaris Office refuses to open.
+     */
     static void set(Paragraph p, String text) throws Exception {
         long cs = p.getCharShape().getPositonShapeIdPairList().get(0).getShapeId();
+        List<HWPChar> keep = new ArrayList<>();
+        boolean hasControls = p.getControlList() != null && !p.getControlList().isEmpty();
+        if (hasControls && p.getText() != null)
+            for (HWPChar c : p.getText().getCharList()) if (c.getType() == HWPCharType.ControlExtend) keep.add(c);
         p.deleteText();
-        if (!text.isEmpty()) {
+        long mask = 0, count = 1;
+        if (!keep.isEmpty() || !text.isEmpty()) {
             p.createText();
-            p.getText().addString(text);
+            for (HWPChar c : keep) {
+                p.getText().getCharList().add(c);
+                mask |= 1L << c.getCode();
+                count += c.getCharSize();
+            }
+            if (!text.isEmpty()) p.getText().addString(text);
+            count += text.length();
         }
         p.deleteCharShape();
         p.createCharShape();
         p.getCharShape().addParaCharShape(0, cs);
         p.deleteLineSeg();
         p.deleteRangeTag();
-        p.getHeader().setCharacterCount(text.length() + 1);
+        p.getHeader().getControlMask().setValue(mask);
+        p.getHeader().setCharacterCount(count);
         p.getHeader().setCharShapeCount(1);
         p.getHeader().setLineAlignCount(0);
         p.getHeader().setRangeTagCount(0);
@@ -66,7 +85,11 @@ public class BuildReport {
         String[] ls = value.split("\n", -1);
         Paragraph proto = pl.getParagraph(0);
         for (int i = 0; i < ls.length; i++) {
-            if (i >= pl.getParagraphCount()) pl.insertParagraph(pl.getParagraphCount(), proto.clone());
+            if (i >= pl.getParagraphCount()) {
+                Paragraph copy = proto.clone();
+                if (copy.getControlList() != null) copy.getControlList().clear();   // a copied line must not duplicate a picture or table
+                pl.insertParagraph(pl.getParagraphCount(), copy);
+            }
             set(pl.getParagraph(i), ls[i]);
         }
         while (pl.getParagraphCount() > ls.length) pl.deleteParagraph(pl.getParagraphCount() - 1);
